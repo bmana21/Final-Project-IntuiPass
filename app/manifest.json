@@ -1,0 +1,18 @@
+{
+    "manifest_version": 3,
+    "name": "IntuiPass - Visual Password Manager",
+    "version": "1.0",
+    "description": "Visual Password Manager - Save and access passwords using visual patterns.",
+    "action": {
+      "default_popup": "popup/popup.html",
+      "default_icon": "assets/main-icon.png"
+    },
+    "permissions": [
+    "storage",
+    "activeTab"
+    ],
+    "icons": {
+      "48": "assets/main-icon.png"
+    }
+  }
+  
