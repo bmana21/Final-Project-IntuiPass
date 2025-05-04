@@ -8,11 +8,33 @@
       "default_icon": "assets/main-icon.png"
     },
     "permissions": [
+    "identity",
     "storage",
     "activeTab"
     ],
     "icons": {
       "48": "assets/main-icon.png"
-    }
+    },
+    "host_permissions": ["https://*.firebaseapp.com/", "https://*.googleapis.com/"],
+    "background": {
+      "service_worker": "services/background.js"
+    },
+    "content_security_policy": {
+      "extension_pages": "default-src 'self'; script-src 'self'; connect-src https://apis.google.com https://www.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://*.firebaseio.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+    },
+    "oauth2": {
+    "client_id": "26624816574-jj05ge314ts7g0fr0f21vqhejbefvgpr.apps.googleusercontent.com",
+      "scopes": [
+        "openid",
+        "email",
+        "profile"
+      ]
+    },
+    "web_accessible_resources": [
+      {
+        "resources": ["firebase/*"],
+        "matches": ["<all_urls>"]
+      }
+    ]  
   }
   
