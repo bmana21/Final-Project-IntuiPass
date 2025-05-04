@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const credential = firebase.auth.GoogleAuthProvider.credential(null, token);
       firebase.auth().signInWithCredential(credential)
         .then((userCredential) => {
+          showUserInfo(userCredential.user);
           console.log("Signed in:", userCredential.user.email);
         })
         .catch((error) => {
