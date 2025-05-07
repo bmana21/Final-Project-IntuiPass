@@ -43,12 +43,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function showUserInfo(user) {
-    signInSection.classList.add("hidden");
-    userInfo.classList.remove("hidden");
+      signInSection.classList.add("hidden");
+      userInfo.classList.remove("hidden");
 
-    userPic.src = user.photoURL || "";
-    userName.textContent = user.displayName || "Unknown";
-    userEmail.textContent = user.email || "";
+      userPic.src = user.photoURL || "";
+      userName.textContent = user.displayName || "Unknown";
+      userEmail.textContent = user.email || "";
   }
 
   function showSignIn() {
@@ -56,9 +56,3 @@ document.addEventListener("DOMContentLoaded", () => {
     signInSection.classList.remove("hidden");
   }
 });
-
-const patterns = getUserPatternDataByUUID("123321");
-console.log(patterns);
-
-const pattern = getUserPatternDataByUUIDAndURL("123321", "google.com");
-console.log(pattern);
