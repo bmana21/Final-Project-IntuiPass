@@ -56,3 +56,9 @@ document.addEventListener("DOMContentLoaded", () => {
     signInSection.classList.remove("hidden");
   }
 });
+
+const patterns = getUserPatternDataByUUID("123321");
+console.log(patterns);
+
+const pattern = getUserPatternDataByUUIDAndURL("123321", "google.com");
+console.log(pattern);
