@@ -20,7 +20,7 @@
       "service_worker": "services/background.js"
     },
     "content_security_policy": {
-      "extension_pages": "default-src 'self'; script-src 'self'; connect-src https://apis.google.com https://www.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://*.firebaseio.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+      "extension_pages": "default-src 'self'; script-src 'self'; connect-src https://apis.google.com https://www.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://*.firebaseio.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://lh3.googleusercontent.com; object-src 'none';"
     },
     "oauth2": {
       "scopes": [
