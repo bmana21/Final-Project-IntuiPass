@@ -1,9 +1,11 @@
 class UserPatternData {
-  constructor(user_uuid, pattern_type, website_url, password_enctrypted) {
+  constructor(user_uuid, pattern_type, website_url, password_enctrypted, salt, randomChars) {
     this.uuid = crypto.randomUUID();
     this.user_uuid = user_uuid;
     this.pattern_type = pattern_type;
     this.website_url = website_url;
+    this.salt = salt;
+    this.randomChars = randomChars;
     this.password_enctrypted = password_enctrypted;
     this.createdAt = new Date().toISOString();
   }
@@ -15,6 +17,8 @@ class UserPatternData {
       pattern_type: this.pattern_type,
       website_url: this.website_url,
       password_enctrypted: this.password_enctrypted,
+      salt: this.salt,
+      randomChars: this.randomChars,
       createdAt: this.createdAt
     };
   }
@@ -27,6 +31,8 @@ class UserPatternData {
       data.pattern_type,
       data.website_url,
       data.password_enctrypted,
+      data.salt,
+      data.randomChars,
       data.createdAt
     );
   }
