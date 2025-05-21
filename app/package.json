@@ -1,0 +1,40 @@
+{
+  "name": "your-extension",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "build:dev": "cross-env NODE_ENV=development vite build --watch",
+    "build:prod": "cross-env NODE_ENV=production tsc && vite build",
+    "copy-assets": "mkdir -p dist/assets && cp -r assets/* dist/assets/",
+    "copy-services": "mkdir -p dist/src/services && cp -r src/services/* dist/src/services",
+    "copy-manifest": "cp manifest.json dist/manifest.json",
+    "copy-firebase": "mkdir -p dist/src/firebase && cp -r src/firebase/* dist/src/firebase",
+    "copy": "npm run copy-assets && npm run copy-services && npm run copy-manifest && npm run copy-firebase"
+  },
+  "dependencies": {
+    "firebase": "^11.8.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.25.0",
+    "@types/chrome": "^0.0.323",
+    "@types/node": "^22.15.3",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.4.1",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.25.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.30.1",
+    "vite": "^6.3.5"
+  }
+}
