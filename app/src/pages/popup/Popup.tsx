@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { addUserPatternData, getUserPatternDataByUUID, getUserPatternDataByUUIDAndURL } from '../../services/firestore-service.ts';
+import { UserPatternData } from '../../models/user-pattern-data.ts';
+import { PatternType } from '../../models/pattern-type.ts';
 
 declare global {
   interface Window {
@@ -16,6 +19,29 @@ const Popup: React.FC = () => {
       }
     });
   }, []);
+
+  const testFirebase = () => {
+    const create = async () => {
+      const sample_data = new UserPatternData('123', PatternType.CONNECT_DOTS, 'google.com', 'abcd123', '000', 'aAbB');
+      await addUserPatternData(sample_data);
+    };
+
+    create();
+
+    const retrieve = async () => {
+      const user_data = await getUserPatternDataByUUID('123');
+      console.log('user data is ', user_data);
+    }
+
+    retrieve();
+
+    const retrieve2 = async () => {
+      const user_data = await getUserPatternDataByUUIDAndURL('123', 'google.com');
+      console.log('user data 2 is ', user_data);
+    }
+
+    retrieve2();
+  }
 
   const handleSignIn = () => {
     chrome.identity.getAuthToken({ interactive: true }, (token) => {
@@ -53,6 +79,7 @@ const Popup: React.FC = () => {
             <p id="user-name">{user.displayName || "Unknown"}</p>
             <p id="user-email">{user.email || ""}</p>
             <button id="sign-out" onClick={handleSignOut}>Sign Out</button>
+            <button onClick={testFirebase}>TEST!</button>
           </div>
         ) : (
           <div id="sign-in-section">
