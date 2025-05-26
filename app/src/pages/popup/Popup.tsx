@@ -22,21 +22,21 @@ const Popup: React.FC = () => {
 
   const testFirebase = () => {
     const create = async () => {
-      const sample_data = new UserPatternData('123', PatternType.CONNECT_DOTS, 'google.com', 'abcd123', '000', 'aAbB');
+      const sample_data = new UserPatternData('LtJxTYcYlVcxHxRcBgJy4RMH4km1', PatternType.CONNECT_DOTS, 'google.com', 'abcd123', '000', 'aAbB');
       await addUserPatternData(sample_data);
     };
 
     create();
 
     const retrieve = async () => {
-      const user_data = await getUserPatternDataByUUID('123');
+      const user_data = await getUserPatternDataByUUID('LtJxTYcYlVcxHxRcBgJy4RMH4km1');
       console.log('user data is ', user_data);
     }
 
     retrieve();
 
     const retrieve2 = async () => {
-      const user_data = await getUserPatternDataByUUIDAndURL('123', 'google.com');
+      const user_data = await getUserPatternDataByUUIDAndURL('LtJxTYcYlVcxHxRcBgJy4RMH4km1', 'google.com');
       console.log('user data 2 is ', user_data);
     }
 

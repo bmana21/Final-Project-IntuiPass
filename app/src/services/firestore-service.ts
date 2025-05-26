@@ -31,8 +31,7 @@ export async function addUserPatternData(userPatternData: UserPatternData): Prom
   } catch (error) {
     console.error("Error adding document: ", error);
   }
-}
-
+} 
 /**
  * Retrieves user patterns by user UUID.
  */

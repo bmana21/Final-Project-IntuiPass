@@ -6,6 +6,5 @@
   ],
   "compilerOptions": {
     "types": ["chrome"],
-    "allowJs": true
   },
 }
