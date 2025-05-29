@@ -1,8 +1,10 @@
-import { firebaseApp } from "./firebase-config";
+import { firebaseApp } from "../firebase/firebase-config.ts";
 import { UserPatternData } from '../models/user-pattern-data.ts';
 
 export class UserPatternService {
+  
   private firestore = firebaseApp.firestore();
+
   /**
    * Adds a UserPatternData document to Firestore.
    */

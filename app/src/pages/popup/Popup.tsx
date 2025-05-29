@@ -3,7 +3,7 @@ import firebase from 'firebase/compat/app';
 import { UserPatternService } from '../../services/firestore-service';
 import { UserPatternData } from '../../models/user-pattern-data';
 import { PatternType } from '../../models/pattern-type';
-import { firebaseApp } from '../../services/firebase-config';
+import { firebaseApp } from '../../firebase/firebase-config';
 
 const Popup: React.FC = () => {
   const [user, setUser] = useState<any>(null);
