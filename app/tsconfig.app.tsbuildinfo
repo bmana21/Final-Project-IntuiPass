@@ -1,1 +1,1 @@
-{"root":["./src/vite-env.d.ts","./src/firebase/firebase-config.ts","./src/models/pattern-type.ts","./src/models/user-pattern-data.ts","./src/pages/popup/Popup.tsx","./src/pages/popup/index.tsx","./src/services/encryption.ts","./src/services/firestore-service.ts"],"version":"5.8.3"}
+{"root":["./src/vite-env.d.ts","./src/firebase/firebase-config.ts","./src/models/pattern-type.ts","./src/models/user-pattern-data.ts","./src/pages/popup/popup.tsx","./src/pages/popup/index.tsx","./src/services/encryption.ts","./src/services/firestore-service.ts"],"version":"5.8.3"}

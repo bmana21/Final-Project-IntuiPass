@@ -19,7 +19,7 @@ const Popup: React.FC = () => {
    const testFirebase = () => {
     const firestore_service = new UserPatternService();
     const create = async () => {
-      const sample_data = new UserPatternData('LtJxTYcYlVcxHxRcBgJy4RMH4km1', PatternType.CONNECT_DOTS, 'google.com', 'abcd123', '000', 'aAbB');
+      const sample_data = new UserPatternData('LtJxTYcYlVcxHxRcBgJy4RMH4km1', PatternType.CONNECT_DOTS, 'google.com', 'abcd123', 'aAbB');
       await firestore_service.addUserPatternData(sample_data);
     };
 
