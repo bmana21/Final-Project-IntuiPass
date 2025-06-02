@@ -30,6 +30,20 @@ export default defineConfig({
           console.log(`Copied ${manifestPath} to ./dist/manifest.json`);
         }
       }
+    },
+    // Custom plugin to copy popup HTML
+    {
+      name: 'copy-popup-html',
+      buildEnd() {
+        const popupHtmlPath = './src/extension/popup.html';
+        if (fs.existsSync(popupHtmlPath)) {
+          if (!fs.existsSync('./dist')) {
+            fs.mkdirSync('./dist', { recursive: true });
+          }
+          fs.copyFileSync(popupHtmlPath, './dist/popup.html');
+          console.log('Copied popup.html to dist/');
+        }
+      }
     }
   ],
   build: {
