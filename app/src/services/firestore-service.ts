@@ -10,7 +10,6 @@ export class UserPatternService {
    */
   async addUserPatternData(userPatternData: UserPatternData): Promise<void> {
     try {
-      console.log("Adding user pattern data:", firebaseApp.auth().currentUser?.uid);
       const docRef = await this.firestore.collection("user_patterns").add(userPatternData.toFirestore());
       console.log("Document written with ID: ", docRef.id);
     } catch (error) {

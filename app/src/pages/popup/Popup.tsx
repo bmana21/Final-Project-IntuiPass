@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import firebase from 'firebase/compat/app';
-import { UserPatternService } from '../../services/firestore-service';
-import { UserPatternData } from '../../models/user-pattern-data';
-import { PatternType } from '../../models/pattern-type';
+// import { UserPatternService } from '../../services/firestore-service';
+import { PasswordFieldManager } from '../../services/password-field-manager';
+// import { UserPatternData } from '../../models/user-pattern-data';
+// import { PatternType } from '../../models/pattern-type';
 import { firebaseApp } from '../../firebase/firebase-config';
 
 const Popup: React.FC = () => {
@@ -17,27 +18,30 @@ const Popup: React.FC = () => {
   }, []);
 
    const testFirebase = () => {
-    const firestore_service = new UserPatternService();
-    const create = async () => {
-      const sample_data = new UserPatternData('LtJxTYcYlVcxHxRcBgJy4RMH4km1', PatternType.CONNECT_DOTS, 'google.com', 'abcd123', '000', 'aAbB');
-      await firestore_service.addUserPatternData(sample_data);
-    };
+    const password_field_manager = new PasswordFieldManager();
+    password_field_manager.fillPassword('test1234');
 
-    create();
+    // const firestore_service = new UserPatternService();
+    // const create = async () => {
+    //   const sample_data = new UserPatternData('LtJxTYcYlVcxHxRcBgJy4RMH4km1', PatternType.CONNECT_DOTS, 'google.com', 'abcd123', '000', 'aAbB');
+    //   await firestore_service.addUserPatternData(sample_data);
+    // };
 
-    const retrieve = async () => {
-      const user_data = await firestore_service.getUserPatternDataByUUID('LtJxTYcYlVcxHxRcBgJy4RMH4km1');
-      console.log('user data is ', user_data);
-    }
+    // create();
 
-    retrieve();
+    // const retrieve = async () => {
+    //   const user_data = await firestore_service.getUserPatternDataByUUID('LtJxTYcYlVcxHxRcBgJy4RMH4km1');
+    //   console.log('user data is ', user_data);
+    // }
 
-    const retrieve2 = async () => {
-      const user_data = await firestore_service.getUserPatternDataByUUIDAndURL('LtJxTYcYlVcxHxRcBgJy4RMH4km1', 'google.com');
-      console.log('user data 2 is ', user_data);
-    }
+    // retrieve();
 
-    retrieve2();
+    // const retrieve2 = async () => {
+    //   const user_data = await firestore_service.getUserPatternDataByUUIDAndURL('LtJxTYcYlVcxHxRcBgJy4RMH4km1', 'google.com');
+    //   console.log('user data 2 is ', user_data);
+    // }
+
+    // retrieve2();
   }
 
   const handleSignIn = () => {
@@ -72,6 +76,7 @@ const Popup: React.FC = () => {
         });
     });
   };
+
 
   const handleSignOut = () => {
     firebaseApp.auth().signOut()
