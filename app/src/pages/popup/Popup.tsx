@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import firebase from 'firebase/compat/app';
-import { UserPatternService } from '../../services/firestore-service';
-import { UserPatternData } from '../../models/user-pattern-data';
-import { PatternType } from '../../models/pattern-type';
-import { firebaseApp } from '../../firebase/firebase-config';
+import { useNavigation } from '../../components/AppRouter';
+import './popup.css';
+
+declare global {
+  interface Window {
+    firebase: any;
+  }
+}
 
 const Popup: React.FC = () => {
   const [user, setUser] = useState<any>(null);
+  const { navigateTo } = useNavigation();
 
   useEffect(() => {
     chrome.runtime.sendMessage({ command: "getAuthStatus" }, (response) => {
@@ -15,31 +19,6 @@ const Popup: React.FC = () => {
       }
     });
   }, []);
-
-   const testFirebase = () => {
-    const firestore_service = new UserPatternService();
-    const create = async () => {
-      const sample_data = new UserPatternData('LtJxTYcYlVcxHxRcBgJy4RMH4km1', PatternType.CONNECT_DOTS, 'google.com', 'abcd123', 'aAbB');
-      await firestore_service.addUserPatternData(sample_data);
-    };
-
-    create();
-
-    const retrieve = async () => {
-      const user_data = await firestore_service.getUserPatternDataByUUID('LtJxTYcYlVcxHxRcBgJy4RMH4km1');
-      console.log('user data is ', user_data);
-    }
-
-    retrieve();
-
-    const retrieve2 = async () => {
-      const user_data = await firestore_service.getUserPatternDataByUUIDAndURL('LtJxTYcYlVcxHxRcBgJy4RMH4km1', 'google.com');
-      console.log('user data 2 is ', user_data);
-    }
-
-    retrieve2();
-  }
-
   const handleSignIn = () => {
     chrome.identity.getAuthToken({ interactive: true }, (token) => {
       if (chrome.runtime.lastError || !token) {
@@ -84,23 +63,77 @@ const Popup: React.FC = () => {
       });
   };
 
+  const handleNavigateToConnectDots = () => {
+    navigateTo('connect_the_dots');
+  };
+
+  const handleNavigateToPatternLock = () => {
+    navigateTo('pattern_lock');
+  };
+
+  const handleNavigateToColorSequence = () => {
+    navigateTo('color_sequence');
+  };
+
   return (
-    <div id="root">
-      <div id="content">
-        {user ? (
-          <div id="user-info">
-            <img id="user-pic" src={user.photoURL || ''} alt="User Picture" />
-            <p id="user-name">{user.displayName || "Unknown"}</p>
-            <p id="user-email">{user.email || ""}</p>
-            <button id="sign-out" onClick={handleSignOut}>Sign Out</button>
-            <button onClick={testFirebase}>TEST!</button>
+    <div id="content">
+      {user ? (
+        <div id="user-info">
+          <img id="user-pic" src={user.photoURL || ''} alt="User Picture" />
+          <p id="user-name">{user.displayName || "Unknown"}</p>
+          <p id="user-email">{user.email || ""}</p>
+          
+          {/* Password Creation Options */}
+          <div className="password-options">
+            <h3>Create Password</h3>
+            <button 
+              className="password-type-button"
+              onClick={handleNavigateToConnectDots}
+            >
+              <span className="button-icon">⚫</span>
+              <div className="button-content">
+                <span className="button-title">Connect The Dots</span>
+                <span className="button-description">Create patterns by connecting dots</span>
+              </div>
+            </button>
+            
+            <button 
+              className="password-type-button"
+              onClick={handleNavigateToPatternLock}
+            >
+              <span className="button-icon">🔒</span>
+              <div className="button-content">
+                <span className="button-title">Pattern Lock</span>
+                <span className="button-description">Draw unlock patterns</span>
+              </div>
+            </button>
+            
+            <button 
+              className="password-type-button"
+              onClick={handleNavigateToColorSequence}
+            >
+              <span className="button-icon">🎨</span>
+              <div className="button-content">
+                <span className="button-title">Color Sequence</span>
+                <span className="button-description">Remember color combinations</span>
+              </div>
+            </button>
           </div>
-        ) : (
-          <div id="sign-in-section">
-            <button id="sign-in" onClick={handleSignIn}>Sign In with Google</button>
+          
+          <button id="sign-out" onClick={handleSignOut}>Sign Out</button>
+        </div>
+      ) : (
+        <div id="sign-in-section">
+          <div className="logo">
+            <h1>🔐 IntuiPass</h1>
           </div>
-        )}
-      </div>
+          <h2>Welcome to IntuiPass</h2>
+          <p>Secure password manager with intuitive password creation</p>
+          <button id="sign-in" onClick={handleSignIn}>
+            <span>🔑</span> Sign In with Google
+          </button>
+        </div>
+      )}
     </div>
   );
 };
