@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import firebase from 'firebase/compat/app';
 import { useNavigation } from '../../components/AppRouter';
 import './popup.css';
-
+import { firebaseApp } from '../../firebase/firebase-config';
 declare global {
   interface Window {
     firebase: any;
