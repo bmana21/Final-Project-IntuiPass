@@ -19,7 +19,6 @@ const Popup: React.FC = () => {
       }
     });
   }, []);
-
   const handleSignIn = () => {
     chrome.identity.getAuthToken({ interactive: true }, (token) => {
       if (chrome.runtime.lastError || !token) {
@@ -28,23 +27,40 @@ const Popup: React.FC = () => {
         return;
       }
 
-      const credential = window.firebase.auth.GoogleAuthProvider.credential(null, token);
-      window.firebase.auth().signInWithCredential(credential)
-        .then((userCredential: any) => {
-          setUser(userCredential.user);
-          console.log("Signed in:", userCredential.user.email);
+      const tokenString = typeof token === 'string' ? token : token.token;
+      
+      if (!tokenString) {
+        console.error("No valid token received");
+        alert("Authentication failed - no token");
+        return;
+      }
+
+      const credential = firebase.auth.GoogleAuthProvider.credential(null, tokenString);
+      firebaseApp.auth().signInWithCredential(credential)
+        .then((userCredential) => {
+          if (userCredential.user) {
+            setUser(userCredential.user);
+            console.log("Signed in:", userCredential.user.email);
+          } else {
+            console.error("Sign in succeeded but no user data received");
+          }
         })
-        .catch((error: any) => {
+        .catch((error) => {
           console.error("Firebase sign-in failed:", error);
-          alert("Firebase sign-in failed");
+          alert("Firebase sign-in failed: " + error.message);
         });
     });
   };
 
   const handleSignOut = () => {
-    window.firebase.auth().signOut().then(() => {
-      setUser(null);
-    });
+    firebaseApp.auth().signOut()
+      .then(() => {
+        setUser(null);
+        console.log("Signed out successfully");
+      })
+      .catch((error) => {
+        console.error("Sign out failed:", error);
+      });
   };
 
   const handleNavigateToConnectDots = () => {
