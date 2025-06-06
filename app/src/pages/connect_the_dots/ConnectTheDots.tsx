@@ -26,12 +26,11 @@ const ConnectTheDots: React.FC = () => {
   const [passwordPattern, setPasswordPattern] = useState<string>('');
 
   useEffect(() => {
-    // Initialize with a 3x3 grid of points
     const initialPoints: Point[] = [];
     const gridSize = 3;
     const spacing = 80;
-    const offsetX = 100;
-    const offsetY = 80;
+    const offsetX = 120;
+    const offsetY = 100;
     
     for (let row = 0; row < gridSize; row++) {
       for (let col = 0; col < gridSize; col++) {
@@ -56,10 +55,8 @@ const ConnectTheDots: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw existing connections
     ctx.strokeStyle = '#4CAF50';
     ctx.lineWidth = 4;
     connections.forEach(connection => {
@@ -74,7 +71,6 @@ const ConnectTheDots: React.FC = () => {
       }
     });
 
-    // Draw current path being drawn
     if (selectedPath.length > 1) {
       ctx.strokeStyle = '#FF9800';
       ctx.lineWidth = 3;
@@ -94,7 +90,6 @@ const ConnectTheDots: React.FC = () => {
       ctx.stroke();
     }
 
-    // Draw line from last selected point to current mouse position
     if (isDrawing && selectedPath.length > 0 && currentMousePos) {
       const lastPoint = points.find(p => p.id === selectedPath[selectedPath.length - 1]);
       if (lastPoint) {
@@ -109,7 +104,6 @@ const ConnectTheDots: React.FC = () => {
       }
     }
 
-    // Draw points
     points.forEach(point => {
       ctx.beginPath();
       ctx.arc(point.x, point.y, 20, 0, 2 * Math.PI);
@@ -125,7 +119,6 @@ const ConnectTheDots: React.FC = () => {
       ctx.lineWidth = 2;
       ctx.stroke();
       
-      // Draw point number
       ctx.fillStyle = 'white';
       ctx.font = 'bold 14px Arial';
       ctx.textAlign = 'center';
@@ -136,7 +129,7 @@ const ConnectTheDots: React.FC = () => {
   const getPointAtPosition = (x: number, y: number): Point | null => {
     return points.find(point => {
       const distance = Math.sqrt((point.x - x) ** 2 + (point.y - y) ** 2);
-      return distance <= 25; // Slightly larger hit area
+      return distance <= 35;
     }) || null;
   };
 
@@ -156,6 +149,9 @@ const ConnectTheDots: React.FC = () => {
     const clickedPoint = getPointAtPosition(coords.x, coords.y);
     
     if (clickedPoint) {
+      setConnections([]);
+      setPasswordPattern('');
+      
       setIsDrawing(true);
       setSelectedPath([clickedPoint.id]);
       setCurrentMousePos(coords);
@@ -171,21 +167,18 @@ const ConnectTheDots: React.FC = () => {
     const hoveredPoint = getPointAtPosition(coords.x, coords.y);
     
     if (hoveredPoint && !selectedPath.includes(hoveredPoint.id)) {
-      // Add the new point to the path
       setSelectedPath(prev => [...prev, hoveredPoint.id]);
     }
   };
 
   const handleMouseUp = () => {
     if (!isDrawing || selectedPath.length < 2) {
-      // Reset if no valid pattern was drawn
       setSelectedPath([]);
       setIsDrawing(false);
       setCurrentMousePos(null);
       return;
     }
 
-    // Convert the path to connections
     const newConnections: Connection[] = [];
     for (let i = 0; i < selectedPath.length - 1; i++) {
       newConnections.push({
@@ -194,20 +187,16 @@ const ConnectTheDots: React.FC = () => {
       });
     }
 
-    // Add to existing connections
-    setConnections(prev => [...prev, ...newConnections]);
+    setConnections(newConnections);
     
-    // Update password pattern
     const patternString = selectedPath.join('-');
-    setPasswordPattern(prev => prev ? prev + ',' + patternString : patternString);
+    setPasswordPattern(patternString);
 
-    // Reset drawing state
     setSelectedPath([]);
     setIsDrawing(false);
     setCurrentMousePos(null);
   };
 
-  // Add mouse leave handler to handle edge cases
   const handleMouseLeave = () => {
     if (isDrawing) {
       handleMouseUp();
@@ -234,11 +223,10 @@ const ConnectTheDots: React.FC = () => {
         pattern: passwordPattern,
         connections: connections,
         createdAt: new Date(),
-        userId: 'current_user_id' // Get from your auth system
+        userId: 'current_user_id'
       };
 
       console.log('Saving password:', passwordData);
-      // TODO: Implement Firestore save
       
       alert('Connect the Dots password saved successfully!');
       
