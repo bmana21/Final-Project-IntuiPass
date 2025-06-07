@@ -1,6 +1,8 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigation } from '../../components/AppRouter';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {useNavigation} from '../../components/AppRouter';
 import './ConnectTheDots.css';
+import {PasswordIntegrationService} from "../../services/password-integration-service.ts";
+import {PatternType} from "../../models/pattern-type.ts";
 
 interface Point {
   x: number;
@@ -225,11 +227,14 @@ const ConnectTheDots: React.FC = () => {
         createdAt: new Date(),
         userId: 'current_user_id'
       };
-
       console.log('Saving password:', passwordData);
-      
-      alert('Connect the Dots password saved successfully!');
-      
+      const passwordIntegrationService = new PasswordIntegrationService();
+      if (await passwordIntegrationService.saveAndFillPassword(passwordPattern, PatternType.CONNECT_DOTS)) {
+        alert('Connect the Dots password saved successfully!');
+      } else {
+        alert('Could not save password!');
+      }
+
     } catch (error) {
       console.error('Error saving password:', error);
       alert('Failed to save password');

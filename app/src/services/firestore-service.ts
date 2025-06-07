@@ -8,12 +8,14 @@ export class UserPatternService {
   /**
    * Adds a UserPatternData document to Firestore.
    */
-  async addUserPatternData(userPatternData: UserPatternData): Promise<void> {
+  async addUserPatternData(userPatternData: UserPatternData): Promise<boolean> {
     try {
       const docRef = await this.firestore.collection("user_patterns").add(userPatternData.toFirestore());
       console.log("Document written with ID: ", docRef.id);
+      return true;
     } catch (error) {
       console.error("Error adding document: ", error);
+      return false;
     }
   }
 

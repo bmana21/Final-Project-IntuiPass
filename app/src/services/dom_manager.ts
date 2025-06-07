@@ -1,4 +1,4 @@
-export class PasswordFieldManager {
+export class DomManager {
   private currentTabId: number | null = null;
 
   constructor() {
@@ -142,5 +142,19 @@ export class PasswordFieldManager {
       console.error('Error refreshing detection:', error);
       return [];
     }
+  }
+
+  async getWebsiteURL(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ type: "GET_CURRENT_TAB_URL" }, (response) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError.message);
+        } else if (response?.hostname) {
+          resolve(response.hostname);
+        } else {
+          reject(response?.error || "Unknown error");
+        }
+      });
+    });
   }
 }

@@ -19,8 +19,8 @@ class BackgroundService {
   }
 
   private handleMessage(
-    message: any, 
-    sender: chrome.runtime.MessageSender, 
+    message: any,
+    sender: chrome.runtime.MessageSender,
     sendResponse: (response?: any) => void
   ): boolean {
     const tabId = sender.tab?.id;
@@ -34,7 +34,7 @@ class BackgroundService {
             fieldInfo: message.fieldInfo,
             lastInteraction: Date.now()
           });
-          
+
           chrome.action.setIcon({
           path: {
             "16": "/assets/main-icon-highlighted.png",
@@ -46,7 +46,7 @@ class BackgroundService {
         });
         }
         break;
-        
+
       case 'PASSWORD_FIELDS_DETECTED':
         if (tabId && message.fieldCount) {
           chrome.action.setIcon({
@@ -60,7 +60,7 @@ class BackgroundService {
           });
         }
         break;
-        
+
       case 'PASSWORD_FIELDS_CLEARED':
         if (tabId) {
           chrome.action.setBadgeText({
@@ -69,7 +69,7 @@ class BackgroundService {
           });
         }
         break;
-        
+
       case 'GET_TAB_PASSWORD_STATE':
         if (tabId) {
           const state = this.tabStates.get(tabId);
@@ -78,10 +78,25 @@ class BackgroundService {
           sendResponse({ hasActivePasswordField: false });
         }
         return true;
+      case "GET_CURRENT_TAB_URL":
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          const tab = tabs[0];
+          if (tab && tab.url) {
+            try {
+              const url = new URL(tab.url);
+              sendResponse({ hostname: url.hostname });
+            } catch (_err) {
+              sendResponse({ error: "Invalid URL" });
+            }
+          } else {
+            sendResponse({ error: "No active tab" });
+          }
+        });
+        return true;
       default:
         return false;
     }
-    
+
     return true;
   }
 
@@ -103,7 +118,7 @@ class BackgroundService {
 
   private async handleActionClick(tab: chrome.tabs.Tab): Promise<void> {
     if (!tab.id) return;
-    
+
     try {
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },

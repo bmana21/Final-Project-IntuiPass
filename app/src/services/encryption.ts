@@ -112,7 +112,7 @@ function getRandomChars(charset: string, count: number): string {
 }
 
 
-export async function encrypt(key: string, user_uid: string, pattern_type: PatternType, website_url: string): Promise<UserPatternData> {
+export async function encrypt(key: string, user_uid: string, pattern_type: PatternType, website_url: string): Promise<[UserPatternData, string]> {
   
   const uppercaseChars = getRandomChars(charSets.uppercase, 2);
   const lowercaseChars = getRandomChars(charSets.lowercase, 2);
@@ -133,7 +133,7 @@ export async function encrypt(key: string, user_uid: string, pattern_type: Patte
     randomChars
   );
 
-  return userPatternData;
+  return [userPatternData, password];
 }
 
 export async function decrypt(userPatternData: UserPatternData, key: string): Promise<string> {
