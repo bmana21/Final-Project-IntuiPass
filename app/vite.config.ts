@@ -42,14 +42,22 @@ export default defineConfig({
         // Add other entry points as needed:
         // options: resolve(__dirname, 'src/pages/options/index.html'),
         // background: resolve(__dirname, 'src/background/index.ts'),
+
+        background: resolve(__dirname, 'src/extension-scripts/background.ts'),
+        'content-script': resolve(__dirname, 'src/extension-scripts/content-script.ts'),
       },
       output: {
-        // For Chrome extensions, don't use hashes in filenames
-        entryFileNames: '[name]/index.js',
+        inlineDynamicImports: false,
+        entryFileNames: (chunkInfo) => {
+          if (['background', 'content-script'].includes(chunkInfo.name)) {
+            return `extension-scripts/[name].js`;
+          }
+          return '[name]/index.js';
+        },
         chunkFileNames: 'assets/[name].js',
         assetFileNames: 'assets/[name].[ext]',
-        format: 'iife', // Use immediately-invoked function expression instead of ES modules
-      },
+        format: 'es',
+      }
     },
   },
   resolve: {

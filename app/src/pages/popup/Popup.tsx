@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import { useNavigation } from '../../components/AppRouter';
-import './popup.css';
 import { firebaseApp } from '../../firebase/firebase-config';
-declare global {
-  interface Window {
-    firebase: any;
-  }
-}
 
 const Popup: React.FC = () => {
   const [user, setUser] = useState<any>(null);
@@ -20,6 +14,7 @@ const Popup: React.FC = () => {
       }
     });
   }, []);
+
   const handleSignIn = () => {
     chrome.identity.getAuthToken({ interactive: true }, (token) => {
       if (chrome.runtime.lastError || !token) {
@@ -83,11 +78,11 @@ const Popup: React.FC = () => {
           <img id="user-pic" src={user.photoURL || ''} alt="User Picture" />
           <p id="user-name">{user.displayName || "Unknown"}</p>
           <p id="user-email">{user.email || ""}</p>
-          
+
           {/* Password Creation Options */}
           <div className="password-options">
             <h3>Create Password</h3>
-            <button 
+            <button
               className="password-type-button"
               onClick={handleNavigateToConnectDots}
             >
@@ -97,8 +92,8 @@ const Popup: React.FC = () => {
                 <span className="button-description">Create patterns by connecting dots</span>
               </div>
             </button>
-            
-            <button 
+
+            <button
               className="password-type-button"
               onClick={handleNavigateToPatternLock}
             >
@@ -108,8 +103,8 @@ const Popup: React.FC = () => {
                 <span className="button-description">Draw unlock patterns</span>
               </div>
             </button>
-            
-            <button 
+
+            <button
               className="password-type-button"
               onClick={handleNavigateToColorSequence}
             >
@@ -120,7 +115,7 @@ const Popup: React.FC = () => {
               </div>
             </button>
           </div>
-          
+
           <button id="sign-out" onClick={handleSignOut}>Sign Out</button>
         </div>
       ) : (
