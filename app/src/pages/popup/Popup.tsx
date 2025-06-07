@@ -2,6 +2,13 @@ import React, { useEffect, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import { useNavigation } from '../../components/AppRouter';
 import { firebaseApp } from '../../firebase/firebase-config';
+import './Popup.css'
+
+declare global {
+  interface Window {
+    firebase: any;
+  }
+}
 
 const Popup: React.FC = () => {
   const [user, setUser] = useState<any>(null);
