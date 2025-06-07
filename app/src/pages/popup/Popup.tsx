@@ -8,6 +8,7 @@ import { firebaseApp } from '../../firebase/firebase-config';
 
 const Popup: React.FC = () => {
   const [user, setUser] = useState<any>(null);
+  const { navigateTo } = useNavigation();
 
   useEffect(() => {
     chrome.runtime.sendMessage({ command: "getAuthStatus" }, (response) => {
@@ -77,7 +78,6 @@ const Popup: React.FC = () => {
     });
   };
 
-
   const handleSignOut = () => {
     firebaseApp.auth().signOut()
       .then(() => {
@@ -89,23 +89,77 @@ const Popup: React.FC = () => {
       });
   };
 
+  const handleNavigateToConnectDots = () => {
+    navigateTo('connect_the_dots');
+  };
+
+  const handleNavigateToPatternLock = () => {
+    navigateTo('pattern_lock');
+  };
+
+  const handleNavigateToColorSequence = () => {
+    navigateTo('color_sequence');
+  };
+
   return (
-    <div id="root">
-      <div id="content">
-        {user ? (
-          <div id="user-info">
-            <img id="user-pic" src={user.photoURL || ''} alt="User Picture" />
-            <p id="user-name">{user.displayName || "Unknown"}</p>
-            <p id="user-email">{user.email || ""}</p>
-            <button id="sign-out" onClick={handleSignOut}>Sign Out</button>
-            <button onClick={testFirebase}>TEST!</button>
+    <div id="content">
+      {user ? (
+        <div id="user-info">
+          <img id="user-pic" src={user.photoURL || ''} alt="User Picture" />
+          <p id="user-name">{user.displayName || "Unknown"}</p>
+          <p id="user-email">{user.email || ""}</p>
+
+          {/* Password Creation Options */}
+          <div className="password-options">
+            <h3>Create Password</h3>
+            <button
+              className="password-type-button"
+              onClick={handleNavigateToConnectDots}
+            >
+              <span className="button-icon">⚫</span>
+              <div className="button-content">
+                <span className="button-title">Connect The Dots</span>
+                <span className="button-description">Create patterns by connecting dots</span>
+              </div>
+            </button>
+
+            <button
+              className="password-type-button"
+              onClick={handleNavigateToPatternLock}
+            >
+              <span className="button-icon">🔒</span>
+              <div className="button-content">
+                <span className="button-title">Pattern Lock</span>
+                <span className="button-description">Draw unlock patterns</span>
+              </div>
+            </button>
+
+            <button
+              className="password-type-button"
+              onClick={handleNavigateToColorSequence}
+            >
+              <span className="button-icon">🎨</span>
+              <div className="button-content">
+                <span className="button-title">Color Sequence</span>
+                <span className="button-description">Remember color combinations</span>
+              </div>
+            </button>
           </div>
-        ) : (
-          <div id="sign-in-section">
-            <button id="sign-in" onClick={handleSignIn}>Sign In with Google</button>
+
+          <button id="sign-out" onClick={handleSignOut}>Sign Out</button>
+        </div>
+      ) : (
+        <div id="sign-in-section">
+          <div className="logo">
+            <h1>🔐 IntuiPass</h1>
           </div>
-        )}
-      </div>
+          <h2>Welcome to IntuiPass</h2>
+          <p>Secure password manager with intuitive password creation</p>
+          <button id="sign-in" onClick={handleSignIn}>
+            <span>🔑</span> Sign In with Google
+          </button>
+        </div>
+      )}
     </div>
   );
 };
