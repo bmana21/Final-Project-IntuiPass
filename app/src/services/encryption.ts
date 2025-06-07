@@ -129,8 +129,7 @@ export async function encrypt(key: string, user_uid: string, pattern_type: Patte
     user_uid,
     pattern_type,
     website_url,
-    encrypted_password,
-    randomChars
+    encrypted_password
   );
 
   return [userPatternData, password];

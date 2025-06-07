@@ -6,7 +6,6 @@ export class UserPatternData {
   pattern_type: PatternType;
   website_url: string;
   password_encrypted: string;
-  randomChars: string;
   createdAt: string;
 
   constructor(
@@ -14,13 +13,12 @@ export class UserPatternData {
     pattern_type: PatternType,
     website_url: string,
     password_encrypted: string,
-    randomChars: string
+
   ) {
     this.uuid = crypto.randomUUID();
     this.user_uuid = user_uuid;
     this.pattern_type = pattern_type;
     this.website_url = website_url;
-    this.randomChars = randomChars;
     this.password_encrypted = password_encrypted;
     this.createdAt = new Date().toISOString();
   }
@@ -32,7 +30,6 @@ export class UserPatternData {
       pattern_type: this.pattern_type,
       website_url: this.website_url,
       password_encrypted: this.password_encrypted,
-      randomChars: this.randomChars,
       createdAt: this.createdAt
     };
   }
@@ -43,8 +40,7 @@ export class UserPatternData {
       data.user_uuid,
       data.pattern_type,
       data.website_url,
-      data.password_encrypted,
-      data.randomChars
+      data.password_encrypted
     );
   }
 }
