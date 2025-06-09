@@ -83,6 +83,28 @@ export class DomManager {
     ]);
   }
 
+  async readUsername(): Promise<string> {
+    if (!this.currentTabId) {
+      await this.init();
+    }
+
+    if (!this.currentTabId) {
+      return "";
+    }
+
+    try {
+      const response = await chrome.tabs.sendMessage(this.currentTabId, {
+        type: 'READ_USERNAME',
+      })
+      console.log("response:", response);
+      return response?.success ? response.username : "";
+    } catch (error) {
+      console.error('Error reading username:', error);
+      return "";
+    }
+
+  }
+
   async fillPassword(password: string): Promise<void> {
     if (!this.currentTabId) {
       await this.init();
