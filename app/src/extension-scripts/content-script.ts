@@ -94,7 +94,7 @@ class PasswordFieldDetector {
   }
 
   private detectUsernameFields(): void {
-    const textInputs = document.querySelectorAll('input[type="text"], input[type="email"]') as NodeListOf<HTMLInputElement>;
+    const textInputs = document.querySelectorAll('input:not([type]), input[type="text"], input[type="email"], input[type="search"]') as NodeListOf<HTMLInputElement>;
     const candidates: Array<{field: HTMLInputElement, priority: number}> = [];
 
     Array.from(textInputs).forEach(input => {
