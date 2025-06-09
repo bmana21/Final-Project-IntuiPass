@@ -256,26 +256,13 @@ class PasswordFieldDetector {
       field.dispatchEvent(keyupEvent);
       field.dispatchEvent(blurEvent);
 
-      this.showUsernameFieldFeedback(field);
+      this.showFieldFeedback(field, 0);
 
       return true;
     } catch (error) {
       console.error('Error filling username field:', error);
       return false;
     }
-  }
-
-  private showUsernameFieldFeedback(field: HTMLInputElement): void {
-    const originalStyle = field.style.border;
-    const originalBackground = field.style.backgroundColor;
-
-    field.style.border = '2px solid #2196F3';
-    field.style.backgroundColor = '#E3F2FD';
-
-    setTimeout(() => {
-      field.style.border = originalStyle;
-      field.style.backgroundColor = originalBackground;
-    }, 1500);
   }
 
   private getSerializableUsernameFieldInfo(field: HTMLInputElement): UsernameFieldInfo {
@@ -503,26 +490,6 @@ class PasswordFieldDetector {
           sendResponse({ success: false, message: 'No password provided' });
         }
         return true;
-
-      case 'FILL_CREDENTIALS':
-        { const results = { username: false, password: false, message: '' };
-
-        if (message.username) {
-          results.username = this.fillUsernameField(message.username);
-        }
-
-        if (message.password) {
-          const filledCount = this.fillAllPasswordFields(message.password);
-          results.password = filledCount > 0;
-        }
-
-        results.message = `Username: ${results.username ? 'filled' : 'failed'}, Password: ${results.password ? 'filled' : 'failed'}`;
-
-        sendResponse({
-          success: results.username || results.password,
-          ...results
-        });
-        return true; }
 
       case 'GET_ALL_PASSWORD_FIELDS':
         { const allFields = this.passwordFields.map(field => this.getSerializableFieldInfo(field));
