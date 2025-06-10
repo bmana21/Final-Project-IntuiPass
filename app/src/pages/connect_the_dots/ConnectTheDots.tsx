@@ -17,17 +17,19 @@ interface Connection {
 
 const ConnectTheDots: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { goBack } = useNavigation();
+  const { goBack, getRouteParams } = useNavigation();
   
   const [points, setPoints] = useState<Point[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [selectedPath, setSelectedPath] = useState<number[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentMousePos, setCurrentMousePos] = useState<{ x: number; y: number } | null>(null);
-  const [isCreatingPassword, _] = useState(true);
+  const routeParams = getRouteParams();
+  const isCreatingPassword = routeParams?.isCreatingPassword ?? true;
   const [passwordPattern, setPasswordPattern] = useState<string>('');
 
   useEffect(() => {
+    console.log("creating password is: ", isCreatingPassword);
     const initialPoints: Point[] = [];
     const gridSize = 3;
     const spacing = 80;
@@ -229,7 +231,7 @@ const ConnectTheDots: React.FC = () => {
       };
       console.log('Saving password:', passwordData);
       const passwordIntegrationService = new PasswordIntegrationService();
-      if (await passwordIntegrationService.saveAndFillPassword(passwordPattern, PatternType.CONNECT_DOTS)) {
+      if (await passwordIntegrationService.processPassword(passwordPattern, PatternType.CONNECT_DOTS, isCreatingPassword)) {
         alert('Connect the Dots password saved successfully!');
       } else {
         alert('Could not save password!');
@@ -282,11 +284,9 @@ const ConnectTheDots: React.FC = () => {
           Clear All
         </button>
         
-        {isCreatingPassword && (
-          <button onClick={savePassword} className="save-button">
-            Save Pattern
+        <button onClick={savePassword} className="save-button">
+            {isCreatingPassword ? "Save Pattern" : "Fill Password"}
           </button>
-        )}
       </div>
 
       {passwordPattern && (
