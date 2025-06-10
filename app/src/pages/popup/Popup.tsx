@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import { useNavigation } from '../../components/AppRouter';
 import { firebaseApp } from '../../firebase/firebase-config';
+import SavedPatterns from '../../components/SavedPatterns/SavedPatterns';
 import './Popup.css'
 
 declare global {
@@ -12,6 +13,7 @@ declare global {
 
 const Popup: React.FC = () => {
   const [user, setUser] = useState<any>(null);
+  const [hasPasswordFields, setHasPasswordFields] = useState(false);
   const { navigateTo } = useNavigation();
 
   useEffect(() => {
@@ -20,7 +22,32 @@ const Popup: React.FC = () => {
         setUser(response.userData);
       }
     });
+    
+    // Check if current page has password fields
+    checkForPasswordFields();
   }, []);
+
+  const checkForPasswordFields = async () => {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!tab.id) return;
+
+      // Try to detect password fields
+      chrome.tabs.sendMessage(tab.id, { type: 'DETECT_PASSWORD_FIELDS' }, (response) => {
+        if (chrome.runtime.lastError) {
+          // Content script might not be loaded
+          console.log('Content script not loaded');
+          return;
+        }
+        
+        if (response && response.totalCount > 0) {
+          setHasPasswordFields(true);
+        }
+      });
+    } catch (error) {
+      console.error('Error checking for password fields:', error);
+    }
+  };
 
   const handleSignIn = () => {
     chrome.identity.getAuthToken({ interactive: true }, (token) => {
@@ -86,9 +113,14 @@ const Popup: React.FC = () => {
           <p id="user-name">{user.displayName || "Unknown"}</p>
           <p id="user-email">{user.email || ""}</p>
 
+          {/* Show saved patterns if on a page with password fields */}
+          {hasPasswordFields && (
+            <SavedPatterns />
+          )}
+
           {/* Password Creation Options */}
           <div className="password-options">
-            <h3>Create Password</h3>
+            <h3>Create New Password</h3>
             <button
               className="password-type-button"
               onClick={handleNavigateToConnectDots}
