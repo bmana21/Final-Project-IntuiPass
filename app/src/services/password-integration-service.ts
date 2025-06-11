@@ -19,7 +19,7 @@ export class PasswordIntegrationService {
         this.domManager = new DomManager();
     }
 
-    public async saveAndFillPassword(key: string, patternType: PatternType): Promise<boolean> {
+    public async processPassword(key: string, patternType: PatternType, save: boolean): Promise<boolean> {
         if (this.domManager == undefined || this.userPatternService == undefined) {
             return false;
         }
@@ -32,16 +32,16 @@ export class PasswordIntegrationService {
             const website_url: string = await this.domManager.getWebsiteURL();
             const username: string = await this.domManager.getUsername();
             const [result, password] = await encrypt(key, user_uuid, username, patternType, website_url);
-            if (!await this.userPatternService.addUserPatternData(result)) {
+            if (save && !await this.userPatternService.addUserPatternData(result)) {
                 console.log("Failed to add user pattern data");
                 return false;
             }
             await this.domManager.fillPassword(password);
-            await this.domManager.fillUsername("it works");
             return true;
         } catch (error) {
             console.log(error);
             return false;
         }
     }
+
 }

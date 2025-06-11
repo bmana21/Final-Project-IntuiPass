@@ -1,12 +1,18 @@
 import React, { useState, createContext, useContext } from 'react';
 
-export type Page = 'main' | 'connect_the_dots' | 'pattern_lock' | 'color_sequence';
+export type Page = 'login' | 'password_mode_selection' | 'password_type_selection' | 'connect_the_dots' | 'pattern_lock' | 'color_sequence';
+
+interface RouteParams {
+  [key: string]: any;
+}
 
 interface NavigationContextType {
   currentPage: Page;
-  navigateTo: (page: Page) => void;
+  currentParams: RouteParams | null;
+  navigateTo: (page: Page, params?: RouteParams) => void;
   goBack: () => void;
   canGoBack: boolean;
+  getRouteParams: () => RouteParams | null;
 }
 
 const NavigationContext = createContext<NavigationContextType | undefined>(undefined);
@@ -23,28 +29,47 @@ interface NavigationProviderProps {
   children: React.ReactNode;
 }
 
-export const NavigationProvider: React.FC<NavigationProviderProps> = ({ children }) => {
-  const [currentPage, setCurrentPage] = useState<Page>('main');
-  const [pageHistory, setPageHistory] = useState<Page[]>(['main']);
+interface PageHistoryItem {
+  page: Page;
+  params: RouteParams | null;
+}
 
-  const navigateTo = (page: Page) => {
+export const NavigationProvider: React.FC<NavigationProviderProps> = ({ children }) => {
+  const [currentPage, setCurrentPage] = useState<Page>('login');
+  const [currentParams, setCurrentParams] = useState<RouteParams | null>(null);
+  const [pageHistory, setPageHistory] = useState<PageHistoryItem[]>([
+    { page: 'login', params: null }
+  ]);
+
+  const navigateTo = (page: Page, params?: RouteParams) => {
+    const newParams = params || null;
     setCurrentPage(page);
-    setPageHistory(prev => [...prev, page]);
+    setCurrentParams(newParams);
+    setPageHistory(prev => [...prev, { page, params: newParams }]);
   };
 
   const goBack = () => {
     if (pageHistory.length > 1) {
       const newHistory = pageHistory.slice(0, -1);
+      const previousItem = newHistory[newHistory.length - 1];
+      
       setPageHistory(newHistory);
-      setCurrentPage(newHistory[newHistory.length - 1]);
+      setCurrentPage(previousItem.page);
+      setCurrentParams(previousItem.params);
     }
+  };
+
+  const getRouteParams = () => {
+    return currentParams;
   };
 
   const value: NavigationContextType = {
     currentPage,
+    currentParams,
     navigateTo,
     goBack,
-    canGoBack: pageHistory.length > 1
+    canGoBack: pageHistory.length > 1,
+    getRouteParams
   };
 
   return (
