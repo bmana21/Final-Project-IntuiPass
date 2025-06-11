@@ -1,3 +1,5 @@
+import { firebaseApp } from "../firebase/firebase-config";
+
 interface TabPasswordState {
   hasActivePasswordField: boolean;
   fieldInfo?: any;
@@ -24,8 +26,29 @@ class BackgroundService {
     sendResponse: (response?: any) => void
   ): boolean {
     const tabId = sender.tab?.id;
-
     switch (message.type) {
+      case 'getAuthStatus':
+        const user = firebaseApp.auth().currentUser;
+        sendResponse({
+          isLoggedIn: !!user,
+          userData: user ? {
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL
+          } : null
+        });
+        return true;
+      case 'signOut':
+        firebaseApp.auth().signOut()
+          .then(() => {
+            console.log("Background: User signed out successfully");
+            sendResponse({ success: true });
+          })
+          .catch((error) => {
+            console.error("Background: Sign out failed:", error);
+            sendResponse({ success: false, error: error.message });
+          });
+        return true;
       case 'PASSWORD_FIELD_CLICKED':
       case 'PASSWORD_FIELD_FOCUSED':
         if (tabId) {
