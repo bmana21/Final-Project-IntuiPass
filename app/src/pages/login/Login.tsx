@@ -16,7 +16,7 @@ const Login: React.FC = () => {
   const { navigateTo } = useNavigation();
 
   useEffect(() => {
-    chrome.runtime.sendMessage({ command: "getAuthStatus" }, (response) => {
+    chrome.runtime.sendMessage({ type: "getAuthStatus" }, (response) => {
       setIsLoading(false);
       if (response && response.isLoggedIn) {
         setUser(response.userData);

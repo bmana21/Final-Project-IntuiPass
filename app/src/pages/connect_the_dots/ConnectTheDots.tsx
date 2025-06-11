@@ -249,7 +249,9 @@ const ConnectTheDots: React.FC = () => {
         <button className="back-button" onClick={goBack}>
           ← Back
         </button>
-        <h2>Connect The Dots</h2>
+        <div className="header-content">
+          <h2>Connect The Dots</h2>
+        </div>
       </div>
 
       <div className="instructions">

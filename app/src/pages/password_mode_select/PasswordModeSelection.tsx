@@ -10,18 +10,18 @@ const PasswordModeSelection: React.FC = () => {
     navigateTo('password_type_selection', { isCreatingPassword: isCreating });
   };
   const handleSignOut = () => {
-      firebaseApp.auth().signOut()
-        .then(() => {
-          chrome.runtime.sendMessage({ command: "signOut" }, (_) => {
-            navigateTo('login');
-            console.log("Signed out successfully");
-          });
-        })
-        .catch((error) => {
-          console.error("Sign out failed:", error);
+    firebaseApp.auth().signOut()
+      .then(() => {
+        chrome.runtime.sendMessage({ command: "signOut" }, (_) => {
           navigateTo('login');
+          console.log("Signed out successfully");
         });
-    };
+      })
+      .catch((error) => {
+        console.error("Sign out failed:", error);
+        navigateTo('login');
+      });
+  };
 
   return (
     <div className="password-mode-container">

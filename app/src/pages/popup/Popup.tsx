@@ -10,7 +10,7 @@ const Popup: React.FC = () => {
   const isCreatingPassword = routeParams?.isCreatingPassword ?? true;
 
   useEffect(() => {
-    chrome.runtime.sendMessage({ command: "getAuthStatus" }, (response) => {
+    chrome.runtime.sendMessage({ type: "getAuthStatus" }, (response) => {
       if (chrome.runtime.lastError) {
         console.error("Chrome runtime error:", chrome.runtime.lastError);
         navigateTo('login');
@@ -69,11 +69,11 @@ const Popup: React.FC = () => {
         </button>
         <div className="header-content">
           <h2>
-            {isCreatingPassword ? 'Create Password' : 'Fill Password'}
-          </h2>
-          <div className="mode-badge">
             {isCreatingPassword ? '🔐 Creating' : '🔓 Filling'}
-          </div>
+          </h2>
+          {/* <div className="mode-badge">
+            
+          </div> */}
         </div>
       </div>
 
