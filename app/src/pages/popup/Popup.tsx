@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '../../components/AppRouter';
-import { firebaseApp } from '../../firebase/firebase-config';
+import { AuthService } from '../../services/auth-service';
 import './Popup.css';
 
 const Popup: React.FC = () => {
@@ -10,35 +10,11 @@ const Popup: React.FC = () => {
   const isCreatingPassword = routeParams?.isCreatingPassword ?? true;
 
   useEffect(() => {
-    chrome.runtime.sendMessage({ type: "getAuthStatus" }, (response) => {
-      if (chrome.runtime.lastError) {
-        console.error("Chrome runtime error:", chrome.runtime.lastError);
-        navigateTo('login');
-        return;
-      }
-      
-      if (response && response.isLoggedIn) {
-        setUser(response.userData);
-      } else {
-        navigateTo('login');
-      }
-    });
+    AuthService.checkAuthStatus((user) => setUser(user), () => navigateTo('login'))
   }, [navigateTo]);
 
   const handleSignOut = () => {
-    firebaseApp.auth().signOut()
-      .then(() => {
-        chrome.runtime.sendMessage({ command: "signOut" }, (_) => {
-          setUser(null);
-          navigateTo('login');
-          console.log("Signed out successfully");
-        });
-      })
-      .catch((error) => {
-        console.error("Sign out failed:", error);
-        setUser(null);
-        navigateTo('login');
-      });
+    AuthService.handleSignOut(() => navigateTo('login'));
   };
 
   const handleNavigateToConnectDots = () => {
@@ -71,9 +47,6 @@ const Popup: React.FC = () => {
           <h2>
             {isCreatingPassword ? '🔐 Creating' : '🔓 Filling'}
           </h2>
-          {/* <div className="mode-badge">
-            
-          </div> */}
         </div>
       </div>
 
@@ -124,7 +97,8 @@ const Popup: React.FC = () => {
 
       <div className="footer">
         <button className="sign-out-button" onClick={handleSignOut}>
-          Sign Out
+          <span className="sign-out-icon">👋</span>
+          <span className="sign-out-text">Sign Out</span>
         </button>
       </div>
     </div>

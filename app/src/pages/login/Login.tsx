@@ -24,7 +24,6 @@ const Login: React.FC = () => {
       }
     });
 
-
   }, []);
 
   const handleSignIn = () => {

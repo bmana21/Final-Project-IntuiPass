@@ -1,6 +1,6 @@
 import React from 'react';
-import { firebaseApp } from '../../firebase/firebase-config';
 import { useNavigation } from '../../components/AppRouter';
+import { AuthService } from '../../services/auth-service';
 import './PasswordModeSelection.css';
 
 const PasswordModeSelection: React.FC = () => {
@@ -10,17 +10,7 @@ const PasswordModeSelection: React.FC = () => {
     navigateTo('password_type_selection', { isCreatingPassword: isCreating });
   };
   const handleSignOut = () => {
-    firebaseApp.auth().signOut()
-      .then(() => {
-        chrome.runtime.sendMessage({ command: "signOut" }, (_) => {
-          navigateTo('login');
-          console.log("Signed out successfully");
-        });
-      })
-      .catch((error) => {
-        console.error("Sign out failed:", error);
-        navigateTo('login');
-      });
+      AuthService.handleSignOut(() => navigateTo('login'));
   };
 
   return (
@@ -49,8 +39,11 @@ const PasswordModeSelection: React.FC = () => {
           </button>
         </div>
         
-        <button className="sign-out-link" onClick={handleSignOut}>
-          Sign Out
+      </div>
+      <div className="footer">
+        <button className="sign-out-button" onClick={handleSignOut}>
+          <span className="sign-out-icon">👋</span>
+          <span className="sign-out-text">Sign Out</span>
         </button>
       </div>
     </div>

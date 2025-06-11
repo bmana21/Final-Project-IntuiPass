@@ -38,6 +38,17 @@ class BackgroundService {
           } : null
         });
         return true;
+      case 'signOut':
+        firebaseApp.auth().signOut()
+          .then(() => {
+            console.log("Background: User signed out successfully");
+            sendResponse({ success: true });
+          })
+          .catch((error) => {
+            console.error("Background: Sign out failed:", error);
+            sendResponse({ success: false, error: error.message });
+          });
+        return true;
       case 'PASSWORD_FIELD_CLICKED':
       case 'PASSWORD_FIELD_FOCUSED':
         if (tabId) {

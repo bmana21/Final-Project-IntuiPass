@@ -140,3 +140,45 @@ body {
     transform: translateY(0);
   }
 }
+
+.footer {
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+  margin: 30px 0;
+}
+
+.sign-out-button {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  border: none;
+  color: white;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sign-out-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3);
+  background: linear-gradient(135deg, #ee5a52, #dc4c4c);
+}
+
+.sign-out-icon {
+  font-size: 16px;
+}
+
+.sign-out-text {
+  font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .sign-out-button {
+    padding: 10px 20px;
+    font-size: 13px;
+    min-width: 100px;
+  }
+}
