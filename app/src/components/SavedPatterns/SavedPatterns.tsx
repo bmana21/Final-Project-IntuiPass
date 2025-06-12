@@ -19,7 +19,6 @@ const SavedPatterns: React.FC = () => {
   const { navigateTo } = useNavigation();
 
   useEffect(() => {
-    // Add a small delay to ensure everything is ready
     const timer = setTimeout(() => {
       loadSavedPatterns();
     }, 100);
@@ -27,7 +26,6 @@ const SavedPatterns: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Reload patterns when component mounts or becomes visible
   useEffect(() => {
     const handleFocus = () => {
       setTimeout(() => {
@@ -44,8 +42,7 @@ const SavedPatterns: React.FC = () => {
   const loadSavedPatterns = async () => {
     try {
       setIsLoading(true);
-      
-      // Wait for Firebase auth to be ready
+
       await new Promise((resolve) => {
         const unsubscribe = firebaseApp.auth().onAuthStateChanged((user) => {
           unsubscribe();
@@ -53,7 +50,6 @@ const SavedPatterns: React.FC = () => {
         });
       });
       
-      // Get current user after ensuring auth is ready
       const user = firebaseApp.auth().currentUser;
       console.log('Current user in loadSavedPatterns:', user?.uid);
       
@@ -64,13 +60,11 @@ const SavedPatterns: React.FC = () => {
         return;
       }
 
-      // Get current website URL
       const domManager = new DomManager();
       const websiteUrl = await domManager.getWebsiteURL();
       console.log('Current website URL:', websiteUrl);
       setCurrentWebsite(websiteUrl);
 
-      // Get saved patterns for this website using the existing service method
       const patternService = new UserPatternService();
       console.log('Querying patterns for user:', user.uid, 'website:', websiteUrl);
       
@@ -81,7 +75,6 @@ const SavedPatterns: React.FC = () => {
 
       console.log('Retrieved patterns:', patterns);
 
-      // Convert to SavedPattern format
       const savedPatternsList: SavedPattern[] = patterns.map(pattern => ({
         patternData: pattern,
         originalCreatedAt: pattern.createdAt
@@ -99,7 +92,6 @@ const SavedPatterns: React.FC = () => {
   };
 
   const handleFillPassword = (pattern: SavedPattern) => {
-    // Navigate to the appropriate page based on pattern type
     const patternType = pattern.patternData.pattern_type;
     const username = pattern.patternData.username;
     
@@ -110,22 +102,8 @@ const SavedPatterns: React.FC = () => {
           username: username
         });
         break;
-      // Add other pattern types when they're implemented
-      // case PatternType.PATTERN_LOCK:
-      //   navigateTo('pattern_lock', { 
-      //     isCreatingPassword: false,
-      //     username: username
-      //   });
-      //   break;
-      // case PatternType.COLOR_SEQUENCE:
-      //   navigateTo('color_sequence', { 
-      //     isCreatingPassword: false,
-      //     username: username
-      //   });
-      //   break;
       default:
         console.warn('Unknown pattern type:', patternType);
-        // Fallback to connect_the_dots for now
         navigateTo('connect_the_dots', { 
           isCreatingPassword: false,
           username: username

@@ -58,8 +58,6 @@ const Popup: React.FC = () => {
           <p className="user-email">{user.email || ""}</p>
         </div>
       </div>
-
-      {/* Show saved patterns only when filling existing passwords */}
       {!isCreatingPassword && (
         <SavedPatterns />
       )}
