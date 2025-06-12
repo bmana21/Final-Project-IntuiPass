@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '../../components/AppRouter';
 import { AuthService } from '../../services/auth-service';
+import SavedPatterns from '../../components/SavedPatterns/SavedPatterns';
 import './Popup.css';
 
 const Popup: React.FC = () => {
@@ -57,6 +58,9 @@ const Popup: React.FC = () => {
           <p className="user-email">{user.email || ""}</p>
         </div>
       </div>
+      {!isCreatingPassword && (
+        <SavedPatterns />
+      )}
 
       <div className="password-options">
         <h3>Choose Password Type:</h3>
