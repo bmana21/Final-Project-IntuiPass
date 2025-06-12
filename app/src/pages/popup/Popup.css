@@ -13,8 +13,6 @@ body {
   padding: 25px;
   border-radius: 15px;
   backdrop-filter: blur(10px);
-  position: relative;
-  z-index: 3; /* Low z-index */
 }
 
 .user-pic {
@@ -42,8 +40,6 @@ body {
   padding: 20px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-  z-index: 4; /* Low z-index */
 }
 
 .password-options h3 {
@@ -67,8 +63,6 @@ body {
   transition: all 0.3s ease;
   text-align: left;
   gap: 15px;
-  position: relative;
-  z-index: 5; /* Low z-index */
 }
 
 
@@ -121,8 +115,6 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 10px;
-  position: relative;
-  z-index: 5; /* Low z-index */
 }
 
 #sign-out:hover {
