@@ -3,6 +3,8 @@ import {useNavigation} from '../../components/AppRouter';
 import './ConnectTheDots.css';
 import {PasswordIntegrationService} from "../../services/password-integration-service.ts";
 import {PatternType} from "../../models/pattern-type.ts";
+import UsernameInput from '../../components/UsernameInput/UsernameInput';
+
 
 interface Point {
   x: number;
@@ -24,12 +26,18 @@ const ConnectTheDots: React.FC = () => {
   const [selectedPath, setSelectedPath] = useState<number[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentMousePos, setCurrentMousePos] = useState<{ x: number; y: number } | null>(null);
+  const [passwordPattern, setPasswordPattern] = useState<string>('');
+  const [username, setUsername] = useState<string>('');
+  const [isUsernameValid, setIsUsernameValid] = useState<boolean>(false);
+  
   const routeParams = getRouteParams();
   const isCreatingPassword = routeParams?.isCreatingPassword ?? true;
-  const [passwordPattern, setPasswordPattern] = useState<string>('');
+  const usernameFromPattern = routeParams?.username;
 
   useEffect(() => {
     console.log("creating password is: ", isCreatingPassword);
+    console.log("username from pattern: ", usernameFromPattern);
+    
     const initialPoints: Point[] = [];
     const gridSize = 3;
     const spacing = 80;
@@ -46,7 +54,12 @@ const ConnectTheDots: React.FC = () => {
       }
     }
     setPoints(initialPoints);
-  }, []);
+
+    if (usernameFromPattern && !isCreatingPassword) {
+      setUsername(usernameFromPattern);
+    }
+  }, [isCreatingPassword, usernameFromPattern]);
+
 
   useEffect(() => {
     drawCanvas();
@@ -215,9 +228,37 @@ const ConnectTheDots: React.FC = () => {
     setCurrentMousePos(null);
   };
 
+  const canProceed = () => {
+    const hasPattern = connections.length > 0 && passwordPattern.length > 0;
+    
+    if (isCreatingPassword) {
+      return isUsernameValid && hasPattern;
+    } else {
+      return hasPattern;
+    }
+  };
+
   const savePassword = async () => {
-    if (connections.length === 0) {
-      alert('Please create at least one pattern!');
+    if (!canProceed()) {
+      if (isCreatingPassword) {
+        if (!isUsernameValid) {
+          alert('Please enter a valid username!');
+          return;
+        }
+        if (connections.length === 0) {
+          alert('Please create a pattern!');
+          return;
+        }
+      } else {
+        alert('Please create a pattern!');
+        return;
+      }
+    }
+
+    const finalUsername = isCreatingPassword ? username : (usernameFromPattern || '');
+    
+    if (!finalUsername.trim()) {
+      alert('Username is required!');
       return;
     }
 
@@ -226,20 +267,31 @@ const ConnectTheDots: React.FC = () => {
         type: 'connect_the_dots',
         pattern: passwordPattern,
         connections: connections,
+        username: finalUsername,
         createdAt: new Date(),
         userId: 'current_user_id'
       };
-      console.log('Saving password:', passwordData);
+      
+      console.log('Processing password:', passwordData);
+      
       const passwordIntegrationService = new PasswordIntegrationService();
-      if (await passwordIntegrationService.processPassword(passwordPattern, PatternType.CONNECT_DOTS, isCreatingPassword)) {
-        alert('Connect the Dots password saved successfully!');
+      
+      const success = await passwordIntegrationService.processPassword(
+        passwordPattern, 
+        PatternType.CONNECT_DOTS, 
+        isCreatingPassword,
+        finalUsername
+      );
+       
+      if (success) {
+        window.close()
       } else {
-        alert('Could not save password!');
+        alert('Could not process password!');
       }
 
     } catch (error) {
-      console.error('Error saving password:', error);
-      alert('Failed to save password');
+      console.error('Error processing password:', error);
+      alert('Failed to process password');
     }
   };
 
@@ -253,6 +305,14 @@ const ConnectTheDots: React.FC = () => {
           <h2>Connect The Dots</h2>
         </div>
       </div>
+
+      {isCreatingPassword && (
+        <UsernameInput
+          value={username}
+          onChange={setUsername}
+          onValidation={setIsUsernameValid}
+        />
+      )}
 
       <div className="instructions">
         <p>
@@ -286,9 +346,13 @@ const ConnectTheDots: React.FC = () => {
           Clear All
         </button>
         
-        <button onClick={savePassword} className="save-button">
-            {isCreatingPassword ? "Save Pattern" : "Fill Password"}
-          </button>
+        <button 
+          onClick={savePassword} 
+          className={`save-button ${!canProceed() ? 'disabled' : ''}`}
+          disabled={!canProceed()}
+        >
+          {isCreatingPassword ? "Save Pattern" : "Fill Password"}
+        </button>
       </div>
 
       {passwordPattern && (
