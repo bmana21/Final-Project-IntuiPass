@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '../../components/AppRouter';
-import './PianoPassword.css';
+import styles from './PianoPassword.module.css';
 import { PasswordIntegrationService } from "../../services/password-integration-service.ts";
 import { PatternType } from "../../models/pattern-type.ts";
 
@@ -185,71 +185,70 @@ const PianoPassword: React.FC = () => {
   };
 
   return (
-    <div className="piano-password-container">
-      <div className="header">
-        <button className="back-button" onClick={goBack}>
+    <div className={styles.pianoPasswordContainer}>
+      <div className={styles.header}>
+        <button className={styles.backButton} onClick={goBack}>
           ← Back
         </button>
         <h2>Piano Sequence</h2>
-        <div className="mode-badge">
+        <div className={styles.modeBadge}>
           {isCreatingPassword ? '🔐 Creating' : '🔓 Filling'}
         </div>
       </div>
 
-      <div className="instructions">
+      <div className={styles.instructions}>
         <p>
           {isCreatingPassword 
             ? "Play notes on the piano to create your sequence. Use keyboard keys or click the piano keys."
             : "Recreate your password sequence by playing the same notes."
           }
         </p>
-        <div className="keyboard-hints">
+        <div className={styles.keyboardHints}>
           <p><small>Keyboard: A S D F G H J K (white keys) | W E T Y U (black keys)</small></p>
         </div>
       </div>
 
-      <div className="piano-container">
-        <div className="piano">
+      <div className={styles.pianoContainer}>
+        <div className={styles.piano}>
           {pianoKeys.map((key) => (
             <button
               key={key.id}
-              className={`piano-key ${key.isBlack ? 'black-key' : 'white-key'} ${
-                pressedKeys.has(key.id) ? 'pressed' : ''
-              }`}
+              className={`${styles.pianoKey} ${key.isBlack ? styles.blackKey : styles.whiteKey}`}
+              data-pressed={pressedKeys.has(key.id)}
               onClick={() => handleKeyClick(key)}
               onMouseDown={(e) => e.preventDefault()}
             >
-              <span className="note-label">{key.note}</span>
-              <span className="key-label">{key.keyboardKey.toUpperCase()}</span>
+              <span className={styles.noteLabel}>{key.note}</span>
+              <span className={styles.keyLabel}>{key.keyboardKey.toUpperCase()}</span>
             </button>
           ))}
         </div>
       </div>
 
-      <div className="controls">
-        <button onClick={clearSequence} className="clear-button">
+      <div className={styles.controls}>
+        <button onClick={clearSequence} className={styles.clearButton}>
           Clear Sequence
         </button>
         
         {isCreatingPassword ? (
-          <button onClick={savePassword} className="save-button">
+          <button onClick={savePassword} className={styles.saveButton}>
             Save Sequence
           </button>
         ) : (
-          <button onClick={fillPassword} className="fill-button">
+          <button onClick={fillPassword} className={styles.fillButton}>
             Fill Password
           </button>
         )}
       </div>
 
       {sequence.length > 0 && (
-        <div className="sequence-display">
+        <div className={styles.sequenceDisplay}>
           <p><strong>Current Sequence:</strong></p>
-          <div className="sequence-notes">
+          <div className={styles.sequenceNotes}>
             {sequence.map((noteId, index) => {
               const key = pianoKeys.find(k => k.id === noteId);
               return (
-                <span key={index} className="sequence-note">
+                <span key={index} className={styles.sequenceNote}>
                   {key?.note}
                 </span>
               );
