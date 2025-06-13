@@ -92,24 +92,30 @@ const SavedPatterns: React.FC = () => {
   };
 
   const handleFillPassword = (pattern: SavedPattern) => {
-    const patternType = pattern.patternData.pattern_type;
-    const username = pattern.patternData.username;
-    
-    switch (patternType) {
-      case PatternType.CONNECT_DOTS:
-        navigateTo('connect_the_dots', { 
-          isCreatingPassword: false,
-          username: username
-        });
-        break;
-      default:
-        console.warn('Unknown pattern type:', patternType);
-        navigateTo('connect_the_dots', { 
-          isCreatingPassword: false,
-          username: username
-        });
-    }
-  };
+ const patternType = pattern.patternData.pattern_type;
+ const username = pattern.patternData.username;
+ 
+ switch (patternType) {
+   case PatternType.CONNECT_DOTS:
+     navigateTo('connect_the_dots', { 
+       isCreatingPassword: false,
+       username: username
+     });
+     break;
+   case PatternType.PIANO_SEQUENCE:
+     navigateTo('piano_password', { 
+       isCreatingPassword: false,
+       username: username
+     });
+     break;
+   default:
+     console.warn('Unknown pattern type:', patternType);
+     navigateTo('connect_the_dots', { 
+       isCreatingPassword: false,
+       username: username
+     });
+ }
+};
 
   const getPatternTypeDisplay = (type: PatternType) => {
     switch (type) {

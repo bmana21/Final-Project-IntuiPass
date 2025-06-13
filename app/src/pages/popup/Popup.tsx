@@ -58,6 +58,7 @@ const Popup: React.FC = () => {
         <SavedPatterns />
       )}
 
+    {isCreatingPassword && (
       <div className="password-options">
         <h3>Choose Password Type:</h3>
 
@@ -94,7 +95,8 @@ const Popup: React.FC = () => {
           </div>
         </button> */}
       </div>
-
+    )}
+    
       <div className="footer">
         <button className="sign-out-button" onClick={handleSignOut}>
           <span className="sign-out-icon">👋</span>

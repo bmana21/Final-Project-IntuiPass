@@ -3,6 +3,7 @@ import { useNavigation } from '../../components/AppRouter';
 import styles from './PianoPassword.module.css';
 import { PasswordIntegrationService } from "../../services/password-integration-service.ts";
 import { PatternType } from "../../models/pattern-type.ts";
+import UsernameInput from '../../components/UsernameInput/UsernameInput';
 
 interface PianoKey {
   id: string;
@@ -17,11 +18,14 @@ const PianoPassword: React.FC = () => {
   
   const routeParams = getRouteParams();
   const isCreatingPassword = routeParams?.isCreatingPassword ?? true;
+  const usernameFromPattern = routeParams?.username;
   
   const [sequence, setSequence] = useState<string[]>([]);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
   const [passwordPattern, setPasswordPattern] = useState<string>('');
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+  const [username, setUsername] = useState<string>('');
+  const [isUsernameValid, setIsUsernameValid] = useState<boolean>(false);
 
   const pianoKeys: PianoKey[] = [
     { id: 'C4', note: 'C', frequency: 261.63, keyboardKey: 'a', isBlack: false },
@@ -40,6 +44,22 @@ const PianoPassword: React.FC = () => {
   ];
 
   useEffect(() => {
+    if (usernameFromPattern && !isCreatingPassword) {
+      setUsername(usernameFromPattern);
+    }
+  }, [isCreatingPassword, usernameFromPattern]);
+
+  // Helper function to check if user is typing in an input field
+  const isTypingInInput = () => {
+    const activeElement = document.activeElement;
+    return activeElement && (
+      activeElement.tagName === 'INPUT' || 
+      activeElement.tagName === 'TEXTAREA' ||
+      (activeElement as HTMLElement).contentEditable === 'true'
+    );
+  };
+
+  useEffect(() => {
     const initAudio = () => {
       if (!audioContext) {
         const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -48,6 +68,11 @@ const PianoPassword: React.FC = () => {
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Don't play piano keys if user is typing in an input field
+      if (isTypingInInput()) {
+        return;
+      }
+
       const key = pianoKeys.find(k => k.keyboardKey === event.key.toLowerCase());
       if (key && !pressedKeys.has(key.id)) {
         playNote(key);
@@ -57,6 +82,11 @@ const PianoPassword: React.FC = () => {
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
+      // Don't handle key up for piano keys if user is typing in an input field
+      if (isTypingInInput()) {
+        return;
+      }
+
       const key = pianoKeys.find(k => k.keyboardKey === event.key.toLowerCase());
       if (key) {
         setPressedKeys(prev => {
@@ -138,9 +168,37 @@ const PianoPassword: React.FC = () => {
     setPressedKeys(new Set());
   };
 
+  const canProceed = () => {
+    const hasSequence = sequence.length > 0;
+    
+    if (isCreatingPassword) {
+      return isUsernameValid && hasSequence;
+    } else {
+      return hasSequence;
+    }
+  };
+
   const savePassword = async () => {
-    if (sequence.length === 0) {
-      alert('Please create at least one note sequence!');
+    if (!canProceed()) {
+      if (isCreatingPassword) {
+        if (!isUsernameValid) {
+          alert('Please enter a valid username!');
+          return;
+        }
+        if (sequence.length === 0) {
+          alert('Please create a sequence!');
+          return;
+        }
+      } else {
+        alert('Please create a sequence!');
+        return;
+      }
+    }
+
+    const finalUsername = isCreatingPassword ? username : (usernameFromPattern || '');
+    
+    if (!finalUsername.trim()) {
+      alert('Username is required!');
       return;
     }
 
@@ -149,38 +207,30 @@ const PianoPassword: React.FC = () => {
         type: 'piano_sequence',
         pattern: passwordPattern,
         sequence: sequence,
+        username: finalUsername,
         createdAt: new Date(),
         userId: 'current_user_id'
       };
-      console.log('Saving password:', passwordData);
+      
+      console.log('Processing password:', passwordData);
+      
       const passwordIntegrationService = new PasswordIntegrationService();
-      if (await passwordIntegrationService.processPassword(passwordPattern, PatternType.PIANO_SEQUENCE, isCreatingPassword)) {
-        alert('Piano sequence password saved successfully!');
+      
+      const success = await passwordIntegrationService.processPassword(
+        passwordPattern, 
+        PatternType.PIANO_SEQUENCE, 
+        isCreatingPassword,
+        finalUsername
+      );
+      
+      if (success) {
+        window.close();
       } else {
-        alert('Could not save password!');
+        alert('Could not process password!');
       }
     } catch (error) {
-      console.error('Error saving password:', error);
-      alert('Failed to save password');
-    }
-  };
-
-  const fillPassword = async () => {
-    if (sequence.length === 0) {
-      alert('Please play your sequence first!');
-      return;
-    }
-
-    try {
-      const passwordIntegrationService = new PasswordIntegrationService();
-      if (await passwordIntegrationService.processPassword(passwordPattern, PatternType.PIANO_SEQUENCE, isCreatingPassword)) {
-        alert('Password filled successfully!');
-      } else {
-        alert('Could not fill password!');
-      }
-    } catch (error) {
-      console.error('Error filling password:', error);
-      alert('Failed to fill password');
+      console.error('Error processing password:', error);
+      alert('Failed to process password');
     }
   };
 
@@ -195,6 +245,14 @@ const PianoPassword: React.FC = () => {
           {isCreatingPassword ? '🔐 Creating' : '🔓 Filling'}
         </div>
       </div>
+
+      {isCreatingPassword && (
+        <UsernameInput
+          value={username}
+          onChange={setUsername}
+          onValidation={setIsUsernameValid}
+        />
+      )}
 
       <div className={styles.instructions}>
         <p>
@@ -230,15 +288,13 @@ const PianoPassword: React.FC = () => {
           Clear Sequence
         </button>
         
-        {isCreatingPassword ? (
-          <button onClick={savePassword} className={styles.saveButton}>
-            Save Sequence
-          </button>
-        ) : (
-          <button onClick={fillPassword} className={styles.fillButton}>
-            Fill Password
-          </button>
-        )}
+        <button 
+          onClick={savePassword} 
+          className={`${styles.saveButton} ${!canProceed() ? styles.disabled : ''}`}
+          disabled={!canProceed()}
+        >
+          {isCreatingPassword ? "Save Sequence" : "Fill Password"}
+        </button>
       </div>
 
       {sequence.length > 0 && (
