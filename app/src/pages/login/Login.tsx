@@ -97,12 +97,8 @@ const Login: React.FC = () => {
             <span>Connect the Dots</span>
           </div>
           <div className="feature">
-            <span className="feature-icon">🔒</span>
-            <span>Pattern Lock</span>
-          </div>
-          <div className="feature">
-            <span className="feature-icon">🎨</span>
-            <span>Color Sequence</span>
+            <span className="feature-icon">🎹</span>
+            <span>Piano</span>
           </div>
         </div>
       </div>
