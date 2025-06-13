@@ -22,12 +22,8 @@ const Popup: React.FC = () => {
     navigateTo('connect_the_dots', { isCreatingPassword });
   };
 
-  const handleNavigateToPatternLock = () => {
-    navigateTo('pattern_lock', { isCreatingPassword });
-  };
-
-  const handleNavigateToColorSequence = () => {
-    navigateTo('color_sequence', { isCreatingPassword });
+  const handleNavigateToPiano = () => {
+    navigateTo('piano_password', { isCreatingPassword });
   };
 
   if (!user) {
@@ -64,7 +60,7 @@ const Popup: React.FC = () => {
 
       <div className="password-options">
         <h3>Choose Password Type:</h3>
-        
+
         <button
           className="password-type-button"
           onClick={handleNavigateToConnectDots}
@@ -78,16 +74,16 @@ const Popup: React.FC = () => {
 
         <button
           className="password-type-button"
-          onClick={handleNavigateToPatternLock}
+          onClick={handleNavigateToPiano}
         >
-          <span className="button-icon">🔒</span>
+          <span className="button-icon">🎹</span>
           <div className="button-content">
-            <span className="button-title">Pattern Lock</span>
-            <span className="button-description">Draw unlock patterns</span>
+            <span className="button-title">Piano Sequence</span>
+            <span className="button-description">Create melodies as passwords</span>
           </div>
         </button>
 
-        <button
+        {/* <button
           className="password-type-button"
           onClick={handleNavigateToColorSequence}
         >
@@ -96,7 +92,7 @@ const Popup: React.FC = () => {
             <span className="button-title">Color Sequence</span>
             <span className="button-description">Remember color combinations</span>
           </div>
-        </button>
+        </button> */}
       </div>
 
       <div className="footer">
