@@ -6,6 +6,7 @@ import { firebaseApp } from '../../firebase/firebase-config';
 import { PatternType } from '../../models/pattern-type';
 import { useNavigation } from '../../components/AppRouter';
 import './SavedPatterns.css';
+import {getPatternTypeDisplay} from "../../utils/PatternUtils.ts";
 
 interface SavedPattern {
   patternData: UserPatternData;
@@ -116,17 +117,6 @@ const SavedPatterns: React.FC = () => {
      });
  }
 };
-
-  const getPatternTypeDisplay = (type: PatternType) => {
-    switch (type) {
-      case PatternType.CONNECT_DOTS:
-        return { icon: '⚫', name: 'Connect The Dots' };
-      case PatternType.PIANO_SEQUENCE:
-        return { icon: '🎹', name: 'Piano'};
-      default:
-        return { icon: '🔐', name: 'Pattern' };
-    }
-  };
 
   if (isLoading) {
     return (
