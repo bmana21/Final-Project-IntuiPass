@@ -1,6 +1,6 @@
 import React, { useState, createContext, useContext } from 'react';
 
-export type Page = 'login' | 'password_mode_selection' | 'password_type_selection' | 'connect_the_dots' | 'pattern_lock' | 'color_sequence' | 'piano_password';
+export type Page = 'login' | 'password_mode_selection' | 'password_type_selection' | 'connect_the_dots' | 'pattern_lock' | 'color_sequence' | 'piano_password' | 'password-manager-page';
 
 interface RouteParams {
   [key: string]: any;
