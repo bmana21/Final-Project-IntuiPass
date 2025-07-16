@@ -62,14 +62,12 @@ const PasswordManager: React.FC = () => {
                         ← Back
                     </button>
                     <h1 className="page-title">Password Manager</h1>
+                    <button className="refresh-button" onClick={fetchPasswords} disabled={isLoading}>
+                        🔄
+                    </button>
                 </div>
 
                 <div className="passwords-container">
-                    <div className="container-header">
-                        <button className="refresh-button" onClick={fetchPasswords} disabled={isLoading}>
-                            🔄
-                        </button>
-                    </div>
                     <div className="loading-screen">
                         <div className="spinner"></div>
                         <div className="loading-text">Loading your passwords...</div>
@@ -86,14 +84,12 @@ const PasswordManager: React.FC = () => {
                     ← Back
                 </button>
                 <h1 className="page-title">Password Manager</h1>
+                <button className="refresh-button" onClick={fetchPasswords} disabled={isLoading}>
+                    🔄
+                </button>
             </div>
 
             <div className="passwords-container">
-                <div className="container-header">
-                    <button className="refresh-button" onClick={fetchPasswords} disabled={isLoading}>
-                        🔄
-                    </button>
-                </div>
                 {Object.keys(groupedPasswords).length === 0 ? (
                     <div className="no-passwords">
                         <div className="no-passwords-icon">🔐</div>
