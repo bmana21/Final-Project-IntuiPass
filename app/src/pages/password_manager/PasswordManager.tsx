@@ -1,107 +1,44 @@
-import React, {useState} from 'react';
-import {PatternType} from "../../models/pattern-type";
+import React, {useEffect, useState} from 'react';
 import {useNavigation} from "../../components/AppRouter";
 import {getPatternTypeDisplay} from "../../utils/PatternUtils";
 import {UserPatternData} from "../../models/user-pattern-data";
 import "./PasswordManager.css";
+import {UserPatternService} from "../../services/firestore-service.ts";
+import {firebaseApp} from "../../firebase/firebase-config.ts";
 
 const PasswordManager: React.FC = () => {
     // @ts-ignore
     const {_navigateTo, _getRouteParams, goBack} = useNavigation();
     const [expandedWebsites, setExpandedWebsites] = useState<Set<string>>(new Set());
+    const [userPasswords, setUserPasswords] = useState<UserPatternData[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Test data, TODO: Replace this with real data from DB.
-    const testPasswords: UserPatternData[] = [
-        new UserPatternData(
-            'user1',
-            PatternType.CONNECT_DOTS,
-            'john.doe@email.com',
-            'https://www.google.com',
-            'encrypted_password_1'
-        ),
-        new UserPatternData(
-            'user1',
-            PatternType.CONNECT_DOTS,
-            'john.doe@email.com',
-            'https://www.google.com',
-            'encrypted_password_1'
-        ),
-        new UserPatternData(
-            'user1',
-            PatternType.CONNECT_DOTS,
-            'john.doe@email.com',
-            'https://www.google.com',
-            'encrypted_password_1'
-        ),
-        new UserPatternData(
-            'user1',
-            PatternType.CONNECT_DOTS,
-            'johnsmith',
-            'https://www.facebook.com',
-            'encrypted_password_2'
-        ),
-        new UserPatternData(
-            'user1',
-            PatternType.CONNECT_DOTS,
-            'john_doe',
-            'https://www.github.com',
-            'encrypted_password_3'
-        ),
-        new UserPatternData(
-            'user1',
-            PatternType.PIANO_SEQUENCE,
-            'john.doe@company.com',
-            'https://www.linkedin.com',
-            'encrypted_password_4'
-        ),
-        new UserPatternData(
-            'user1',
-            PatternType.PIANO_SEQUENCE,
-            'john.doe@company.com',
-            'https://www.codeforces.com',
-            'encrypted_password_4'
-        ),
-        new UserPatternData(
-            'user1',
-            PatternType.PIANO_SEQUENCE,
-            'john.doe@company.com',
-            'https://www.codeforces.com',
-            'encrypted_password_4'
-        ),
-        new UserPatternData(
-            'user1',
-            PatternType.PIANO_SEQUENCE,
-            'john.doe@company.com',
-            'https://www.codeforces.com',
-            'encrypted_password_4'
-        ),
-        new UserPatternData(
-            'user1',
-            PatternType.PIANO_SEQUENCE,
-            'john.doe@company.com',
-            'https://www.youtube.com',
-            'encrypted_password_4'
-        ),
-        new UserPatternData(
-            'user1',
-            PatternType.PIANO_SEQUENCE,
-            'john.doe@company.com',
-            'https://www.asus.com',
-            'encrypted_password_4'
-        )
-    ];
-
-    const getDomainName = (url: string) => {
+    const fetchPasswords = async () => {
         try {
-            const domain = new URL(url).hostname;
-            return domain.replace('www.', '');
-        } catch {
-            return url;
+            setIsLoading(true);
+            const uid = firebaseApp.auth().currentUser?.uid;
+            if (!uid) {
+                setIsLoading(false);
+                console.log("No user logged in");
+                return;
+            }
+
+            const service = new UserPatternService();
+            const data = await service.getUserPatternDataByUUID(uid);
+            setUserPasswords(data);
+        } catch (e) {
+            console.error('Error loading saved patterns:', e);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const groupedPasswords = testPasswords.reduce((acc, pwd) => {
-        const domain = getDomainName(pwd.website_url);
+    useEffect(() => {
+        fetchPasswords();
+    }, []);
+
+    const groupedPasswords = userPasswords.reduce((acc, pwd) => {
+        const domain = pwd.website_url;
         if (!acc[domain]) acc[domain] = [];
         acc[domain].push(pwd);
         return acc;
@@ -117,6 +54,31 @@ const PasswordManager: React.FC = () => {
         setExpandedWebsites(newSet);
     };
 
+    if (isLoading) {
+        return (
+            <div className="manager-container">
+                <div className="header">
+                    <button className="back-button" onClick={goBack}>
+                        ← Back
+                    </button>
+                    <h1 className="page-title">Password Manager</h1>
+                </div>
+
+                <div className="passwords-container">
+                    <div className="container-header">
+                        <button className="refresh-button" onClick={fetchPasswords} disabled={isLoading}>
+                            🔄
+                        </button>
+                    </div>
+                    <div className="loading-screen">
+                        <div className="spinner"></div>
+                        <div className="loading-text">Loading your passwords...</div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="manager-container">
             <div className="header">
@@ -127,6 +89,11 @@ const PasswordManager: React.FC = () => {
             </div>
 
             <div className="passwords-container">
+                <div className="container-header">
+                    <button className="refresh-button" onClick={fetchPasswords} disabled={isLoading}>
+                        🔄
+                    </button>
+                </div>
                 {Object.keys(groupedPasswords).length === 0 ? (
                     <div className="no-passwords">
                         <div className="no-passwords-icon">🔐</div>
@@ -142,7 +109,7 @@ const PasswordManager: React.FC = () => {
                                         <div className="website-icon">🌐</div>
                                         <div className="website-details">
                                             <div className="website-name">{domain}</div>
-                                            <div className="website-url">{passwords[0].website_url}</div>
+                                            <div className="password-count">{passwords.length} passwords saved</div>
                                         </div>
                                     </div>
                                     <div className="expand-icon">
@@ -159,7 +126,9 @@ const PasswordManager: React.FC = () => {
                                                 </div>
                                                 <div className="password-info">
                                                     <div className="password-main-text">
-                                                        {`${getPatternTypeDisplay(password.pattern_type).name}\n${password.username}`}
+                                                        {getPatternTypeDisplay(password.pattern_type).name}
+                                                        <br/>
+                                                        {password.username}
                                                     </div>
                                                     <div className="password-date-text">
                                                         {new Date(password.createdAt).toLocaleDateString()}
