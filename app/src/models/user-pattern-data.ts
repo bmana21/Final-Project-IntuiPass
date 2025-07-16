@@ -39,12 +39,14 @@ export class UserPatternData {
 
   static fromFirestore(snapshot: { data: () => any }): UserPatternData {
     const data = snapshot.data();
-    return new UserPatternData(
+    const result = new UserPatternData(
       data.user_uuid,
       data.pattern_type,
       data.username,
       data.website_url,
       data.password_encrypted
     );
+    result.uuid = data.uuid;
+    return result;
   }
 }

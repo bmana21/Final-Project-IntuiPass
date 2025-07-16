@@ -8,7 +8,7 @@ import {firebaseApp} from "../../firebase/firebase-config.ts";
 
 const PasswordManager: React.FC = () => {
     // @ts-ignore
-    const {_navigateTo, _getRouteParams, goBack} = useNavigation();
+    const {navigateTo, getRouteParams, goBack} = useNavigation();
     const [expandedWebsites, setExpandedWebsites] = useState<Set<string>>(new Set());
     const [userPasswords, setUserPasswords] = useState<UserPatternData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -52,6 +52,25 @@ const PasswordManager: React.FC = () => {
             newSet.add(domain);
         }
         setExpandedWebsites(newSet);
+    };
+
+    // @ts-ignore
+    const handlePasswordView = (password: UserPatternData) => {
+        // TODO: Handle password view
+    };
+
+    const handlePasswordDelete = async (e: React.MouseEvent, password: UserPatternData) => {
+        e.stopPropagation();
+
+        if (window.confirm(`Are you sure you want to delete the password for ${password.username} on ${password.website_url}?`)) {
+            try {
+                await (new UserPatternService()).deleteUserPatternData(password.uuid);
+                await fetchPasswords();
+            } catch (error) {
+                console.error('Error deleting password:', error);
+                alert('Failed to delete password. Please try again.');
+            }
+        }
     };
 
     if (isLoading) {
@@ -116,7 +135,11 @@ const PasswordManager: React.FC = () => {
                                 {expandedWebsites.has(domain) && (
                                     <div className="password-details-group">
                                         {passwords.map((password) => (
-                                            <div key={password.uuid} className="password-tile">
+                                            <div
+                                                key={password.uuid}
+                                                className="password-tile"
+                                                onClick={() => handlePasswordView(password)}
+                                            >
                                                 <div className="pattern-type-icon">
                                                     {getPatternTypeDisplay(password.pattern_type).icon}
                                                 </div>
@@ -130,7 +153,13 @@ const PasswordManager: React.FC = () => {
                                                         {new Date(password.createdAt).toLocaleDateString()}
                                                     </div>
                                                 </div>
-                                                <button className="eye-button">👁️</button>
+                                                <button
+                                                    className="delete-button"
+                                                    onClick={(e) => handlePasswordDelete(e, password)}
+                                                    title="Delete password"
+                                                >
+                                                    🗑️
+                                                </button>
                                             </div>
                                         ))}
                                     </div>

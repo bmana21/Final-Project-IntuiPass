@@ -28,8 +28,7 @@ export class PasswordIntegrationService {
                 return false;
             }
             const website_url: string = await this.domManager.getWebsiteURL();
-            
-            
+
             const [result, password] = await encrypt(key, user_uuid, username, patternType, website_url);
             if (save && !await this.userPatternService.addUserPatternData(result)) {
                 console.log("Failed to add user pattern data");
