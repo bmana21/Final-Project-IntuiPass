@@ -108,6 +108,12 @@ const SavedPatterns: React.FC = () => {
        username: username
      });
      break;
+   case PatternType.CHESS_BOARD:
+     navigateTo('chess_password', { 
+       isCreatingPassword: false,
+       username: username
+     });
+     break;
    default:
      console.warn('Unknown pattern type:', patternType);
      navigateTo('connect_the_dots', { 
@@ -123,6 +129,8 @@ const SavedPatterns: React.FC = () => {
         return { icon: '⚫', name: 'Connect The Dots' };
       case PatternType.PIANO_SEQUENCE:
         return { icon: '🎹', name: 'Piano'};
+      case PatternType.CHESS_BOARD:
+        return { icon: '♔', name: 'Chess Board'};
       default:
         return { icon: '🔐', name: 'Pattern' };
     }

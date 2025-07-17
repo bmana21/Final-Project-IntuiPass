@@ -26,6 +26,10 @@ const Popup: React.FC = () => {
     navigateTo('piano_password', { isCreatingPassword });
   };
 
+  const handleNavigateToChess = () => {
+    navigateTo('chess_password', { isCreatingPassword });
+  };
+
   if (!user) {
     return (
       <div className="popup-container">
@@ -84,16 +88,16 @@ const Popup: React.FC = () => {
           </div>
         </button>
 
-        {/* <button
+        <button
           className="password-type-button"
-          onClick={handleNavigateToColorSequence}
+          onClick={handleNavigateToChess}
         >
-          <span className="button-icon">🎨</span>
+          <span className="button-icon">♔</span>
           <div className="button-content">
-            <span className="button-title">Color Sequence</span>
-            <span className="button-description">Remember color combinations</span>
+            <span className="button-title">Chess Board</span>
+            <span className="button-description">Place pieces on a chess board</span>
           </div>
-        </button> */}
+        </button>
       </div>
     )}
     
