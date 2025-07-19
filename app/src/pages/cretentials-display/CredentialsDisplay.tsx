@@ -85,7 +85,7 @@ export const CredentialsDisplay: React.FC<CredentialsDisplayProps> = ({
                         onClick={togglePasswordVisibility}
                     >
     <span className="view-text">
-        {isPasswordVisible ? '🙈' : '👁️'}
+        {isPasswordVisible ? '🔒' : '👁️'}
         </span>
                     </button>
                     <button

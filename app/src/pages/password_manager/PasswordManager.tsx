@@ -8,35 +8,64 @@ import {firebaseApp} from "../../firebase/firebase-config.ts";
 import {PatternType} from "../../models/pattern-type.ts";
 
 const PasswordManager: React.FC = () => {
-    // @ts-ignore
-    const {navigateTo, getRouteParams, goBack} = useNavigation();
+    const {navigateTo, goBack} = useNavigation();
     const [expandedWebsites, setExpandedWebsites] = useState<Set<string>>(new Set());
     const [userPasswords, setUserPasswords] = useState<UserPatternData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [authChecked, setAuthChecked] = useState(false);
 
-    const fetchPasswords = async () => {
+    const fetchPasswords = async (retryCount = 0) => {
         try {
             setIsLoading(true);
-            const uid = firebaseApp.auth().currentUser?.uid;
-            if (!uid) {
+
+            const currentUser = firebaseApp.auth().currentUser;
+            if (!currentUser) {
+                if (retryCount < 3) {
+                    setTimeout(() => fetchPasswords(retryCount + 1), 500);
+                    return;
+                }
                 setIsLoading(false);
-                console.log("No user logged in");
+                console.log("No user logged in after retries");
                 return;
             }
 
+            const uid = currentUser.uid;
             const service = new UserPatternService();
             const data = await service.getUserPatternDataByUserUUID(uid);
             setUserPasswords(data);
         } catch (e) {
             console.error('Error loading saved patterns:', e);
+            if (retryCount < 2) {
+                setTimeout(() => fetchPasswords(retryCount + 1), 1000);
+            }
         } finally {
             setIsLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchPasswords();
+        const unsubscribe = firebaseApp.auth().onAuthStateChanged((user) => {
+            setAuthChecked(true);
+            if (user) {
+                fetchPasswords();
+            } else {
+                setUserPasswords([]);
+                setIsLoading(false);
+                console.log("User is not authenticated");
+            }
+        });
+
+        return () => unsubscribe();
     }, []);
+
+    const handleRefresh = async () => {
+        const currentUser = firebaseApp.auth().currentUser;
+        if (!currentUser) {
+            alert("Please make sure you're logged in");
+            return;
+        }
+        await fetchPasswords();
+    };
 
     const groupedPasswords = userPasswords.reduce((acc, pwd) => {
         const domain = pwd.website_url;
@@ -72,7 +101,6 @@ const PasswordManager: React.FC = () => {
         });
     };
 
-
     const handlePasswordDelete = async (e: React.MouseEvent, password: UserPatternData) => {
         e.stopPropagation();
 
@@ -87,7 +115,7 @@ const PasswordManager: React.FC = () => {
         }
     };
 
-    if (isLoading) {
+    if (!authChecked || isLoading) {
         return (
             <div className="manager-container">
                 <div className="header">
@@ -95,7 +123,7 @@ const PasswordManager: React.FC = () => {
                         ← Back
                     </button>
                     <h1 className="page-title">Password Manager</h1>
-                    <button className="refresh-button" onClick={fetchPasswords} disabled={isLoading}>
+                    <button className="refresh-button" onClick={handleRefresh} disabled={isLoading}>
                         🔄
                     </button>
                 </div>
@@ -103,7 +131,36 @@ const PasswordManager: React.FC = () => {
                 <div className="passwords-container">
                     <div className="loading-screen">
                         <div className="spinner"></div>
-                        <div className="loading-text">Loading your passwords...</div>
+                        <div className="loading-text">
+                            {!authChecked ? "Checking authentication..." : "Loading your passwords..."}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (!firebaseApp.auth().currentUser) {
+        return (
+            <div className="manager-container">
+                <div className="header">
+                    <button className="back-button" onClick={goBack}>
+                        ← Back
+                    </button>
+                    <h1 className="page-title">Password Manager</h1>
+                    <button className="refresh-button" onClick={handleRefresh}>
+                        🔄
+                    </button>
+                </div>
+
+                <div className="passwords-container">
+                    <div className="no-passwords">
+                        <div className="no-passwords-icon">🔐</div>
+                        <h3>Authentication Required</h3>
+                        <p>Please log in to view your saved passwords</p>
+                        <button className="refresh-button" onClick={handleRefresh} style={{marginTop: '20px'}}>
+                            Try Again
+                        </button>
                     </div>
                 </div>
             </div>
@@ -117,7 +174,7 @@ const PasswordManager: React.FC = () => {
                     ← Back
                 </button>
                 <h1 className="page-title">Password Manager</h1>
-                <button className="refresh-button" onClick={fetchPasswords} disabled={isLoading}>
+                <button className="refresh-button" onClick={handleRefresh} disabled={isLoading}>
                     🔄
                 </button>
             </div>
@@ -128,6 +185,9 @@ const PasswordManager: React.FC = () => {
                         <div className="no-passwords-icon">🔐</div>
                         <h3>No passwords saved yet</h3>
                         <p>Start by creating your first password</p>
+                        <button className="refresh-button" onClick={handleRefresh} style={{marginTop: '20px'}}>
+                            Refresh
+                        </button>
                     </div>
                 ) : (
                     <div className="passwords-list">
@@ -172,7 +232,7 @@ const PasswordManager: React.FC = () => {
                                                     onClick={(e) => handlePasswordDelete(e, password)}
                                                     title="Delete password"
                                                 >
-                                                    🗑️
+                                                    ❌️
                                                 </button>
                                             </div>
                                         ))}
