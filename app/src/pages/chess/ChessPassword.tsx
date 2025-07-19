@@ -4,6 +4,7 @@ import './ChessPassword.css';
 import { PasswordIntegrationService } from "../../services/password-integration-service.ts";
 import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
+import {CredentialsDisplay} from '../cretentials-display/CredentialsDisplay';
 
 interface ChessPiece {
   id: string;
@@ -23,11 +24,12 @@ interface PlacedPiece {
 
 const ChessPassword: React.FC = () => {
   const { goBack, getRouteParams } = useNavigation();
-  
+
   const routeParams = getRouteParams();
   const isCreatingPassword = routeParams?.isCreatingPassword ?? true;
+  const isViewingPassword = routeParams?.isViewingPassword ?? false;
   const usernameFromPattern = routeParams?.username;
-  
+
   const [placedPieces, setPlacedPieces] = useState<PlacedPiece[]>([]);
   const [passwordPattern, setPasswordPattern] = useState<string>('');
   const [username, setUsername] = useState<string>('');
@@ -36,6 +38,9 @@ const ChessPassword: React.FC = () => {
   const [dragOverSquare, setDragOverSquare] = useState<string | null>(null);
   const [draggedFromBoard, setDraggedFromBoard] = useState<{position: string, piece: PlacedPiece} | null>(null);
   const [draggedPieceId, setDraggedPieceId] = useState<string | null>(null);
+
+  const [showCredentials, setShowCredentials] = useState<boolean>(false);
+  const [retrievedPassword, setRetrievedPassword] = useState<string>('');
 
   const whitePieces: ChessPiece[] = [
     { id: 'white-king', name: 'King', whiteSymbol: '♔', blackSymbol: '♚', value: 'K', color: 'white' },
@@ -67,7 +72,7 @@ const ChessPassword: React.FC = () => {
         if (a.row !== b.row) return a.row - b.row;
         return a.col - b.col;
       });
-      
+
       const pattern = sortedPieces.map(p => `${p.piece.value}${p.position}`).join('-');
       setPasswordPattern(pattern);
     } else {
@@ -85,24 +90,24 @@ const ChessPassword: React.FC = () => {
     setDraggedPiece(piece);
     setDraggedFromBoard(null);
     setDraggedPieceId(piece.id);
-    
+
     if (e) {
       const dragImage = document.createElement('div');
       dragImage.innerHTML = piece.color === 'white' ? piece.whiteSymbol : piece.blackSymbol;
       dragImage.style.fontSize = '36px';
       dragImage.style.fontWeight = 'bold';
       dragImage.style.color = piece.color === 'white' ? 'white' : 'black';
-      dragImage.style.textShadow = piece.color === 'white' 
+      dragImage.style.textShadow = piece.color === 'white'
         ? '1px 1px 2px black, -1px -1px 2px black, 1px -1px 2px black, -1px 1px 2px black'
         : '1px 1px 1px rgba(255, 255, 255, 0.5)';
       dragImage.style.position = 'absolute';
       dragImage.style.top = '-1000px';
       dragImage.style.background = 'transparent';
       dragImage.style.padding = '10px';
-      
+
       document.body.appendChild(dragImage);
       e.dataTransfer.setDragImage(dragImage, 25, 25);
-      
+
       setTimeout(() => {
         document.body.removeChild(dragImage);
       }, 0);
@@ -113,24 +118,24 @@ const ChessPassword: React.FC = () => {
     setDraggedPiece(placedPiece.piece);
     setDraggedFromBoard({ position: placedPiece.position, piece: placedPiece });
     setDraggedPieceId(`board-${placedPiece.position}`);
-    
+
     if (e) {
       const dragImage = document.createElement('div');
       dragImage.innerHTML = placedPiece.piece.color === 'white' ? placedPiece.piece.whiteSymbol : placedPiece.piece.blackSymbol;
       dragImage.style.fontSize = '36px';
       dragImage.style.fontWeight = 'bold';
       dragImage.style.color = placedPiece.piece.color === 'white' ? 'white' : 'black';
-      dragImage.style.textShadow = placedPiece.piece.color === 'white' 
+      dragImage.style.textShadow = placedPiece.piece.color === 'white'
         ? '1px 1px 2px black, -1px -1px 2px black, 1px -1px 2px black, -1px 1px 2px black'
         : '1px 1px 1px rgba(255, 255, 255, 0.5)';
       dragImage.style.position = 'absolute';
       dragImage.style.top = '-1000px';
       dragImage.style.background = 'transparent';
       dragImage.style.padding = '10px';
-      
+
       document.body.appendChild(dragImage);
       e.dataTransfer.setDragImage(dragImage, 25, 25);
-      
+
       setTimeout(() => {
         document.body.removeChild(dragImage);
       }, 0);
@@ -157,17 +162,17 @@ const ChessPassword: React.FC = () => {
   const handleDrop = (e: React.DragEvent, row: number, col: number) => {
     e.preventDefault();
     const position = getSquarePosition(row, col);
-    
+
     if (draggedPiece) {
       if (draggedFromBoard) {
         setPlacedPieces(prev => prev.filter(p => p.position !== draggedFromBoard.position));
       }
-      
+
       const existingPieceIndex = placedPieces.findIndex(p => p.position === position);
       if (existingPieceIndex !== -1) {
         setPlacedPieces(prev => prev.filter((_, index) => index !== existingPieceIndex));
       }
-      
+
       const newPiece: PlacedPiece = {
         piece: draggedPiece,
         position,
@@ -176,7 +181,7 @@ const ChessPassword: React.FC = () => {
       };
       setPlacedPieces(prev => [...prev, newPiece]);
     }
-    
+
     setDragOverSquare(null);
     setDraggedPiece(null);
     setDraggedFromBoard(null);
@@ -185,7 +190,7 @@ const ChessPassword: React.FC = () => {
   const handleSquareClick = (row: number, col: number) => {
     const position = getSquarePosition(row, col);
     const existingPieceIndex = placedPieces.findIndex(p => p.position === position);
-    
+
     if (existingPieceIndex !== -1) {
       setPlacedPieces(prev => prev.filter((_, index) => index !== existingPieceIndex));
     }
@@ -207,11 +212,13 @@ const ChessPassword: React.FC = () => {
   const clearBoard = () => {
     setPlacedPieces([]);
     setPasswordPattern('');
+    setShowCredentials(false);
+    setRetrievedPassword('');
   };
 
   const canProceed = () => {
     const hasPieces = placedPieces.length > 0;
-    
+
     if (isCreatingPassword) {
       return isUsernameValid && hasPieces;
     } else {
@@ -237,7 +244,7 @@ const ChessPassword: React.FC = () => {
     }
 
     const finalUsername = isCreatingPassword ? username : (usernameFromPattern || '');
-    
+
     if (!finalUsername.trim()) {
       alert('Username is required!');
       return;
@@ -252,22 +259,33 @@ const ChessPassword: React.FC = () => {
         createdAt: new Date(),
         userId: 'current_user_id'
       };
-      
+
       console.log('Processing password:', passwordData);
-      
+
       const passwordIntegrationService = new PasswordIntegrationService();
-      
-      const success = await passwordIntegrationService.processPassword(
-        passwordPattern, 
-        PatternType.CHESS_BOARD, 
-        isCreatingPassword,
-        finalUsername
-      );
-      
-      if (success) {
-        window.close();
+
+      if (!isViewingPassword) {
+        const success = await passwordIntegrationService.processPassword(
+            passwordPattern,
+            PatternType.CHESS_BOARD,
+            isCreatingPassword,
+            finalUsername
+        );
+
+        if (success) {
+          window.close()
+        } else {
+          alert('Could not process password!');
+        }
       } else {
-        alert('Could not process password!');
+        const password = await passwordIntegrationService.getPasswordByKey(passwordPattern, PatternType.CHESS_BOARD, usernameFromPattern);
+
+        if (password) {
+          setRetrievedPassword(password);
+          setShowCredentials(true);
+        } else {
+          alert('Password not found or pattern incorrect!');
+        }
       }
     } catch (error) {
       console.error('Error processing password:', error);
@@ -285,7 +303,7 @@ const ChessPassword: React.FC = () => {
         const isDragOver = dragOverSquare === position;
         const isPieceDragging = piece && draggedPieceId === `board-${piece.position}`;
         const squareClass = `chess-square ${isLight ? 'light' : 'dark'} ${isDragOver ? 'drag-over' : ''}`;
-        
+
         squares.push(
           <div
             key={`${row}-${col}`}
@@ -297,7 +315,7 @@ const ChessPassword: React.FC = () => {
             title={getSquarePosition(row, col)}
           >
             {piece && (
-              <span 
+              <span
                 className={`chess-piece ${piece.piece.color === 'white' ? 'white-piece' : 'black-piece'} ${isPieceDragging ? 'dragging' : ''}`}
                 draggable
                 onDragStart={(e) => handleBoardPieceDragStart(piece, e)}
@@ -357,7 +375,7 @@ const ChessPassword: React.FC = () => {
 
       <div className="instructions">
         <p>
-          {isCreatingPassword 
+          {isCreatingPassword
             ? "Drag chess pieces from below onto the board, or drag pieces on the board to move them."
             : "Recreate your password pattern by dragging pieces to the same positions."
           }
@@ -379,26 +397,34 @@ const ChessPassword: React.FC = () => {
         </div>
       </div>
 
-      <div className="controls">
-        <button onClick={clearBoard} className="clear-button">
-          Clear Board
-        </button>
-        
-        <button 
-          onClick={savePassword} 
-          className={`save-button ${!canProceed() ? 'disabled' : ''}`}
-          disabled={!canProceed()}
-        >
-          {isCreatingPassword ? "Save Pattern" : "Fill Password"}
-        </button>
-      </div>
+        <div className="controls">
+          <button onClick={clearBoard} className="clear-button">
+            Clear Board
+          </button>
 
-      {placedPieces.length > 0 && (
-        <div className="pattern-display">
-          <p><strong>Placed Pieces:</strong></p>
-          <div className="pattern-pieces">
-            {placedPieces.map((piece, index) => (
-              <span key={index} className="pattern-piece">
+          <button
+              onClick={savePassword}
+              className={`save-button ${!canProceed() ? 'disabled' : ''}`}
+              disabled={!canProceed()}
+          >
+            {isCreatingPassword ? "Save Pattern" : (isViewingPassword ? "View Password" : "Fill Password")}
+          </button>
+        </div>
+
+        {/* Add the CredentialsDisplay component here */}
+        {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
+            <CredentialsDisplay
+                username={usernameFromPattern}
+                password={retrievedPassword}
+            />
+        )}
+
+        {placedPieces.length > 0 && (
+            <div className="pattern-display">
+              <p><strong>Placed Pieces:</strong></p>
+              <div className="pattern-pieces">
+                {placedPieces.map((piece, index) => (
+                    <span key={index} className="pattern-piece">
                 <span className={piece.piece.color === 'white' ? 'white-piece' : 'black-piece'}>
                   {piece.piece.color === 'white' ? piece.piece.whiteSymbol : piece.piece.blackSymbol}
                 </span> {piece.position}

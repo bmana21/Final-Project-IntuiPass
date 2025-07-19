@@ -9,6 +9,11 @@ const PasswordModeSelection: React.FC = () => {
   const handleModeSelection = (isCreating: boolean) => {
     navigateTo('password_type_selection', { isCreatingPassword: isCreating });
   };
+
+  const handleManagePasswords = () => {
+    navigateTo('password-manager-page');
+  };
+
   const handleSignOut = () => {
       AuthService.handleSignOut(() => navigateTo('login'));
   };
@@ -36,6 +41,15 @@ const PasswordModeSelection: React.FC = () => {
             <div className="button-icon">🔓</div>
             <h3>Fill Existing Password</h3>
             <p>Use your saved pattern to fill a password</p>
+          </button>
+
+          <button
+              className="mode-button manage-button"
+              onClick={handleManagePasswords}
+          >
+            <div className="button-icon">📋</div>
+            <h3>Manage Passwords</h3>
+            <p>View and organize all your saved passwords</p>
           </button>
         </div>
         
