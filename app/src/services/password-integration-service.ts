@@ -1,6 +1,6 @@
 import {UserPatternService} from "./firestore-service.ts";
 import {DomManager} from "./dom_manager.ts";
-import {encrypt} from "./encryption.ts";
+import {decrypt, encrypt, generateRandomPassword} from "./encryption.ts";
 import {PatternType} from "../models/pattern-type.ts";
 import {firebaseApp} from "../firebase/firebase-config.ts";
 
@@ -28,11 +28,32 @@ export class PasswordIntegrationService {
                 return false;
             }
             const website_url: string = await this.domManager.getWebsiteURL();
+            let password: string;
 
-            const [result, password] = await encrypt(key, user_uuid, username, patternType, website_url);
-            if (save && !await this.userPatternService.addUserPatternData(result)) {
-                console.log("Failed to add user pattern data");
-                return false;
+            if (save) {
+                const [result, generated_password] = await encrypt(key, user_uuid, username, patternType, website_url);
+                if (save && !await this.userPatternService.addUserPatternData(result)) {
+                    console.log("Failed to add user pattern data");
+                    return false;
+                }
+                password = generated_password;
+            } else {
+                const userPatterns = await this.userPatternService.getUserPatternDataByUUIDAndURL(user_uuid, website_url);
+
+                const matchingPattern = userPatterns.find(pattern =>
+                    pattern.username === username && pattern.pattern_type === patternType
+                );
+
+                if (!matchingPattern) {
+                    console.log("No matching pattern found for username and pattern type");
+                    return false;
+                }
+
+                try {
+                    password = await decrypt(matchingPattern, key);
+                } catch (error) {
+                    password = generateRandomPassword();
+                }
             }
             await this.domManager.fillPassword(password);
             await this.domManager.fillUsername(username);

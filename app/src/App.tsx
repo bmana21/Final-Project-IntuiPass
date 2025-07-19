@@ -6,6 +6,7 @@ import PasswordModeSelection from './pages/password_mode_select/PasswordModeSele
 import Popup from './pages/popup/Popup';
 import ConnectTheDots from './pages/connect_the_dots/ConnectTheDots';
 import PianoPassword from './pages/piano/PianoPassword';
+import ChessPassword from './pages/chess/ChessPassword';
 import PasswordManager from './pages/password_manager/PasswordManager';
 
 const App: React.FC = () => {
@@ -18,6 +19,7 @@ const App: React.FC = () => {
         <Route path="connect_the_dots" component={ConnectTheDots} />
         <Route path="piano_password" component={PianoPassword} />
         <Route path="password-manager-page" component={PasswordManager} />
+        <Route path="chess_password" component={ChessPassword} />
       </div>
     </AppRouter>
   );

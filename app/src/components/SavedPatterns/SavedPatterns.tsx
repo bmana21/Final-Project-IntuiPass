@@ -109,6 +109,12 @@ const SavedPatterns: React.FC = () => {
        username: username
      });
      break;
+   case PatternType.CHESS_BOARD:
+     navigateTo('chess_password', {
+       isCreatingPassword: false,
+       username: username
+     });
+     break;
    default:
      console.warn('Unknown pattern type:', patternType);
      navigateTo('connect_the_dots', { 
