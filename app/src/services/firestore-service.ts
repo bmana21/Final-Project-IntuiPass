@@ -22,7 +22,7 @@ export class UserPatternService {
   /**
    * Retrieves user patterns by user UUID.
    */
-  async getUserPatternDataByUUID(user_uuid: string): Promise<UserPatternData[]> {
+  async getUserPatternDataByUserUUID(user_uuid: string): Promise<UserPatternData[]> {
     try {
       const querySnapshot = await this.firestore.collection("user_patterns")
         .where("user_uuid", "==", user_uuid)

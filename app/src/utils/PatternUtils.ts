@@ -5,7 +5,9 @@ export const getPatternTypeDisplay = (type: PatternType) => {
         case PatternType.CONNECT_DOTS:
             return { icon: '⚫', name: 'Connect The Dots' };
         case PatternType.PIANO_SEQUENCE:
-            return { icon: '🎹', name: 'Piano' };
+            return { icon: '🎹', name: 'Piano'};
+        case PatternType.CHESS_BOARD:
+            return { icon: '♔', name: 'Chess Board'};
         default:
             return { icon: '🔐', name: 'Pattern' };
     }

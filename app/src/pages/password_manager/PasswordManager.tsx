@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {useNavigation} from "../../components/AppRouter";
+import {Page, useNavigation} from "../../components/AppRouter";
 import {getPatternTypeDisplay} from "../../utils/PatternUtils";
 import {UserPatternData} from "../../models/user-pattern-data";
 import "./PasswordManager.css";
 import {UserPatternService} from "../../services/firestore-service.ts";
 import {firebaseApp} from "../../firebase/firebase-config.ts";
+import {PatternType} from "../../models/pattern-type.ts";
 
 const PasswordManager: React.FC = () => {
     // @ts-ignore
@@ -24,7 +25,7 @@ const PasswordManager: React.FC = () => {
             }
 
             const service = new UserPatternService();
-            const data = await service.getUserPatternDataByUUID(uid);
+            const data = await service.getUserPatternDataByUserUUID(uid);
             setUserPasswords(data);
         } catch (e) {
             console.error('Error loading saved patterns:', e);
@@ -54,10 +55,23 @@ const PasswordManager: React.FC = () => {
         setExpandedWebsites(newSet);
     };
 
-    // @ts-ignore
     const handlePasswordView = (password: UserPatternData) => {
-        // TODO: Handle password view
+        const routeMap: Record<PatternType, Page> = {
+            [PatternType.CONNECT_DOTS]: 'connect_the_dots',
+            [PatternType.PIANO_SEQUENCE]: 'piano_password',
+            [PatternType.CHESS_BOARD]: 'chess_password',
+        };
+
+        const route = routeMap[password.pattern_type];
+        if (!route) return;
+
+        navigateTo(route, {
+            isCreatingPassword: false,
+            username: password.username,
+            isViewingPassword: true
+        });
     };
+
 
     const handlePasswordDelete = async (e: React.MouseEvent, password: UserPatternData) => {
         e.stopPropagation();

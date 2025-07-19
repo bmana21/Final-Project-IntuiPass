@@ -17,6 +17,34 @@ export class PasswordIntegrationService {
         this.domManager = new DomManager();
     }
 
+    public async getPasswordByKey(key: string, patternType: PatternType, username: string): Promise<string> {
+        const user_uuid: string | undefined = firebaseApp.auth().currentUser?.uid;
+        if (!user_uuid) {
+            console.log("User not authenticated");
+            return generateRandomPassword();
+        }
+
+        if (this.userPatternService == undefined) {
+            return generateRandomPassword();
+        }
+        const userPatterns = await this.userPatternService.getUserPatternDataByUserUUID(user_uuid);
+
+        const matchingPattern = userPatterns.find(pattern =>
+            pattern.username === username && pattern.pattern_type === patternType
+        );
+
+        if (!matchingPattern) {
+            console.log("No matching pattern found for username and pattern type");
+            return generateRandomPassword();
+        }
+
+        try {
+            return await decrypt(matchingPattern, key);
+        } catch (error) {
+            return generateRandomPassword();
+        }
+    }
+
     public async processPassword(key: string, patternType: PatternType, save: boolean, username: string): Promise<boolean> {
         if (this.domManager == undefined || this.userPatternService == undefined) {
             return false;

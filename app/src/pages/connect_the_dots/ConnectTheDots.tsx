@@ -4,7 +4,7 @@ import './ConnectTheDots.css';
 import {PasswordIntegrationService} from "../../services/password-integration-service.ts";
 import {PatternType} from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
-
+import {CredentialsDisplay} from '../cretentials-display/CredentialsDisplay.tsx';
 
 interface Point {
   x: number;
@@ -29,21 +29,25 @@ const ConnectTheDots: React.FC = () => {
   const [passwordPattern, setPasswordPattern] = useState<string>('');
   const [username, setUsername] = useState<string>('');
   const [isUsernameValid, setIsUsernameValid] = useState<boolean>(false);
-  
+
+  const [showCredentials, setShowCredentials] = useState<boolean>(false);
+  const [retrievedPassword, setRetrievedPassword] = useState<string>('');
+
   const routeParams = getRouteParams();
   const isCreatingPassword = routeParams?.isCreatingPassword ?? true;
+  const isViewingPassword = routeParams?.isViewingPassword ?? false;
   const usernameFromPattern = routeParams?.username;
 
   useEffect(() => {
     console.log("creating password is: ", isCreatingPassword);
     console.log("username from pattern: ", usernameFromPattern);
-    
+
     const initialPoints: Point[] = [];
     const gridSize = 3;
     const spacing = 80;
     const offsetX = 120;
     const offsetY = 100;
-    
+
     for (let row = 0; row < gridSize; row++) {
       for (let col = 0; col < gridSize; col++) {
         initialPoints.push({
@@ -59,7 +63,6 @@ const ConnectTheDots: React.FC = () => {
       setUsername(usernameFromPattern);
     }
   }, [isCreatingPassword, usernameFromPattern]);
-
 
   useEffect(() => {
     drawCanvas();
@@ -79,7 +82,7 @@ const ConnectTheDots: React.FC = () => {
     connections.forEach(connection => {
       const fromPoint = points.find(p => p.id === connection.from);
       const toPoint = points.find(p => p.id === connection.to);
-      
+
       if (fromPoint && toPoint) {
         ctx.beginPath();
         ctx.moveTo(fromPoint.x, fromPoint.y);
@@ -92,11 +95,11 @@ const ConnectTheDots: React.FC = () => {
       ctx.strokeStyle = '#FF9800';
       ctx.lineWidth = 3;
       ctx.beginPath();
-      
+
       for (let i = 0; i < selectedPath.length - 1; i++) {
         const fromPoint = points.find(p => p.id === selectedPath[i]);
         const toPoint = points.find(p => p.id === selectedPath[i + 1]);
-        
+
         if (fromPoint && toPoint) {
           if (i === 0) {
             ctx.moveTo(fromPoint.x, fromPoint.y);
@@ -124,18 +127,18 @@ const ConnectTheDots: React.FC = () => {
     points.forEach(point => {
       ctx.beginPath();
       ctx.arc(point.x, point.y, 20, 0, 2 * Math.PI);
-      
+
       if (selectedPath.includes(point.id)) {
         ctx.fillStyle = '#FF9800';
       } else {
         ctx.fillStyle = '#2196F3';
       }
-      
+
       ctx.fill();
       ctx.strokeStyle = '#333';
       ctx.lineWidth = 2;
       ctx.stroke();
-      
+
       ctx.fillStyle = 'white';
       ctx.font = 'bold 14px Arial';
       ctx.textAlign = 'center';
@@ -164,11 +167,11 @@ const ConnectTheDots: React.FC = () => {
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const coords = getCanvasCoordinates(event);
     const clickedPoint = getPointAtPosition(coords.x, coords.y);
-    
+
     if (clickedPoint) {
       setConnections([]);
       setPasswordPattern('');
-      
+
       setIsDrawing(true);
       setSelectedPath([clickedPoint.id]);
       setCurrentMousePos(coords);
@@ -182,7 +185,7 @@ const ConnectTheDots: React.FC = () => {
     setCurrentMousePos(coords);
 
     const hoveredPoint = getPointAtPosition(coords.x, coords.y);
-    
+
     if (hoveredPoint && !selectedPath.includes(hoveredPoint.id)) {
       setSelectedPath(prev => [...prev, hoveredPoint.id]);
     }
@@ -205,7 +208,7 @@ const ConnectTheDots: React.FC = () => {
     }
 
     setConnections(newConnections);
-    
+
     const patternString = selectedPath.join('-');
     setPasswordPattern(patternString);
 
@@ -226,11 +229,13 @@ const ConnectTheDots: React.FC = () => {
     setSelectedPath([]);
     setIsDrawing(false);
     setCurrentMousePos(null);
+    setShowCredentials(false);
+    setRetrievedPassword('');
   };
 
   const canProceed = () => {
     const hasPattern = connections.length > 0 && passwordPattern.length > 0;
-    
+
     if (isCreatingPassword) {
       return isUsernameValid && hasPattern;
     } else {
@@ -256,7 +261,7 @@ const ConnectTheDots: React.FC = () => {
     }
 
     const finalUsername = isCreatingPassword ? username : (usernameFromPattern || '');
-    
+
     if (!finalUsername.trim()) {
       alert('Username is required!');
       return;
@@ -271,24 +276,33 @@ const ConnectTheDots: React.FC = () => {
         createdAt: new Date(),
         userId: 'current_user_id'
       };
-      
-      console.log('Processing password:', passwordData);
-      
-      const passwordIntegrationService = new PasswordIntegrationService();
-      
-      const success = await passwordIntegrationService.processPassword(
-        passwordPattern, 
-        PatternType.CONNECT_DOTS, 
-        isCreatingPassword,
-        finalUsername
-      );
-       
-      if (success) {
-        window.close()
-      } else {
-        alert('Could not process password!');
-      }
 
+      console.log('Processing password:', passwordData);
+
+      const passwordIntegrationService = new PasswordIntegrationService();
+
+      if (!isViewingPassword) {
+        const success = await passwordIntegrationService.processPassword(
+            passwordPattern,
+            PatternType.CONNECT_DOTS,
+            isCreatingPassword,
+            finalUsername
+        );
+
+        if (success) {
+          window.close()
+        } else {
+          alert('Could not process password!');
+        }
+      } else {
+        const password = await passwordIntegrationService.getPasswordByKey(passwordPattern, PatternType.CONNECT_DOTS, usernameFromPattern);
+        if (password) {
+          setRetrievedPassword(password);
+          setShowCredentials(true);
+        } else {
+          alert('Password not found or pattern incorrect!');
+        }
+      }
     } catch (error) {
       console.error('Error processing password:', error);
       alert('Failed to process password');
@@ -296,72 +310,80 @@ const ConnectTheDots: React.FC = () => {
   };
 
   return (
-    <div className="connect-dots-container">
-      <div className="header">
-        <button className="back-button" onClick={goBack}>
-          ← Back
-        </button>
-        <div className="header-content">
-          <h2>Connect The Dots</h2>
+      <div className="connect-dots-container">
+        <div className="header">
+          <button className="back-button" onClick={goBack}>
+            ← Back
+          </button>
+          <div className="header-content">
+            <h2>Connect The Dots</h2>
+          </div>
         </div>
-      </div>
 
-      {isCreatingPassword && (
-        <UsernameInput
-          value={username}
-          onChange={setUsername}
-          onValidation={setIsUsernameValid}
-        />
-      )}
+        {isCreatingPassword && (
+            <UsernameInput
+                value={username}
+                onChange={setUsername}
+                onValidation={setIsUsernameValid}
+            />
+        )}
 
-      <div className="instructions">
-        <p>
-          {isCreatingPassword 
-            ? "Press and drag from one dot to another to create your pattern. Lift the mouse to finish."
-            : "Recreate your password pattern by dragging through the dots."
-          }
-        </p>
-        {isDrawing && (
-          <p className="drawing-info">
-            Drawing pattern... Current path: {selectedPath.join(' → ')}
+        <div className="instructions">
+          <p>
+            {isCreatingPassword
+                ? "Press and drag from one dot to another to create your pattern. Lift the mouse to finish."
+                : "Recreate your password pattern by dragging through the dots."
+            }
           </p>
+          {isDrawing && (
+              <p className="drawing-info">
+                Drawing pattern... Current path: {selectedPath.join(' → ')}
+              </p>
+          )}
+        </div>
+
+        <div className="canvas-container">
+          <canvas
+              ref={canvasRef}
+              width={400}
+              height={350}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseLeave}
+              className="dots-canvas"
+          />
+        </div>
+
+        <div className="controls">
+          <button onClick={clearConnections} className="clear-button">
+            Clear All
+          </button>
+
+          <button
+              onClick={savePassword}
+              className={`save-button ${!canProceed() ? 'disabled' : ''}`}
+              disabled={!canProceed()}
+          >
+            {isCreatingPassword ? "Save Pattern" : (isViewingPassword ? "View Password" : "Fill Password")}
+          </button>
+        </div>
+
+        {/* Add the CredentialsDisplay component here */}
+        {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
+            <CredentialsDisplay
+                username={usernameFromPattern}
+                password={retrievedPassword}
+            />
+        )}
+
+        {passwordPattern && (
+            <div className="pattern-display">
+              <p><strong>Pattern:</strong> {passwordPattern}</p>
+              <p><small>Each sequence represents a drawn path</small></p>
+            </div>
         )}
       </div>
-
-      <div className="canvas-container">
-        <canvas
-          ref={canvasRef}
-          width={400}
-          height={350}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseLeave}
-          className="dots-canvas"
-        />
-      </div>
-
-      <div className="controls">
-        <button onClick={clearConnections} className="clear-button">
-          Clear All
-        </button>
-        
-        <button 
-          onClick={savePassword} 
-          className={`save-button ${!canProceed() ? 'disabled' : ''}`}
-          disabled={!canProceed()}
-        >
-          {isCreatingPassword ? "Save Pattern" : "Fill Password"}
-        </button>
-      </div>
-
-      {passwordPattern && (
-        <div className="pattern-display">
-          <p><strong>Pattern:</strong> {passwordPattern}</p>
-          <p><small>Each sequence represents a drawn path</small></p>
-        </div>
-      )}
-    </div>
   );
 };
 
