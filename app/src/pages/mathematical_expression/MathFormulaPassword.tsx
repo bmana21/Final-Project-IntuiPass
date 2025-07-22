@@ -4,7 +4,7 @@ import { PasswordIntegrationService } from "../../services/password-integration-
 import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
 import { ConfigService } from '../../services/config-service.ts';
-import './MathFormulaPassword.css';
+import styles from './MathFormulaPassword.module.css';
 
 import * as iink from 'iink-ts';
 import katex from 'katex';
@@ -217,12 +217,12 @@ const MathFormulaPassword: React.FC = () => {
     };
 
     return (
-        <div className="math-formula-container">
-            <div className="header">
-                <button className="back-button" onClick={goBack}>
+        <div className={styles.mathFormulaContainer}>
+            <div className={styles.header}>
+                <button className={styles.backButton} onClick={goBack}>
                     ← Back
                 </button>
-                <div className="header-content">
+                <div className={styles.headerContent}>
                     <h2>Mathematical Formula</h2>
                 </div>
             </div>
@@ -235,7 +235,7 @@ const MathFormulaPassword: React.FC = () => {
                 />
             )}
 
-            <div className="instructions">
+            <div className={styles.instructions}>
                 <p>
                     {isCreatingPassword
                         ? "Draw your mathematical formula using your mouse or touch. The formula will be converted to LaTeX."
@@ -244,23 +244,23 @@ const MathFormulaPassword: React.FC = () => {
                 </p>
             </div>
 
-            <div className="math-editor-section">
-                <div className="controls">
-                    <button onClick={handleClear} disabled={isLoading} className="clear-button">
+            <div className={styles.mathEditorSection}>
+                <div className={styles.controls}>
+                    <button onClick={handleClear} disabled={isLoading} className={styles.clearButton}>
                         Clear
                     </button>
-                    <button onClick={handleUndo} disabled={isLoading} className="undo-button">
+                    <button onClick={handleUndo} disabled={isLoading} className={styles.undoButton}>
                         Undo
                     </button>
-                    <button onClick={handleRedo} disabled={isLoading} className="redo-button">
+                    <button onClick={handleRedo} disabled={isLoading} className={styles.redoButton}>
                         Redo
                     </button>
                 </div>
 
-                <div className="canvas-container">
+                <div className={styles.canvasContainer}>
                     <div
                         ref={editorRef}
-                        className="math-editor"
+                        className={styles.mathEditor}
                         style={{
                             height: '500px',
                             width: '100%',
@@ -271,16 +271,16 @@ const MathFormulaPassword: React.FC = () => {
                     />
 
                     {isLoading && (
-                        <div className="loading-overlay">Loading math editor...</div>
+                        <div className={styles.loadingOverlay}>Loading math editor...</div>
                     )}
                 </div>
             </div>
 
-            <div className="preview-section">
+            <div className={styles.previewSection}>
                 <h3>Preview:</h3>
                 <div
                     ref={resultRef}
-                    className="latex-preview"
+                    className={styles.latexPreview}
                     style={{
                         minHeight: '80px',
                         border: '2px solid #eee',
@@ -290,29 +290,17 @@ const MathFormulaPassword: React.FC = () => {
                         textAlign: 'center'
                     }}
                 />
-                {latexFormula && (
-                    <div className="latex-raw">
-                        <small>LaTeX: {latexFormula}</small>
-                    </div>
-                )}
             </div>
 
-            <div className="controls">
+            <div className={styles.controls}>
                 <button
                     onClick={savePassword}
-                    className={`save-button ${!canProceed() ? 'disabled' : ''}`}
+                    className={`${styles.saveButton} ${!canProceed() ? 'disabled' : ''}`}
                     disabled={!canProceed()}
                 >
                     {isCreatingPassword ? "Save Pattern" : "Fill Password"}
                 </button>
             </div>
-
-            {latexFormula && (
-                <div className="pattern-display">
-                    <p><strong>Formula:</strong> {latexFormula}</p>
-                    <p><small>Mathematical expression in LaTeX format</small></p>
-                </div>
-            )}
         </div>
     );
 };
