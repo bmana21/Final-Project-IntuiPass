@@ -7,14 +7,6 @@ import './Login.css';
 declare global {
   interface Window {
     firebase: any;
-    iink: {
-      Editor: {
-        load: (element: HTMLElement, type: string, options: any) => Promise<any>;
-      };
-    };
-    katex: {
-      render: (latex: string, element: HTMLElement, options?: any) => void;
-    };
   }
 }
 
