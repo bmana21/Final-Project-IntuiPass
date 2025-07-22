@@ -1,4 +1,4 @@
-.connect-dots-container {
+.connectDotsContainer {
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
@@ -16,7 +16,7 @@
   gap: 15px;
 }
 
-.back-button {
+.backButton {
   width: 20%;
   background: rgba(255, 255, 255, 0.2);
   border: none;
@@ -28,11 +28,11 @@
   transition: background-color 0.3s ease;
 }
 
-.back-button:hover {
+.backButton:hover {
   background: rgba(255, 255, 255, 0.3);
 }
 
-.header-content {
+.headerContent {
   text-align: center;
 }
 
@@ -55,7 +55,7 @@
   line-height: 1.5;
 }
 
-.drawing-info {
+.drawingInfo {
   margin-top: 10px !important;
   color: #FF9800;
   font-weight: 500;
@@ -71,7 +71,7 @@
   }
 }
 
-.canvas-container {
+.canvasContainer {
   background: white;
   border-radius: 15px;
   padding: 20px;
@@ -81,7 +81,7 @@
   justify-content: center;
 }
 
-.dots-canvas {
+.dotsCanvas {
   border: 2px solid #e0e0e0;
   border-radius: 10px;
   cursor: crosshair;
@@ -89,11 +89,11 @@
   user-select: none;
 }
 
-.dots-canvas:hover {
+.dotsCanvas:hover {
   border-color: #2196F3;
 }
 
-.dots-canvas:active {
+.dotsCanvas:active {
   cursor: grabbing;
 }
 
@@ -104,8 +104,8 @@
   margin-bottom: 20px;
 }
 
-.clear-button,
-.save-button {
+.clearButton,
+.saveButton {
   padding: 12px 24px;
   border: none;
   border-radius: 8px;
@@ -116,39 +116,39 @@
   min-width: 120px;
 }
 
-.clear-button {
+.clearButton {
   background: #f44336;
   color: white;
 }
 
-.clear-button:hover {
+.clearButton:hover {
   background: #d32f2f;
   transform: translateY(-2px);
 }
 
-.save-button {
+.saveButton {
   background: #4CAF50;
   color: white;
 }
 
-.save-button:hover {
+.saveButton:hover {
   background: #45a049;
   transform: translateY(-2px);
 }
 
-.save-button.disabled {
+.saveButton.disabled {
   background: #ccc;
   color: #999;
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.save-button.disabled:hover {
+.saveButton.disabled:hover {
   background: #ccc;
   transform: none;
 }
 
-.pattern-display {
+.patternDisplay {
   background: rgba(255, 255, 255, 0.1);
   padding: 15px;
   border-radius: 10px;
@@ -156,7 +156,7 @@
   text-align: center;
 }
 
-.pattern-display p {
+.patternDisplay p {
   margin: 0;
   font-family: 'Courier New', monospace;
   font-size: 14px;
@@ -164,11 +164,11 @@
 }
 
 @media (max-width: 600px) {
-  .connect-dots-container {
+  .connectDotsContainer {
     padding: 15px;
   }
   
-  .dots-canvas {
+  .dotsCanvas {
     width: 100%;
     max-width: 350px;
     height: auto;
@@ -179,8 +179,8 @@
     align-items: center;
   }
   
-  .clear-button,
-  .save-button {
+  .clearButton,
+  .saveButton {
     width: 100%;
     max-width: 200px;
   }

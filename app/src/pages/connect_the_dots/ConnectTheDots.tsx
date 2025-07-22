@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useNavigation} from '../../components/AppRouter';
-import './ConnectTheDots.css';
+import styles from './ConnectTheDots.module.css';
 import {PasswordIntegrationService} from "../../services/password-integration-service.ts";
 import {PatternType} from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
@@ -296,12 +296,12 @@ const ConnectTheDots: React.FC = () => {
   };
 
   return (
-    <div className="connect-dots-container">
-      <div className="header">
-        <button className="back-button" onClick={goBack}>
+    <div className={styles.ConnectDotsContainer}>
+      <div className={styles.header}>
+        <button className={styles.backButton} onClick={goBack}>
           ← Back
         </button>
-        <div className="header-content">
+        <div className={styles.headerContent}>
           <h2>Connect The Dots</h2>
         </div>
       </div>
@@ -314,7 +314,7 @@ const ConnectTheDots: React.FC = () => {
         />
       )}
 
-      <div className="instructions">
+      <div className={styles.instructions}>
         <p>
           {isCreatingPassword 
             ? "Press and drag from one dot to another to create your pattern. Lift the mouse to finish."
@@ -322,13 +322,13 @@ const ConnectTheDots: React.FC = () => {
           }
         </p>
         {isDrawing && (
-          <p className="drawing-info">
+          <p className={styles.drawingInfo}>
             Drawing pattern... Current path: {selectedPath.join(' → ')}
           </p>
         )}
       </div>
 
-      <div className="canvas-container">
+      <div className={styles.canvasContainer}>
         <canvas
           ref={canvasRef}
           width={400}
@@ -337,18 +337,18 @@ const ConnectTheDots: React.FC = () => {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
-          className="dots-canvas"
+          className={styles.dotsCanvas}
         />
       </div>
 
-      <div className="controls">
-        <button onClick={clearConnections} className="clear-button">
+      <div className={styles.controls}>
+        <button onClick={clearConnections} className={styles.clearButton}>
           Clear All
         </button>
         
         <button 
           onClick={savePassword} 
-          className={`save-button ${!canProceed() ? 'disabled' : ''}`}
+          className={`${styles.saveButton} ${!canProceed() ? 'disabled' : ''}`}
           disabled={!canProceed()}
         >
           {isCreatingPassword ? "Save Pattern" : "Fill Password"}
@@ -356,7 +356,7 @@ const ConnectTheDots: React.FC = () => {
       </div>
 
       {passwordPattern && (
-        <div className="pattern-display">
+        <div className={styles.patternDisplay}>
           <p><strong>Pattern:</strong> {passwordPattern}</p>
           <p><small>Each sequence represents a drawn path</small></p>
         </div>
