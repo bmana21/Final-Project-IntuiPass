@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigation } from '../../components/AppRouter';
 import { AuthService } from '../../services/auth-service';
-import './PasswordModeSelection.css';
+import styles from './PasswordModeSelection.module.css';
 
 const PasswordModeSelection: React.FC = () => {
   const { navigateTo } = useNavigation();
@@ -14,26 +14,26 @@ const PasswordModeSelection: React.FC = () => {
   };
 
   return (
-    <div className="password-mode-container">
-      <div className="mode-selection-card">
+    <div className={styles.passwordModeContainer}>
+      <div className={styles.modeSelectionCard}>
         <h1>Password Manager</h1>
-        <p className="subtitle">Choose what you'd like to do</p>
+        <p className={styles.subtitle}>Choose what you'd like to do</p>
         
-        <div className="mode-buttons">
+        <div className={styles.modeButtons}>
           <button 
-            className="mode-button create-button"
+            className={`${styles.modeButton} ${styles.createButton}`}
             onClick={() => handleModeSelection(true)}
           >
-            <div className="button-icon">🔐</div>
+            <div className={styles.buttonIcon}>🔐</div>
             <h3>Create New Password</h3>
             <p>Set up a new pattern-based password</p>
           </button>
           
           <button 
-            className="mode-button fill-button"
+            className={`${styles.modeButton} ${styles.fillButton}`}
             onClick={() => handleModeSelection(false)}
           >
-            <div className="button-icon">🔓</div>
+            <div className={styles.buttonIcon}>🔓</div>
             <h3>Fill Existing Password</h3>
             <p>Use your saved pattern to fill a password</p>
           </button>
