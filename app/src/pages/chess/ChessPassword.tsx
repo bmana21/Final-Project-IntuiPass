@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '../../components/AppRouter';
-import './ChessPassword.css';
+import styles from './ChessPassword.module.css';
 import { PasswordIntegrationService } from "../../services/password-integration-service.ts";
 import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
@@ -284,7 +284,7 @@ const ChessPassword: React.FC = () => {
         const position = getSquarePosition(row, col);
         const isDragOver = dragOverSquare === position;
         const isPieceDragging = piece && draggedPieceId === `board-${piece.position}`;
-        const squareClass = `chess-square ${isLight ? 'light' : 'dark'} ${isDragOver ? 'drag-over' : ''}`;
+        const squareClass = `${styles.chessSquare} ${isLight ? styles.light : styles.dark} ${isDragOver ? styles.dragOver : ''}`;
         
         squares.push(
           <div
@@ -298,7 +298,7 @@ const ChessPassword: React.FC = () => {
           >
             {piece && (
               <span 
-                className={`chess-piece ${piece.piece.color === 'white' ? 'white-piece' : 'black-piece'} ${isPieceDragging ? 'dragging' : ''}`}
+                className={`${styles.chessPiece} ${piece.piece.color === styles.white ? styles.whitePiece : styles.blackPiece} ${isPieceDragging ? styles.dragging : ''}`}
                 draggable
                 onDragStart={(e) => handleBoardPieceDragStart(piece, e)}
                 onDragEnd={handleDragEnd}
@@ -315,20 +315,20 @@ const ChessPassword: React.FC = () => {
   };
 
   const renderPieceRow = (pieces: ChessPiece[]) => (
-    <div className="piece-container">
-      <div className="piece-items">
+    <div className={styles.pieceContainer}>
+      <div className={styles.pieceItems}>
         {pieces.map((piece) => {
           const isDragging = draggedPieceId === piece.id;
           return (
             <div
               key={piece.id}
-              className={`piece-button ${isDragging ? 'dragging' : ''}`}
+              className={`${styles.pieceButton} ${isDragging ? styles.dragging : ''}`}
               draggable
               onDragStart={(e) => handleDragStart(piece, e)}
               onDragEnd={handleDragEnd}
               title={piece.name}
             >
-              <span className={`piece-icon ${piece.color === 'white' ? 'white-piece' : 'black-piece'}`}>
+              <span className={`${styles.pieceIcon} ${piece.color === styles.white ? styles.whitePiece : styles.blackPiece}`}>
                 {piece.color === 'white' ? piece.whiteSymbol : piece.blackSymbol}
               </span>
             </div>
@@ -339,9 +339,9 @@ const ChessPassword: React.FC = () => {
   );
 
   return (
-    <div className="chess-password-container">
-      <div className="header">
-        <button className="back-button" onClick={goBack}>
+    <div className={styles.chessPasswordContainer}>
+      <div className={styles.header}>
+        <button className={styles.backButton} onClick={goBack}>
           ← Back
         </button>
         <h2>Chess Board Pattern</h2>
@@ -355,7 +355,7 @@ const ChessPassword: React.FC = () => {
         />
       )}
 
-      <div className="instructions">
+      <div className={styles.instructions}>
         <p>
           {isCreatingPassword 
             ? "Drag chess pieces from below onto the board, or drag pieces on the board to move them."
@@ -365,28 +365,28 @@ const ChessPassword: React.FC = () => {
         <p><small>Click on a piece to remove it, or double-click pieces on the board to delete them.</small></p>
       </div>
 
-      <div className="piece-selector">
+      <div className={styles.pieceSelector}>
         <h3>Drag Pieces to the Board:</h3>
-        <div className="piece-rows">
+        <div className={styles.pieceRows}>
           {renderPieceRow(whitePieces)}
           {renderPieceRow(blackPieces)}
         </div>
       </div>
 
-      <div className="chess-board-container">
-        <div className="chess-board">
+      <div className={styles.chessBoardContainer}>
+        <div className={styles.chessBoard}>
           {renderBoard()}
         </div>
       </div>
 
-      <div className="controls">
-        <button onClick={clearBoard} className="clear-button">
+      <div className={styles.controls}>
+        <button onClick={clearBoard} className={styles.clearButton}>
           Clear Board
         </button>
         
         <button 
           onClick={savePassword} 
-          className={`save-button ${!canProceed() ? 'disabled' : ''}`}
+          className={`${styles.saveButton} ${!canProceed() ? 'disabled' : ''}`}
           disabled={!canProceed()}
         >
           {isCreatingPassword ? "Save Pattern" : "Fill Password"}
@@ -394,12 +394,12 @@ const ChessPassword: React.FC = () => {
       </div>
 
       {placedPieces.length > 0 && (
-        <div className="pattern-display">
+        <div className={styles.patternDisplay}>
           <p><strong>Placed Pieces:</strong></p>
-          <div className="pattern-pieces">
+          <div className={styles.patternPieces}>
             {placedPieces.map((piece, index) => (
-              <span key={index} className="pattern-piece">
-                <span className={piece.piece.color === 'white' ? 'white-piece' : 'black-piece'}>
+              <span key={index} className={styles.patternPiece}>
+                <span className={piece.piece.color === 'white' ? styles.whitePiece : styles.blackPiece}>
                   {piece.piece.color === 'white' ? piece.piece.whiteSymbol : piece.piece.blackSymbol}
                 </span> {piece.position}
               </span>
