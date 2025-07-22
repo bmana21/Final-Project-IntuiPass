@@ -30,6 +30,10 @@ const Popup: React.FC = () => {
     navigateTo('chess_password', { isCreatingPassword });
   };
 
+  const handleNavigateToMathFormula = () => {
+    navigateTo('math_formula', { isCreatingPassword });
+  };
+
   if (!user) {
     return (
       <div className="popup-container">
@@ -62,45 +66,57 @@ const Popup: React.FC = () => {
         <SavedPatterns />
       )}
 
-    {isCreatingPassword && (
-      <div className="password-options">
-        <h3>Choose Password Type:</h3>
+      {isCreatingPassword && (
+        <div className="password-options">
+          <h3>Choose Password Type:</h3>
 
-        <button
-          className="password-type-button"
-          onClick={handleNavigateToConnectDots}
-        >
-          <span className="button-icon">⚫</span>
-          <div className="button-content">
-            <span className="button-title">Connect The Dots</span>
-            <span className="button-description">Create patterns by connecting dots</span>
-          </div>
-        </button>
+          <button
+            className="password-type-button"
+            onClick={handleNavigateToConnectDots}
+          >
+            <span className="button-icon">⚫</span>
+            <div className="button-content">
+              <span className="button-title">Connect The Dots</span>
+              <span className="button-description">Create patterns by connecting dots</span>
+            </div>
+          </button>
 
-        <button
-          className="password-type-button"
-          onClick={handleNavigateToPiano}
-        >
-          <span className="button-icon">🎹</span>
-          <div className="button-content">
-            <span className="button-title">Piano Sequence</span>
-            <span className="button-description">Create melodies as passwords</span>
-          </div>
-        </button>
+          <button
+            className="password-type-button"
+            onClick={handleNavigateToPiano}
+          >
+            <span className="button-icon">🎹</span>
+            <div className="button-content">
+              <span className="button-title">Piano Sequence</span>
+              <span className="button-description">Create melodies as passwords</span>
+            </div>
+          </button>
 
-        <button
-          className="password-type-button"
-          onClick={handleNavigateToChess}
-        >
-          <span className="button-icon">♔</span>
-          <div className="button-content">
-            <span className="button-title">Chess Board</span>
-            <span className="button-description">Place pieces on a chess board</span>
-          </div>
-        </button>
-      </div>
-    )}
-    
+          <button
+            className="password-type-button"
+            onClick={handleNavigateToChess}
+          >
+            <span className="button-icon">♔</span>
+            <div className="button-content">
+              <span className="button-title">Chess Board</span>
+              <span className="button-description">Place pieces on a chess board</span>
+            </div>
+          </button>
+
+          <button
+            className="password-type-button"
+            onClick={handleNavigateToMathFormula}
+          >
+            <span className="button-icon">∫</span>
+            <div className="button-content">
+              <span className="button-title">Mathematical Formula</span>
+              <span className="button-description">Draw mathematical expressions</span>
+            </div>
+          </button>
+
+        </div>
+      )}
+
       <div className="footer">
         <button className="sign-out-button" onClick={handleSignOut}>
           <span className="sign-out-icon">👋</span>
