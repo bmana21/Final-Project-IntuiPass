@@ -4,7 +4,7 @@ import styles from './PianoPassword.module.css';
 import { PasswordIntegrationService } from "../../services/password-integration-service.ts";
 import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
-import {CredentialsDisplay} from '../cretentials-display/CredentialsDisplay';
+import { CredentialsDisplay } from '../cretentials-display/CredentialsDisplay';
 
 interface PianoKey {
   id: string;
@@ -58,9 +58,9 @@ const PianoPassword: React.FC = () => {
   const isTypingInInput = () => {
     const activeElement = document.activeElement;
     return activeElement && (
-        activeElement.tagName === 'INPUT' ||
-        activeElement.tagName === 'TEXTAREA' ||
-        (activeElement as HTMLElement).contentEditable === 'true'
+      activeElement.tagName === 'INPUT' ||
+      activeElement.tagName === 'TEXTAREA' ||
+      (activeElement as HTMLElement).contentEditable === 'true'
     );
   };
 
@@ -225,10 +225,10 @@ const PianoPassword: React.FC = () => {
 
       if (!isViewingPassword) {
         const success = await passwordIntegrationService.processPassword(
-            passwordPattern,
-            PatternType.PIANO_SEQUENCE,
-            isCreatingPassword,
-            finalUsername
+          passwordPattern,
+          PatternType.PIANO_SEQUENCE,
+          isCreatingPassword,
+          finalUsername
         );
 
         if (success) {
@@ -253,93 +253,93 @@ const PianoPassword: React.FC = () => {
   };
 
   return (
-      <div className={styles.pianoPasswordContainer}>
-        <div className={styles.header}>
-          <button className={styles.backButton} onClick={goBack}>
-            ← Back
-          </button>
-          <h2>Piano Sequence</h2>
-          <div className={styles.modeBadge}>
-            {isCreatingPassword ? '🔐 Creating' : (isViewingPassword ? '👁️ Viewing' : '🔓 Filling')}
-          </div>
+    <div className="mainContainer">
+      <div className="passwordOptionHeader">
+        <button className="backButton" onClick={goBack}>
+          ← Back
+        </button>
+        <h2>Piano Sequence</h2>
+        <div className="modeBadge">
+          {isCreatingPassword ? '🔐 Creating' : (isViewingPassword ? '👁️ Viewing' : '🔓 Filling')}
         </div>
+      </div>
 
-        {isCreatingPassword && (
-            <UsernameInput
-                value={username}
-                onChange={setUsername}
-                onValidation={setIsUsernameValid}
-            />
-        )}
+      {isCreatingPassword && (
+        <UsernameInput
+          value={username}
+          onChange={setUsername}
+          onValidation={setIsUsernameValid}
+        />
+      )}
 
-        <div className={styles.instructions}>
-          <p>
-            {isCreatingPassword
-                ? "Play notes on the piano to create your sequence. Use keyboard keys or click the piano keys."
-                : "Recreate your password sequence by playing the same notes."
-            }
-          </p>
-          <div className={styles.keyboardHints}>
-            <p><small>Keyboard: A S D F G H J K (white keys) | W E T Y U (black keys)</small></p>
-          </div>
+      <div className={styles.instructions}>
+        <p>
+          {isCreatingPassword
+            ? "Play notes on the piano to create your sequence. Use keyboard keys or click the piano keys."
+            : "Recreate your password sequence by playing the same notes."
+          }
+        </p>
+        <div className={styles.keyboardHints}>
+          <p><small>Keyboard: A S D F G H J K (white keys) | W E T Y U (black keys)</small></p>
         </div>
+      </div>
 
-        <div className={styles.pianoContainer}>
-          <div className={styles.piano}>
-            {pianoKeys.map((key) => (
-                <button
-                    key={key.id}
-                    className={`${styles.pianoKey} ${key.isBlack ? styles.blackKey : styles.whiteKey}`}
-                    data-pressed={pressedKeys.has(key.id)}
-                    onClick={() => handleKeyClick(key)}
-                    onMouseDown={(e) => e.preventDefault()}
-                >
-                  <span className={styles.noteLabel}>{key.note}</span>
-                  <span className={styles.keyLabel}>{key.keyboardKey.toUpperCase()}</span>
-                </button>
-            ))}
-          </div>
+      <div className={styles.pianoContainer}>
+        <div className={styles.piano}>
+          {pianoKeys.map((key) => (
+            <button
+              key={key.id}
+              className={`${styles.pianoKey} ${key.isBlack ? styles.blackKey : styles.whiteKey}`}
+              data-pressed={pressedKeys.has(key.id)}
+              onClick={() => handleKeyClick(key)}
+              onMouseDown={(e) => e.preventDefault()}
+            >
+              <span className={styles.noteLabel}>{key.note}</span>
+              <span className={styles.keyLabel}>{key.keyboardKey.toUpperCase()}</span>
+            </button>
+          ))}
         </div>
+      </div>
 
-        <div className={styles.controls}>
-          <button onClick={clearSequence} className={styles.clearButton}>
-            Clear Sequence
-          </button>
+      <div className={styles.controls}>
+        <button onClick={clearSequence} className={styles.clearButton}>
+          Clear Sequence
+        </button>
 
-          <button
-              onClick={savePassword}
-              className={`${styles.saveButton} ${!canProceed() ? styles.disabled : ''}`}
-              disabled={!canProceed()}
-          >
-            {isCreatingPassword ? "Save Sequence" : (isViewingPassword ? "View Password" : "Fill Password")}
-          </button>
-        </div>
+        <button
+          onClick={savePassword}
+          className={`${styles.saveButton} ${!canProceed() ? styles.disabled : ''}`}
+          disabled={!canProceed()}
+        >
+          {isCreatingPassword ? "Save Sequence" : (isViewingPassword ? "View Password" : "Fill Password")}
+        </button>
+      </div>
 
-        {/* Add the CredentialsDisplay component here */}
-        {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
-            <CredentialsDisplay
-                username={usernameFromPattern}
-                password={retrievedPassword}
-            />
-        )}
+      {/* Add the CredentialsDisplay component here */}
+      {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
+        <CredentialsDisplay
+          username={usernameFromPattern}
+          password={retrievedPassword}
+        />
+      )}
 
-        {sequence.length > 0 && (
-            <div className={styles.sequenceDisplay}>
-              <p><strong>Current Sequence:</strong></p>
-              <div className={styles.sequenceNotes}>
-                {sequence.map((noteId, index) => {
-                  const key = pianoKeys.find(k => k.id === noteId);
-                  return (
-                      <span key={index} className={styles.sequenceNote}>
+      {sequence.length > 0 && (
+        <div className={styles.sequenceDisplay}>
+          <p><strong>Current Sequence:</strong></p>
+          <div className={styles.sequenceNotes}>
+            {sequence.map((noteId, index) => {
+              const key = pianoKeys.find(k => k.id === noteId);
+              return (
+                <span key={index} className={styles.sequenceNote}>
                   {key?.note}
                 </span>
-                  );
-                })}
-              </div>
-              <p><small>Pattern: {passwordPattern}</small></p>
-            </div>
-        )}
-      </div>
+              );
+            })}
+          </div>
+          <p><small>Pattern: {passwordPattern}</small></p>
+        </div>
+      )}
+    </div>
   );
 };
 

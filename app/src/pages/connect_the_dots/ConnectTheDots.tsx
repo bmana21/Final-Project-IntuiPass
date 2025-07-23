@@ -1,10 +1,10 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {useNavigation} from '../../components/AppRouter';
-import './ConnectTheDots.css';
-import {PasswordIntegrationService} from "../../services/password-integration-service.ts";
-import {PatternType} from "../../models/pattern-type.ts";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigation } from '../../components/AppRouter';
+import styles from './ConnectTheDots.module.css';
+import { PasswordIntegrationService } from "../../services/password-integration-service.ts";
+import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
-import {CredentialsDisplay} from '../cretentials-display/CredentialsDisplay.tsx';
+import { CredentialsDisplay } from '../cretentials-display/CredentialsDisplay.tsx';
 
 interface Point {
   x: number;
@@ -20,7 +20,7 @@ interface Connection {
 const ConnectTheDots: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { goBack, getRouteParams } = useNavigation();
-  
+
   const [points, setPoints] = useState<Point[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [selectedPath, setSelectedPath] = useState<number[]>([]);
@@ -283,10 +283,10 @@ const ConnectTheDots: React.FC = () => {
 
       if (!isViewingPassword) {
         const success = await passwordIntegrationService.processPassword(
-            passwordPattern,
-            PatternType.CONNECT_DOTS,
-            isCreatingPassword,
-            finalUsername
+          passwordPattern,
+          PatternType.CONNECT_DOTS,
+          isCreatingPassword,
+          finalUsername
         );
 
         if (success) {
@@ -310,81 +310,80 @@ const ConnectTheDots: React.FC = () => {
   };
 
   return (
-      <div className="connect-dots-container">
-        <div className="header">
-          <button className="back-button" onClick={goBack}>
-            ← Back
-          </button>
-          <div className="header-content">
-            <h2>Connect The Dots</h2>
-          </div>
+    <div className="mainContainer">
+      <div className="passwordOptionHeader">
+        <button className="backButton" onClick={goBack}>
+          ← Back
+        </button>
+        <h2>Connect The Dots</h2>
+        <div className="modeBadge">
+          {isCreatingPassword ? '🔐 Creating' : '🔓 Filling'}
         </div>
 
         {isCreatingPassword && (
-            <UsernameInput
-                value={username}
-                onChange={setUsername}
-                onValidation={setIsUsernameValid}
-            />
+          <UsernameInput
+            value={username}
+            onChange={setUsername}
+            onValidation={setIsUsernameValid}
+          />
         )}
 
-        <div className="instructions">
+        <div className={styles.instructions}>
           <p>
             {isCreatingPassword
-                ? "Press and drag from one dot to another to create your pattern. Lift the mouse to finish."
-                : "Recreate your password pattern by dragging through the dots."
+              ? "Press and drag from one dot to another to create your pattern. Lift the mouse to finish."
+              : "Recreate your password pattern by dragging through the dots."
             }
           </p>
           {isDrawing && (
-              <p className="drawing-info">
-                Drawing pattern... Current path: {selectedPath.join(' → ')}
-              </p>
-          )}
+            <p className={styles.drawingInfo}>
+              Drawing pattern... Current path: {selectedPath.join(' → ')}
+            </p>)}
         </div>
 
-        <div className="canvas-container">
+        <div className={styles.canvasContainer}>
           <canvas
-              ref={canvasRef}
-              width={400}
-              height={350}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseLeave}
-              className="dots-canvas"
+            ref={canvasRef}
+            width={400}
+            height={350}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseLeave}
+            className={styles.dotsCanvas}
           />
         </div>
 
-        <div className="controls">
-          <button onClick={clearConnections} className="clear-button">
+        <div className={styles.controls}>
+          <button onClick={clearConnections} className={styles.clearButton}>
             Clear All
           </button>
 
           <button
-              onClick={savePassword}
-              className={`save-button ${!canProceed() ? 'disabled' : ''}`}
-              disabled={!canProceed()}
+            onClick={savePassword}
+            className={`${styles.saveButton} ${!canProceed() ? 'disabled' : ''}`}
+            disabled={!canProceed()}
           >
-            {isCreatingPassword ? "Save Pattern" : (isViewingPassword ? "View Password" : "Fill Password")}
+            {isCreatingPassword ? "Save Pattern" : "Fill Password"}
           </button>
         </div>
 
         {/* Add the CredentialsDisplay component here */}
         {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
-            <CredentialsDisplay
-                username={usernameFromPattern}
-                password={retrievedPassword}
-            />
+          <CredentialsDisplay
+            username={usernameFromPattern}
+            password={retrievedPassword}
+          />
         )}
 
         {passwordPattern && (
-            <div className="pattern-display">
-              <p><strong>Pattern:</strong> {passwordPattern}</p>
-              <p><small>Each sequence represents a drawn path</small></p>
-            </div>
+          <div className={styles.patternDisplay}>
+            <p><strong>Pattern:</strong> {passwordPattern}</p>
+            <p><small>Each sequence represents a drawn path</small></p>
+          </div>
         )}
       </div>
+    </div>
   );
 };
-
 export default ConnectTheDots;

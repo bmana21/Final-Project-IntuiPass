@@ -6,24 +6,6 @@
   backdrop-filter: blur(10px);
 }
 
-.username-input-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.username-label {
-  font-weight: 600;
-  color: white;
-  font-size: 16px;
-}
-
-.required {
-  color: #FF5722;
-  font-weight: bold;
-}
-
 .loading-indicator {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.7);

@@ -19,12 +19,6 @@ const UsernameInput: React.FC<UsernameInputProps> = ({ value, onChange, onValida
 
   return (
     <div className="username-input-container">
-      <div className="username-input-header">
-        <label htmlFor="username-input" className="username-label">
-          Username <span className="required">*</span>
-        </label>
-      </div>
-      
       <div className="username-input-wrapper">
         <input
           id="username-input"

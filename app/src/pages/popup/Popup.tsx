@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigation } from '../../components/AppRouter';
 import { AuthService } from '../../services/auth-service';
 import SavedPatterns from '../../components/SavedPatterns/SavedPatterns';
-import './Popup.css';
+import styles from './Popup.module.css';
 
 const Popup: React.FC = () => {
   const [user, setUser] = useState<any>(null);
@@ -36,30 +36,30 @@ const Popup: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="popup-container">
-        <div className="loading">Loading...</div>
+      <div className={styles.popupContainer}>
+        <div className={styles.loading}>Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="popup-container">
-      <div className="header">
-        <button className="back-button" onClick={goBack}>
+    <div className={styles.popupContainer}>
+      <div className={styles.header}>
+        <button className="backButton" onClick={goBack}>
           ← Back
         </button>
-        <div className="header-content">
+        <div className={styles.headerContent}>
           <h2>
             {isCreatingPassword ? '🔐 Creating' : '🔓 Filling'}
           </h2>
         </div>
       </div>
 
-      <div className="user-info">
-        <img className="user-pic" src={user.photoURL || ''} alt="User Picture" />
-        <div className="user-details">
-          <p className="user-name">{user.displayName || "Unknown"}</p>
-          <p className="user-email">{user.email || ""}</p>
+      <div className={styles.userInfo}>
+        <img className={styles.userPic} src={user.photoURL || ''} alt="User Picture" />
+        <div className={styles.userDetails}>
+          <p className={styles.userName}>{user.displayName || "Unknown"}</p>
+          <p className={styles.userEmail}>{user.email || ""}</p>
         </div>
       </div>
       {!isCreatingPassword && (
@@ -67,50 +67,50 @@ const Popup: React.FC = () => {
       )}
 
       {isCreatingPassword && (
-        <div className="password-options">
+        <div className={styles.passwordOptions}>
           <h3>Choose Password Type:</h3>
 
           <button
-            className="password-type-button"
+            className={styles.passwordTypeButton}
             onClick={handleNavigateToConnectDots}
           >
-            <span className="button-icon">⚫</span>
-            <div className="button-content">
-              <span className="button-title">Connect The Dots</span>
-              <span className="button-description">Create patterns by connecting dots</span>
+            <span className={styles.buttonIcon}>⚫</span>
+            <div className={styles.buttonContent}>
+              <span className={styles.buttonTitle}>Connect The Dots</span>
+              <span className={styles.buttonDescription}>Create patterns by connecting dots</span>
             </div>
           </button>
 
           <button
-            className="password-type-button"
+            className={styles.passwordTypeButton}
             onClick={handleNavigateToPiano}
           >
-            <span className="button-icon">🎹</span>
-            <div className="button-content">
-              <span className="button-title">Piano Sequence</span>
-              <span className="button-description">Create melodies as passwords</span>
+            <span className={styles.buttonIcon}>🎹</span>
+            <div className={styles.buttonContent}>
+              <span className={styles.buttonTitle}>Piano Sequence</span>
+              <span className={styles.buttonDescription}>Create melodies as passwords</span>
             </div>
           </button>
 
           <button
-            className="password-type-button"
+            className={styles.passwordTypeButton}
             onClick={handleNavigateToChess}
           >
-            <span className="button-icon">♔</span>
-            <div className="button-content">
-              <span className="button-title">Chess Board</span>
-              <span className="button-description">Place pieces on a chess board</span>
+            <span className={styles.buttonIcon}>♔</span>
+            <div className={styles.buttonContent}>
+              <span className={styles.buttonTitle}>Chess Board</span>
+              <span className={styles.buttonDescription}>Place pieces on a chess board</span>
             </div>
           </button>
 
           <button
-            className="password-type-button"
+            className={styles.passwordTypeButton}
             onClick={handleNavigateToMathFormula}
           >
-            <span className="button-icon">∫</span>
-            <div className="button-content">
-              <span className="button-title">Mathematical Formula</span>
-              <span className="button-description">Draw mathematical expressions</span>
+            <span className={styles.buttonIcon}>∫</span>
+            <div className={styles.buttonContent}>
+              <span className={styles.buttonTitle}>Mathematical Formula</span>
+              <span className={styles.buttonDescription}>Draw mathematical expressions</span>
             </div>
           </button>
 
@@ -118,9 +118,9 @@ const Popup: React.FC = () => {
       )}
 
       <div className="footer">
-        <button className="sign-out-button" onClick={handleSignOut}>
-          <span className="sign-out-icon">👋</span>
-          <span className="sign-out-text">Sign Out</span>
+        <button className="signOutButton" onClick={handleSignOut}>
+          <span className="signOutIcon">👋</span>
+          <span className="signOutText">Sign Out</span>
         </button>
       </div>
     </div>

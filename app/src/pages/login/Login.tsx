@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import { useNavigation } from '../../components/AppRouter';
 import { firebaseApp } from '../../firebase/firebase-config';
-import './Login.css';
+import styles from './Login.module.css';
 
 declare global {
   interface Window {
@@ -67,12 +67,12 @@ const Login: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="login-container">
-        <div className="loading-section">
-          <div className="logo">
+      <div className={styles.loginContainer}>
+        <div className={styles.loadingSection}>
+          <div className={styles.logo}>
             <h1>🔐 IntuiPass</h1>
           </div>
-          <div className="loading-spinner"></div>
+          <div className={styles.loadingSpinner}></div>
           <p>Loading...</p>
         </div>
       </div>
@@ -80,24 +80,24 @@ const Login: React.FC = () => {
   }
 
   return (
-    <div className="login-container">
-      <div className="login-section">
-        <div className="logo">
+    <div className={styles.loginContainer}>
+      <div className={styles.loginSection}>
+        <div className={styles.logo}>
           <h1>🔐 IntuiPass</h1>
         </div>
         <h2>Welcome to IntuiPass</h2>
         <p>Secure password manager with intuitive password creation</p>
-        <button className="sign-in-button" onClick={handleSignIn}>
+        <button className={styles.signInButton} onClick={handleSignIn}>
           <span>🔑</span> Sign In with Google
         </button>
         
-        <div className="features">
-          <div className="feature">
-            <span className="feature-icon">⚫</span>
+        <div className={styles.features}>
+          <div className={styles.feature}>
+            <span className={styles.featureIcon}>⚫</span>
             <span>Connect the Dots</span>
           </div>
-          <div className="feature">
-            <span className="feature-icon">🎹</span>
+          <div className={styles.feature}>
+            <span className={styles.featureIcon}>🎹</span>
             <span>Piano</span>
           </div>
           <div className="feature">
