@@ -4,18 +4,20 @@ import './PixelArt.css';
 import { PasswordIntegrationService } from "../../services/password-integration-service.ts";
 import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
+import {CredentialsDisplay} from '../cretentials-display/CredentialsDisplay';
 
 interface PixelGrid {
   [key: string]: boolean;
 }
 
-const GRID_SIZE = 12;
+const GRID_SIZE = 8;
 
 const PixelArt: React.FC = () => {
   const { goBack, getRouteParams } = useNavigation();
   
   const routeParams = getRouteParams();
   const isCreatingPassword = routeParams?.isCreatingPassword ?? true;
+  const isViewingPassword = routeParams?.isViewingPassword ?? false;
   const usernameFromPattern = routeParams?.username;
   
   const [pixelGrid, setPixelGrid] = useState<PixelGrid>({});
@@ -25,6 +27,9 @@ const PixelArt: React.FC = () => {
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
   const [drawMode, setDrawMode] = useState<'draw' | 'erase'>('draw');
   const [isInitialClick, setIsInitialClick] = useState<boolean>(false);
+
+  const [showCredentials, setShowCredentials] = useState<boolean>(false);
+  const [retrievedPassword, setRetrievedPassword] = useState<string>('');
 
   useEffect(() => {
     if (usernameFromPattern && !isCreatingPassword) {
@@ -56,14 +61,12 @@ const PixelArt: React.FC = () => {
     const newMode = isCurrentlySelected ? 'erase' : 'draw';
     setDrawMode(newMode);
     
-    // Apply the action immediately
     const key = getPixelKey(row, col);
     setPixelGrid(prev => ({
       ...prev,
       [key]: newMode === 'draw'
     }));
     
-    // Reset initial click flag after a short delay to prevent layout shift issues
     setTimeout(() => setIsInitialClick(false), 50);
   };
 
@@ -85,6 +88,8 @@ const PixelArt: React.FC = () => {
   const clearGrid = () => {
     setPixelGrid({});
     setPasswordPattern('');
+    setShowCredentials(false);
+    setRetrievedPassword('');
   };
 
   const canProceed = () => {
@@ -135,17 +140,28 @@ const PixelArt: React.FC = () => {
       
       const passwordIntegrationService = new PasswordIntegrationService();
       
-      const success = await passwordIntegrationService.processPassword(
-        passwordPattern, 
-        PatternType.PIXEL_ART, 
-        isCreatingPassword,
-        finalUsername
-      );
-      
-      if (success) {
-        window.close();
+      if (!isViewingPassword) {
+        const success = await passwordIntegrationService.processPassword(
+          passwordPattern, 
+          PatternType.PIXEL_ART, 
+          isCreatingPassword,
+          finalUsername
+        );
+        
+        if (success) {
+          window.close();
+        } else {
+          alert('Could not process password!');
+        }
       } else {
-        alert('Could not process password!');
+        const password = await passwordIntegrationService.getPasswordByKey(passwordPattern, PatternType.PIXEL_ART, usernameFromPattern);
+        
+        if (password) {
+          setRetrievedPassword(password);
+          setShowCredentials(true);
+        } else {
+          alert('Password not found or pattern incorrect!');
+        }
       }
     } catch (error) {
       console.error('Error processing password:', error);
@@ -227,9 +243,17 @@ const PixelArt: React.FC = () => {
           className={`save-button ${!canProceed() ? 'disabled' : ''}`}
           disabled={!canProceed()}
         >
-          {isCreatingPassword ? "Save Pattern" : "Fill Password"}
+          {isCreatingPassword ? "Save Pattern" : (isViewingPassword ? "View Password" : "Fill Password")}
         </button>
       </div>
+
+      {/* Add the CredentialsDisplay component here */}
+      {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
+        <CredentialsDisplay
+          username={usernameFromPattern}
+          password={retrievedPassword}
+        />
+      )}
 
       {passwordPattern && (
         <div className="pattern-display">
