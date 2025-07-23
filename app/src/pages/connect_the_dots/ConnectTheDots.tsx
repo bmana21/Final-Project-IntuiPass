@@ -296,13 +296,14 @@ const ConnectTheDots: React.FC = () => {
   };
 
   return (
-    <div className={styles.ConnectDotsContainer}>
-      <div className={styles.header}>
+    <div className="mainContainer">
+      <div className="passwordOptionHeader">
         <button className="backButton" onClick={goBack}>
           ← Back
         </button>
-        <div className="headerContent">
-          <h2>Connect The Dots</h2>
+        <h2>Connect The Dots</h2>
+        <div className="modeBadge">
+          {isCreatingPassword ? '🔐 Creating' : '🔓 Filling'}
         </div>
       </div>
 

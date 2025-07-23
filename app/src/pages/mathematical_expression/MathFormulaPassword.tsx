@@ -217,13 +217,14 @@ const MathFormulaPassword: React.FC = () => {
     };
 
     return (
-        <div className={styles.mathFormulaContainer}>
-            <div className={styles.header}>
+        <div className="mainContainer">
+            <div className="passwordOptionHeader">
                 <button className="backButton" onClick={goBack}>
                     ← Back
                 </button>
-                <div className={styles.headerContent}>
-                    <h2>Mathematical Formula</h2>
+                <h2>Mathematical Expression</h2>
+                <div className="modeBadge">
+                    {isCreatingPassword ? '🔐 Creating' : '🔓 Filling'}
                 </div>
             </div>
 

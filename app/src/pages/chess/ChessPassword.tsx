@@ -339,12 +339,15 @@ const ChessPassword: React.FC = () => {
   );
 
   return (
-    <div className={styles.chessPasswordContainer}>
-      <div className={styles.header}>
+    <div className="mainContainer">
+      <div className="passwordOptionHeader">
         <button className="backButton" onClick={goBack}>
           ← Back
         </button>
-        <h2>Chess Board Pattern</h2>
+        <h2>Chess Board</h2>
+        <div className="modeBadge">
+          {isCreatingPassword ? '🔐 Creating' : '🔓 Filling'}
+        </div>
       </div>
 
       {isCreatingPassword && (

@@ -44,14 +44,12 @@ const Popup: React.FC = () => {
 
   return (
     <div className={styles.popupContainer}>
-      <div className={styles.header}>
+      <div className="passwordOptionHeader">
         <button className="backButton" onClick={goBack}>
           ← Back
         </button>
-        <div className={styles.headerContent}>
-          <h2>
-            {isCreatingPassword ? '🔐 Creating' : '🔓 Filling'}
-          </h2>
+        <div className="modeBadge">
+          {isCreatingPassword ? '🔐 Creating' : '🔓 Filling'}
         </div>
       </div>
 

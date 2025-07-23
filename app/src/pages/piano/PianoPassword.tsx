@@ -235,13 +235,13 @@ const PianoPassword: React.FC = () => {
   };
 
   return (
-    <div className={styles.pianoPasswordContainer}>
-      <div className={styles.header}>
+    <div className="mainContainer">
+      <div className="passwordOptionHeader">
         <button className="backButton" onClick={goBack}>
           ← Back
         </button>
         <h2>Piano Sequence</h2>
-        <div className={styles.modeBadge}>
+        <div className="modeBadge">
           {isCreatingPassword ? '🔐 Creating' : '🔓 Filling'}
         </div>
       </div>
