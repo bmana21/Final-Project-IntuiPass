@@ -34,6 +34,10 @@ const Popup: React.FC = () => {
     navigateTo('math_formula', { isCreatingPassword });
   };
 
+  const handleNavigateToPixelArt = () => {
+    navigateTo('pixel_art', { isCreatingPassword });
+  };
+
   if (!user) {
     return (
       <div className="popup-container">
@@ -111,6 +115,17 @@ const Popup: React.FC = () => {
             <div className="button-content">
               <span className="button-title">Mathematical Formula</span>
               <span className="button-description">Draw mathematical expressions</span>
+            </div>
+          </button>
+
+          <button
+            className="password-type-button"
+            onClick={handleNavigateToPixelArt}
+          >
+            <span className="button-icon">🎨</span>
+            <div className="button-content">
+              <span className="button-title">Pixel Art</span>
+              <span className="button-description">Create patterns with pixel art</span>
             </div>
           </button>
 
