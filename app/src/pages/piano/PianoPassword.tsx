@@ -4,6 +4,7 @@ import styles from './PianoPassword.module.css';
 import { PasswordIntegrationService } from "../../services/password-integration-service.ts";
 import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
+import {CredentialsDisplay} from '../cretentials-display/CredentialsDisplay';
 
 interface PianoKey {
   id: string;
@@ -15,17 +16,21 @@ interface PianoKey {
 
 const PianoPassword: React.FC = () => {
   const { goBack, getRouteParams } = useNavigation();
-  
+
   const routeParams = getRouteParams();
   const isCreatingPassword = routeParams?.isCreatingPassword ?? true;
+  const isViewingPassword = routeParams?.isViewingPassword ?? false;
   const usernameFromPattern = routeParams?.username;
-  
+
   const [sequence, setSequence] = useState<string[]>([]);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
   const [passwordPattern, setPasswordPattern] = useState<string>('');
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [username, setUsername] = useState<string>('');
   const [isUsernameValid, setIsUsernameValid] = useState<boolean>(false);
+
+  const [showCredentials, setShowCredentials] = useState<boolean>(false);
+  const [retrievedPassword, setRetrievedPassword] = useState<string>('');
 
   const pianoKeys: PianoKey[] = [
     { id: 'C4', note: 'C', frequency: 261.63, keyboardKey: 'a', isBlack: false },
@@ -53,9 +58,9 @@ const PianoPassword: React.FC = () => {
   const isTypingInInput = () => {
     const activeElement = document.activeElement;
     return activeElement && (
-      activeElement.tagName === 'INPUT' || 
-      activeElement.tagName === 'TEXTAREA' ||
-      (activeElement as HTMLElement).contentEditable === 'true'
+        activeElement.tagName === 'INPUT' ||
+        activeElement.tagName === 'TEXTAREA' ||
+        (activeElement as HTMLElement).contentEditable === 'true'
     );
   };
 
@@ -151,7 +156,7 @@ const PianoPassword: React.FC = () => {
   const handleKeyClick = (key: PianoKey) => {
     playNote(key);
     addToSequence(key.id);
-    
+
     setPressedKeys(prev => new Set([...prev, key.id]));
     setTimeout(() => {
       setPressedKeys(prev => {
@@ -166,11 +171,13 @@ const PianoPassword: React.FC = () => {
     setSequence([]);
     setPasswordPattern('');
     setPressedKeys(new Set());
+    setShowCredentials(false);
+    setRetrievedPassword('');
   };
 
   const canProceed = () => {
     const hasSequence = sequence.length > 0;
-    
+
     if (isCreatingPassword) {
       return isUsernameValid && hasSequence;
     } else {
@@ -196,7 +203,7 @@ const PianoPassword: React.FC = () => {
     }
 
     const finalUsername = isCreatingPassword ? username : (usernameFromPattern || '');
-    
+
     if (!finalUsername.trim()) {
       alert('Username is required!');
       return;
@@ -211,22 +218,33 @@ const PianoPassword: React.FC = () => {
         createdAt: new Date(),
         userId: 'current_user_id'
       };
-      
+
       console.log('Processing password:', passwordData);
-      
+
       const passwordIntegrationService = new PasswordIntegrationService();
-      
-      const success = await passwordIntegrationService.processPassword(
-        passwordPattern, 
-        PatternType.PIANO_SEQUENCE, 
-        isCreatingPassword,
-        finalUsername
-      );
-      
-      if (success) {
-        window.close();
+
+      if (!isViewingPassword) {
+        const success = await passwordIntegrationService.processPassword(
+            passwordPattern,
+            PatternType.PIANO_SEQUENCE,
+            isCreatingPassword,
+            finalUsername
+        );
+
+        if (success) {
+          window.close()
+        } else {
+          alert('Could not process password!');
+        }
       } else {
-        alert('Could not process password!');
+        const password = await passwordIntegrationService.getPasswordByKey(passwordPattern, PatternType.PIANO_SEQUENCE, usernameFromPattern);
+
+        if (password) {
+          setRetrievedPassword(password);
+          setShowCredentials(true);
+        } else {
+          alert('Password not found or sequence incorrect!');
+        }
       }
     } catch (error) {
       console.error('Error processing password:', error);
@@ -235,85 +253,93 @@ const PianoPassword: React.FC = () => {
   };
 
   return (
-    <div className={styles.pianoPasswordContainer}>
-      <div className={styles.header}>
-        <button className={styles.backButton} onClick={goBack}>
-          ← Back
-        </button>
-        <h2>Piano Sequence</h2>
-        <div className={styles.modeBadge}>
-          {isCreatingPassword ? '🔐 Creating' : '🔓 Filling'}
+      <div className={styles.pianoPasswordContainer}>
+        <div className={styles.header}>
+          <button className={styles.backButton} onClick={goBack}>
+            ← Back
+          </button>
+          <h2>Piano Sequence</h2>
+          <div className={styles.modeBadge}>
+            {isCreatingPassword ? '🔐 Creating' : (isViewingPassword ? '👁️ Viewing' : '🔓 Filling')}
+          </div>
         </div>
-      </div>
 
-      {isCreatingPassword && (
-        <UsernameInput
-          value={username}
-          onChange={setUsername}
-          onValidation={setIsUsernameValid}
-        />
-      )}
+        {isCreatingPassword && (
+            <UsernameInput
+                value={username}
+                onChange={setUsername}
+                onValidation={setIsUsernameValid}
+            />
+        )}
 
-      <div className={styles.instructions}>
-        <p>
-          {isCreatingPassword 
-            ? "Play notes on the piano to create your sequence. Use keyboard keys or click the piano keys."
-            : "Recreate your password sequence by playing the same notes."
-          }
-        </p>
-        <div className={styles.keyboardHints}>
-          <p><small>Keyboard: A S D F G H J K (white keys) | W E T Y U (black keys)</small></p>
+        <div className={styles.instructions}>
+          <p>
+            {isCreatingPassword
+                ? "Play notes on the piano to create your sequence. Use keyboard keys or click the piano keys."
+                : "Recreate your password sequence by playing the same notes."
+            }
+          </p>
+          <div className={styles.keyboardHints}>
+            <p><small>Keyboard: A S D F G H J K (white keys) | W E T Y U (black keys)</small></p>
+          </div>
         </div>
-      </div>
 
-      <div className={styles.pianoContainer}>
-        <div className={styles.piano}>
-          {pianoKeys.map((key) => (
-            <button
-              key={key.id}
-              className={`${styles.pianoKey} ${key.isBlack ? styles.blackKey : styles.whiteKey}`}
-              data-pressed={pressedKeys.has(key.id)}
-              onClick={() => handleKeyClick(key)}
-              onMouseDown={(e) => e.preventDefault()}
-            >
-              <span className={styles.noteLabel}>{key.note}</span>
-              <span className={styles.keyLabel}>{key.keyboardKey.toUpperCase()}</span>
-            </button>
-          ))}
+        <div className={styles.pianoContainer}>
+          <div className={styles.piano}>
+            {pianoKeys.map((key) => (
+                <button
+                    key={key.id}
+                    className={`${styles.pianoKey} ${key.isBlack ? styles.blackKey : styles.whiteKey}`}
+                    data-pressed={pressedKeys.has(key.id)}
+                    onClick={() => handleKeyClick(key)}
+                    onMouseDown={(e) => e.preventDefault()}
+                >
+                  <span className={styles.noteLabel}>{key.note}</span>
+                  <span className={styles.keyLabel}>{key.keyboardKey.toUpperCase()}</span>
+                </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className={styles.controls}>
-        <button onClick={clearSequence} className={styles.clearButton}>
-          Clear Sequence
-        </button>
-        
-        <button 
-          onClick={savePassword} 
-          className={`${styles.saveButton} ${!canProceed() ? styles.disabled : ''}`}
-          disabled={!canProceed()}
-        >
-          {isCreatingPassword ? "Save Sequence" : "Fill Password"}
-        </button>
-      </div>
+        <div className={styles.controls}>
+          <button onClick={clearSequence} className={styles.clearButton}>
+            Clear Sequence
+          </button>
 
-      {sequence.length > 0 && (
-        <div className={styles.sequenceDisplay}>
-          <p><strong>Current Sequence:</strong></p>
-          <div className={styles.sequenceNotes}>
-            {sequence.map((noteId, index) => {
-              const key = pianoKeys.find(k => k.id === noteId);
-              return (
-                <span key={index} className={styles.sequenceNote}>
+          <button
+              onClick={savePassword}
+              className={`${styles.saveButton} ${!canProceed() ? styles.disabled : ''}`}
+              disabled={!canProceed()}
+          >
+            {isCreatingPassword ? "Save Sequence" : (isViewingPassword ? "View Password" : "Fill Password")}
+          </button>
+        </div>
+
+        {/* Add the CredentialsDisplay component here */}
+        {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
+            <CredentialsDisplay
+                username={usernameFromPattern}
+                password={retrievedPassword}
+            />
+        )}
+
+        {sequence.length > 0 && (
+            <div className={styles.sequenceDisplay}>
+              <p><strong>Current Sequence:</strong></p>
+              <div className={styles.sequenceNotes}>
+                {sequence.map((noteId, index) => {
+                  const key = pianoKeys.find(k => k.id === noteId);
+                  return (
+                      <span key={index} className={styles.sequenceNote}>
                   {key?.note}
                 </span>
-              );
-            })}
-          </div>
-          <p><small>Pattern: {passwordPattern}</small></p>
-        </div>
-      )}
-    </div>
+                  );
+                })}
+              </div>
+              <p><small>Pattern: {passwordPattern}</small></p>
+            </div>
+        )}
+      </div>
   );
 };
 

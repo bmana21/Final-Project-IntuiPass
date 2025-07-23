@@ -100,6 +100,14 @@ const Login: React.FC = () => {
             <span className="feature-icon">🎹</span>
             <span>Piano</span>
           </div>
+          <div className="feature">
+            <span className="feature-icon">♔</span>
+            <span>Chess Board</span>
+          </div>
+          <div className="feature">
+            <span className="feature-icon">∫</span>
+            <span>Mathematical Formula</span>
+          </div>
         </div>
       </div>
     </div>
