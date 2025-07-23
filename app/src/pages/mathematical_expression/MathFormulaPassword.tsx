@@ -4,6 +4,7 @@ import { PasswordIntegrationService } from "../../services/password-integration-
 import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
 import { ConfigService } from '../../services/config-service.ts';
+import {CredentialsDisplay} from '../cretentials-display/CredentialsDisplay';
 import './MathFormulaPassword.css';
 
 import * as iink from 'iink-ts';
@@ -21,8 +22,12 @@ const MathFormulaPassword: React.FC = () => {
     const [username, setUsername] = useState<string>('');
     const [isUsernameValid, setIsUsernameValid] = useState<boolean>(false);
 
+    const [showCredentials, setShowCredentials] = useState<boolean>(false);
+    const [retrievedPassword, setRetrievedPassword] = useState<string>('');
+
     const routeParams = getRouteParams();
     const isCreatingPassword = routeParams?.isCreatingPassword ?? true;
+    const isViewingPassword = routeParams?.isViewingPassword ?? false;
     const usernameFromPattern = routeParams?.username;
 
     useEffect(() => {
@@ -136,6 +141,8 @@ const MathFormulaPassword: React.FC = () => {
                 resultRef.current.innerHTML = '';
             }
         }
+        setShowCredentials(false);
+        setRetrievedPassword('');
     };
 
     const handleUndo = () => {
@@ -196,20 +203,29 @@ const MathFormulaPassword: React.FC = () => {
             console.log('Processing password:', passwordData);
 
             const passwordIntegrationService = new PasswordIntegrationService();
+            if (!isViewingPassword) {
+                const success = await passwordIntegrationService.processPassword(
+                    latexFormula,
+                    PatternType.MATHEMATICAL_FORMULA,
+                    isCreatingPassword,
+                    finalUsername
+                );
 
-            const success = await passwordIntegrationService.processPassword(
-                latexFormula,
-                PatternType.MATHEMATICAL_FORMULA,
-                isCreatingPassword,
-                finalUsername
-            );
-
-            if (success) {
-                window.close();
+                if (success) {
+                    window.close();
+                } else {
+                    alert('Could not process password!');
+                }
             } else {
-                alert('Could not process password!');
-            }
+                const password = await passwordIntegrationService.getPasswordByKey(latexFormula, PatternType.MATHEMATICAL_FORMULA, usernameFromPattern);
 
+                if (password) {
+                    setRetrievedPassword(password);
+                    setShowCredentials(true);
+                } else {
+                    alert('Password not found or formula incorrect!');
+                }
+            }
         } catch (error) {
             console.error('Error processing password:', error);
             alert('Failed to process password');
@@ -303,9 +319,17 @@ const MathFormulaPassword: React.FC = () => {
                     className={`save-button ${!canProceed() ? 'disabled' : ''}`}
                     disabled={!canProceed()}
                 >
-                    {isCreatingPassword ? "Save Pattern" : "Fill Password"}
+                    {isCreatingPassword ? "Save Pattern" : (isViewingPassword ? "View Password" : "Fill Password")}
                 </button>
             </div>
+
+            {/* Add the CredentialsDisplay component here */}
+            {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
+                <CredentialsDisplay
+                    username={usernameFromPattern}
+                    password={retrievedPassword}
+                />
+            )}
 
             {latexFormula && (
                 <div className="pattern-display">

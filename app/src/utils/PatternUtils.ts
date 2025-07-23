@@ -8,6 +8,8 @@ export const getPatternTypeDisplay = (type: PatternType) => {
             return { icon: '🎹', name: 'Piano'};
         case PatternType.CHESS_BOARD:
             return { icon: '♔', name: 'Chess Board'};
+        case PatternType.MATHEMATICAL_FORMULA:
+            return {icon: '∫', name: 'Mathematical Formula'}
         default:
             return { icon: '🔐', name: 'Pattern' };
     }
