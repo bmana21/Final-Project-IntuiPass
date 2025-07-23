@@ -10,6 +10,8 @@ export const getPatternTypeDisplay = (type: PatternType) => {
             return { icon: '♔', name: 'Chess Board'};
         case PatternType.MATHEMATICAL_FORMULA:
             return {icon: '∫', name: 'Mathematical Formula'}
+        case PatternType.PIXEL_ART:
+            return { icon: '🎨', name: 'Pixel Art'};
         default:
             return { icon: '🔐', name: 'Pattern' };
     }

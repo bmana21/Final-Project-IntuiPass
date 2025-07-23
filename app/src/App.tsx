@@ -8,6 +8,7 @@ import ConnectTheDots from './pages/connect_the_dots/ConnectTheDots';
 import PianoPassword from './pages/piano/PianoPassword';
 import ChessPassword from './pages/chess/ChessPassword';
 import MathFormulaPassword from './pages/mathematical_expression/MathFormulaPassword';
+import PixelArt from './pages/pixel_art/PixelArt';
 import { InitService } from './services/init-service';
 import PasswordManager from './pages/password_manager/PasswordManager';
 
@@ -25,6 +26,7 @@ const App: React.FC = () => {
         <Route path="password-manager-page" component={PasswordManager} />
         <Route path="chess_password" component={ChessPassword} />
         <Route path="math_formula" component={MathFormulaPassword} />
+        <Route path="pixel_art" component={PixelArt} />
       </div>
     </AppRouter>
   );

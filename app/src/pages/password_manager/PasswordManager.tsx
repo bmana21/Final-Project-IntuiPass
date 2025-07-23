@@ -89,7 +89,8 @@ const PasswordManager: React.FC = () => {
             [PatternType.CONNECT_DOTS]: 'connect_the_dots',
             [PatternType.PIANO_SEQUENCE]: 'piano_password',
             [PatternType.CHESS_BOARD]: 'chess_password',
-            [PatternType.MATHEMATICAL_FORMULA]: 'math_formula'
+            [PatternType.MATHEMATICAL_FORMULA]: 'math_formula',
+            [PatternType.PIXEL_ART]: 'pixel_art'
         };
 
         const route = routeMap[password.pattern_type];
