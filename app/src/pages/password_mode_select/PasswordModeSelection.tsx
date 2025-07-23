@@ -44,10 +44,10 @@ const PasswordModeSelection: React.FC = () => {
           </button>
 
           <button
-              className="mode-button manage-button"
+              className={`${styles.modeButton} ${styles.manageButton}`}
               onClick={handleManagePasswords}
           >
-            <div className="button-icon">📋</div>
+            <div className={styles.buttonIcon}>📋</div>
             <h3>Manage Passwords</h3>
             <p>View and organize all your saved passwords</p>
           </button>

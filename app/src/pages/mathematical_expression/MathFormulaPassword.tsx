@@ -326,13 +326,6 @@ const MathFormulaPassword: React.FC = () => {
                     password={retrievedPassword}
                 />
             )}
-
-            {latexFormula && (
-                <div className="pattern-display">
-                    <p><strong>Formula:</strong> {latexFormula}</p>
-                    <p><small>Mathematical expression in LaTeX format</small></p>
-                </div>
-            )}
         </div>
     );
 };
