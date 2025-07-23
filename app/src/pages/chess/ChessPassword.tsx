@@ -356,6 +356,13 @@ const ChessPassword: React.FC = () => {
     </div>
   );
 
+  const getSortedPlacedPieces = () => {
+    return [...placedPieces].sort((a, b) => {
+      if (a.row !== b.row) return a.row - b.row;
+      return a.col - b.col;
+    });
+  };
+
   return (
     <div className="mainContainer">
       <div className="passwordOptionHeader">
@@ -425,10 +432,10 @@ const ChessPassword: React.FC = () => {
         {placedPieces.length > 0 && (
             <div className={styles.patternDisplay}>
               <p><strong>Placed Pieces:</strong></p>
-              <div className={styles.patternPieces}>
-                {placedPieces.map((piece, index) => (
-                    <span key={index} className={styles.patternPiece}>
-                <span className={piece.piece.color === 'white' ? styles.whitePiece : styles.blackPiece}>
+              <div className="pattern-pieces">
+                {getSortedPlacedPieces().map((piece, index) => (
+                    <span key={index} className="pattern-piece">
+                <span className={piece.piece.color === 'white' ? 'white-piece' : 'black-piece'}>
                   {piece.piece.color === 'white' ? piece.piece.whiteSymbol : piece.piece.blackSymbol}
                 </span> {piece.position}
               </span>
