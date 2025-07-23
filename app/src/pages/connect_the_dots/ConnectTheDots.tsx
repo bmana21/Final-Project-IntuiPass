@@ -317,8 +317,9 @@ const ConnectTheDots: React.FC = () => {
         </button>
         <h2>Connect The Dots</h2>
         <div className="modeBadge">
-          {isCreatingPassword ? '🔐 Creating' : '🔓 Filling'}
+          {isCreatingPassword ? '🔐 Creating' : (isViewingPassword ? '👁️ Viewing' : '🔓 Filling')}
         </div>
+      </div>
 
         {isCreatingPassword && (
           <UsernameInput
@@ -383,7 +384,6 @@ const ConnectTheDots: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
   );
 };
 export default ConnectTheDots;
