@@ -18,7 +18,7 @@
     "48": "assets/main-icon.png"
   },
   "host_permissions": [
-    "https://*.firebaseapp.com/*", 
+    "https://*.firebaseapp.com/*",
     "https://*.googleapis.com/*",
     "https://accounts.google.com/*",
     "https://www.googleapis.com/*",
@@ -26,12 +26,11 @@
     "http://*/*",
     "https://*/*"
   ],
-
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://*.firebaseapp.com https://*.firebase.googleapis.com https://www.googleapis.com https://apis.google.com https://accounts.google.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://www.gstatic.com https://firestore.googleapis.com wss://firestore.googleapis.com; frame-src https://*.firebaseapp.com https://firestore.googleapis.com https://accounts.google.com"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://*.firebaseapp.com https://*.firebase.googleapis.com https://www.googleapis.com https://apis.google.com https://accounts.google.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://www.gstatic.com https://firestore.googleapis.com wss://firestore.googleapis.com https://cloud.myscript.com https://webdemoapi.myscript.com wss://cloud.myscript.com wss://webdemoapi.myscript.com; frame-src https://*.firebaseapp.com https://firestore.googleapis.com https://accounts.google.com"
   },
   "oauth2": {
-    "client_id": "26624816574-5s831tuu4hesfk3jfdffjksllspt38ma.apps.googleusercontent.com",
+    "client_id": "26624816574-bco01bi80g1bsfobbmc0m56g8t92n9p4.apps.googleusercontent.com",
     "scopes": [
       "openid",
       "email",
@@ -40,19 +39,28 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["firebase/*", "assets/*"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "firebase/*",
+        "assets/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
-
   "background": {
     "service_worker": "extension-scripts/background.js",
     "type": "module"
   },
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["extension-scripts/content-script.js"],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "extension-scripts/content-script.js"
+      ],
       "run_at": "document_idle"
     }
   ]

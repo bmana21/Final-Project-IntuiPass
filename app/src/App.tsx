@@ -7,9 +7,13 @@ import Popup from './pages/popup/Popup';
 import ConnectTheDots from './pages/connect_the_dots/ConnectTheDots';
 import PianoPassword from './pages/piano/PianoPassword';
 import ChessPassword from './pages/chess/ChessPassword';
+import MathFormulaPassword from './pages/mathematical_expression/MathFormulaPassword';
+import { InitService } from './services/init-service';
 import PasswordManager from './pages/password_manager/PasswordManager';
 
 const App: React.FC = () => {
+  InitService.initializeCredentials();
+
   return (
     <AppRouter>
       <div id="root">
@@ -20,6 +24,7 @@ const App: React.FC = () => {
         <Route path="piano_password" component={PianoPassword} />
         <Route path="password-manager-page" component={PasswordManager} />
         <Route path="chess_password" component={ChessPassword} />
+        <Route path="math_formula" component={MathFormulaPassword} />
       </div>
     </AppRouter>
   );
