@@ -1,0 +1,106 @@
+.userInfo {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 25px;
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+}
+
+.userPic {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.userName {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 10px 0 5px 0;
+}
+
+.userEmail {
+  opacity: 0.8;
+  margin-bottom: 25px;
+  font-size: 14px;
+}
+
+.passwordOptions {
+  margin: 25px 0;
+  padding: 20px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.passwordOptions h3 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.passwordTypeButton {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 12px 0;
+  padding: 18px 20px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  gap: 15px;
+}
+
+
+.buttonIcon {
+  font-size: 24px;
+  min-width: 30px;
+}
+
+.buttonContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.buttonTitle {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.buttonDescription {
+  font-size: 13px;
+  opacity: 0.8;
+  font-weight: 400;
+}
+
+.passwordTypeButton:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.passwordTypeButton:active {
+  transform: translateY(0);
+}
+
+.pageTransition {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -341,7 +341,7 @@ const ChessPassword: React.FC = () => {
   return (
     <div className={styles.chessPasswordContainer}>
       <div className={styles.header}>
-        <button className={styles.backButton} onClick={goBack}>
+        <button className="backButton" onClick={goBack}>
           ← Back
         </button>
         <h2>Chess Board Pattern</h2>

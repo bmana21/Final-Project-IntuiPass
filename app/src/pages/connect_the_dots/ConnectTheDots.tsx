@@ -298,10 +298,10 @@ const ConnectTheDots: React.FC = () => {
   return (
     <div className={styles.ConnectDotsContainer}>
       <div className={styles.header}>
-        <button className={styles.backButton} onClick={goBack}>
+        <button className="backButton" onClick={goBack}>
           ← Back
         </button>
-        <div className={styles.headerContent}>
+        <div className="headerContent">
           <h2>Connect The Dots</h2>
         </div>
       </div>

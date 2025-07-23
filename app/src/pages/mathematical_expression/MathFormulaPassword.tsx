@@ -219,7 +219,7 @@ const MathFormulaPassword: React.FC = () => {
     return (
         <div className={styles.mathFormulaContainer}>
             <div className={styles.header}>
-                <button className={styles.backButton} onClick={goBack}>
+                <button className="backButton" onClick={goBack}>
                     ← Back
                 </button>
                 <div className={styles.headerContent}>

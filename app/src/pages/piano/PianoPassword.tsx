@@ -237,7 +237,7 @@ const PianoPassword: React.FC = () => {
   return (
     <div className={styles.pianoPasswordContainer}>
       <div className={styles.header}>
-        <button className={styles.backButton} onClick={goBack}>
+        <button className="backButton" onClick={goBack}>
           ← Back
         </button>
         <h2>Piano Sequence</h2>

@@ -41,9 +41,9 @@ const PasswordModeSelection: React.FC = () => {
         
       </div>
       <div className="footer">
-        <button className="sign-out-button" onClick={handleSignOut}>
-          <span className="sign-out-icon">👋</span>
-          <span className="sign-out-text">Sign Out</span>
+        <button className="signOutButton" onClick={handleSignOut}>
+          <span className="signOutIcon">👋</span>
+          <span className="signOutText">Sign Out</span>
         </button>
       </div>
     </div>
