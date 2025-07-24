@@ -1,4 +1,4 @@
-.pixel-art-container {
+.pixelArtContainer {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
@@ -15,7 +15,7 @@
   margin-bottom: 20px;
 }
 
-.back-button {
+.backButton {
   background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
@@ -26,7 +26,7 @@
   transition: background-color 0.3s ease;
 }
 
-.back-button:hover {
+.backButton:hover {
   background: rgba(255, 255, 255, 0.3);
 }
 
@@ -52,7 +52,7 @@
   line-height: 1.5;
 }
 
-.grid-container {
+.gridContainer {
   background: white;
   border-radius: 15px;
   padding: 30px;
@@ -62,7 +62,7 @@
   justify-content: center;
 }
 
-.pixel-grid {
+.pixelGrid {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);
@@ -104,7 +104,7 @@
   border-color: #333;
 }
 
-.pattern-info {
+.patternInfo {
   background: rgba(255, 255, 255, 0.1);
   padding: 10px;
   border-radius: 8px;
@@ -113,7 +113,7 @@
   backdrop-filter: blur(10px);
 }
 
-.pattern-info p {
+.patternInfo p {
   margin: 0;
   font-weight: 500;
   font-size: 16px;
@@ -126,8 +126,8 @@
   margin-bottom: 20px;
 }
 
-.clear-button,
-.save-button {
+.clearButton,
+.saveButton {
   padding: 12px 24px;
   border: none;
   border-radius: 8px;
@@ -138,39 +138,39 @@
   min-width: 120px;
 }
 
-.clear-button {
+.clearButton {
   background: #f44336;
   color: white;
 }
 
-.clear-button:hover {
+.clearButton:hover {
   background: #d32f2f;
   transform: translateY(-2px);
 }
 
-.save-button {
+.saveButton {
   background: #4CAF50;
   color: white;
 }
 
-.save-button:hover {
+.saveButton:hover {
   background: #45a049;
   transform: translateY(-2px);
 }
 
-.save-button.disabled {
+.saveButton.disabled {
   background: #ccc;
   color: #999;
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.save-button.disabled:hover {
+.saveButton.disabled:hover {
   background: #ccc;
   transform: none;
 }
 
-.pattern-display {
+.patternDisplay {
   background: rgba(255, 255, 255, 0.1);
   padding: 15px;
   border-radius: 10px;
@@ -179,7 +179,7 @@
   margin-top: 20px;
 }
 
-.pattern-display p {
+.patternDisplay p {
   margin: 0 0 10px 0;
   font-family: 'Courier New', monospace;
   font-size: 14px;
@@ -187,15 +187,15 @@
 }
 
 @media (max-width: 768px) {
-  .pixel-art-container {
+  .pixelArtContainer {
     padding: 15px;
   }
   
-  .grid-container {
+  .gridContainer {
     padding: 20px;
   }
   
-  .pixel-grid {
+  .pixelGrid {
     width: 320px;
     height: 320px;
     padding: 8px;
@@ -210,15 +210,15 @@
     align-items: center;
   }
   
-  .clear-button,
-  .save-button {
+  .clearButton,
+  .saveButton {
     width: 100%;
     max-width: 200px;
   }
 }
 
 @media (max-width: 480px) {
-  .pixel-grid {
+  .pixelGrid {
     width: 280px;
     height: 280px;
     padding: 6px;
@@ -231,22 +231,22 @@
     gap: 10px;
   }
   
-  .back-button {
+  .backButton {
     align-self: flex-start;
   }
 }
 
-.pixel-grid * {
+.pixelGrid * {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
 }
 
-.pixel-grid.drawing {
+.pixelGrid.drawing {
   cursor: grab;
 }
 
-.pixel-grid.drawing:active {
+.pixelGrid.drawing:active {
   cursor: grabbing;
 }

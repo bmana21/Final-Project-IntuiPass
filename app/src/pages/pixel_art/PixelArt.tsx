@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '../../components/AppRouter';
-import './PixelArt.css';
+import styles from './PixelArt.module.css';
 import { PasswordIntegrationService } from "../../services/password-integration-service.ts";
 import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
@@ -177,7 +177,7 @@ const PixelArt: React.FC = () => {
         pixels.push(
           <div
             key={getPixelKey(row, col)}
-            className={`pixel ${isSelected ? 'selected' : ''}`}
+            className={`${styles.pixel} ${isSelected ? styles.selected : ''}`}
             onMouseDown={() => handleMouseDown(row, col)}
             onMouseEnter={() => handleMouseEnter(row, col)}
             onMouseUp={handleMouseUp}
@@ -193,9 +193,9 @@ const PixelArt: React.FC = () => {
   };
 
   return (
-    <div className="pixel-art-container">
-      <div className="header">
-        <button className="back-button" onClick={goBack}>
+    <div className={styles.pixelArtContainer}>
+      <div className={styles.header}>
+        <button className={styles.backButton} onClick={goBack}>
           ← Back
         </button>
         <h2>Pixel Art Pattern</h2>
@@ -209,7 +209,7 @@ const PixelArt: React.FC = () => {
         />
       )}
 
-      <div className="instructions">
+      <div className={styles.instructions}>
         <p>
           {isCreatingPassword 
             ? "Click and drag to paint pixels black. Create your unique pixel art pattern."
@@ -219,9 +219,9 @@ const PixelArt: React.FC = () => {
         <p><small>Click on individual pixels or drag to paint multiple pixels at once.</small></p>
       </div>
 
-      <div className="grid-container">
+      <div className={styles.gridContainer}>
         <div 
-          className="pixel-grid"
+          className={styles.pixelGrid}
           onMouseLeave={handleMouseUp}
           onContextMenu={(e) => e.preventDefault()}
         >
@@ -229,18 +229,18 @@ const PixelArt: React.FC = () => {
         </div>
       </div>
 
-      <div className="pattern-info">
+      <div className={styles.patternInfo}>
         <p>Selected pixels: {Object.values(pixelGrid).filter(Boolean).length}</p>
       </div>
 
-      <div className="controls">
-        <button onClick={clearGrid} className="clear-button">
+      <div className={styles.controls}>
+        <button onClick={clearGrid} className={styles.clearButton}>
           Clear Grid
         </button>
         
         <button 
           onClick={savePassword} 
-          className={`save-button ${!canProceed() ? 'disabled' : ''}`}
+          className={`${styles.saveButton} ${!canProceed() ? 'disabled' : ''}`}
           disabled={!canProceed()}
         >
           {isCreatingPassword ? "Save Pattern" : (isViewingPassword ? "View Password" : "Fill Password")}
@@ -256,7 +256,7 @@ const PixelArt: React.FC = () => {
       )}
 
       {passwordPattern && (
-        <div className="pattern-display">
+        <div className={styles.patternDisplay}>
           <p><strong>Pattern:</strong></p>
           <p><small>{passwordPattern}</small></p>
         </div>
