@@ -193,12 +193,15 @@ const PixelArt: React.FC = () => {
   };
 
   return (
-    <div className={styles.pixelArtContainer}>
-      <div className={styles.header}>
-        <button className={styles.backButton} onClick={goBack}>
+    <div className="mainContainer">
+      <div className="passwordOptionHeader">
+        <button className="backButton" onClick={goBack}>
           ← Back
         </button>
         <h2>Pixel Art Pattern</h2>
+        <div className="modeBadge">
+          {isCreatingPassword ? '🔐 Creating' : (isViewingPassword ? '👁️ Viewing' : '🔓 Filling')}
+        </div>
       </div>
 
       {isCreatingPassword && (
