@@ -12,6 +12,7 @@ import PixelArt from './pages/pixel_art/PixelArt';
 import { InitService } from './services/init-service';
 import PasswordManager from './pages/password_manager/PasswordManager';
 
+
 const App: React.FC = () => {
   InitService.initializeCredentials();
 

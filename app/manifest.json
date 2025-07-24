@@ -3,6 +3,15 @@
   "name": "IntuiPass - Visual Password Manager",
   "version": "1.0",
   "description": "Visual Password Manager - Save and access passwords using visual patterns.",
+  "commands": {
+    "open_piano_password": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+H",
+        "mac": "Command+Shift+H"
+      },
+      "description": "Open Piano Password Creator"
+    }
+  },
   "action": {
     "default_popup": "src/pages/popup/index.html",
     "default_icon": "assets/main-icon.png"

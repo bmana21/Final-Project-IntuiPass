@@ -18,6 +18,33 @@ class BackgroundService {
     chrome.tabs.onUpdated.addListener(this.handleTabUpdate.bind(this));
     chrome.tabs.onRemoved.addListener(this.handleTabRemoved.bind(this));
     chrome.action.onClicked.addListener(this.handleActionClick.bind(this));
+    chrome.commands.onCommand.addListener(this.handleCommand.bind(this));
+  }
+
+  private handleCommand(command: string): void {
+    console.log('Command received:', command);
+
+    switch (command) {
+      case 'open_piano_password':
+        this.openPianoPassword();
+        break;
+    }
+  }
+  private openPianoPassword(): void {
+    chrome.action.openPopup().then(() => {
+      setTimeout(() => {
+        chrome.runtime.sendMessage({
+          action: 'navigate_to_piano',
+          page: 'piano_password',
+          params: { isCreatingPassword: true }
+        });
+      }, 100);
+    }).catch((error) => {
+      console.log('Could not open popup:', error);
+      chrome.tabs.create({
+        url: chrome.runtime.getURL('src/pages/popup/index.html') + '?direct=piano'
+      });
+    });
   }
 
   private handleMessage(
@@ -59,14 +86,14 @@ class BackgroundService {
           });
 
           chrome.action.setIcon({
-          path: {
-            "16": "/assets/main-icon-highlighted.png",
-            "32": "/assets/main-icon-highlighted.png",
-            "48": "/assets/main-icon-highlighted.png",
-            "128": "/assets/main-icon-highlighted.png"
-          },
-          tabId: tabId
-        });
+            path: {
+              "16": "/assets/main-icon-highlighted.png",
+              "32": "/assets/main-icon-highlighted.png",
+              "48": "/assets/main-icon-highlighted.png",
+              "128": "/assets/main-icon-highlighted.png"
+            },
+            tabId: tabId
+          });
         }
         break;
 

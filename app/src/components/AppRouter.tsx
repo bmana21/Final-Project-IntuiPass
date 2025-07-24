@@ -1,5 +1,5 @@
 import React, { useState, createContext, useContext } from 'react';
-
+import { useKeyboardCommands } from '../hooks/useKeyboardCommands';
 export type Page = 'login' | 'password_mode_selection' | 'password_type_selection' | 'connect_the_dots' | 'pattern_lock' | 'color_sequence' | 'piano_password' | 'chess_password' | 'math_formula' | 'password-manager-page' | 'pixel_art';
 
 interface RouteParams {
@@ -83,9 +83,15 @@ interface AppRouterProps {
   children: React.ReactNode;
 }
 
+const KeyboardCommandsWrapper: React.FC = () => {
+  useKeyboardCommands();
+  return null;
+};
+
 const AppRouter: React.FC<AppRouterProps> = ({ children }) => {
   return (
     <NavigationProvider>
+      <KeyboardCommandsWrapper />
       <div className="app-router">
         {children}
       </div>
