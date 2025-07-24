@@ -108,8 +108,8 @@ const Login: React.FC = () => {
             <span className={styles.featureIcon}>∫</span>
             <span>Mathematical Formula</span>
           </div>
-          <div className="feature">
-            <span className="feature-icon">🎨</span>
+          <div className={styles.feature}>
+            <span className={styles.featureIcon}>🎨</span>
             <span>Pixel Art</span>
           </div>
         </div>
