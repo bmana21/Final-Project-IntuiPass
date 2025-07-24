@@ -6,17 +6,27 @@
   "commands": {
     "open_piano_password": {
       "suggested_key": {
-        "default": "Alt+P",
-        "mac": "Alt+P"
+        "default": "Alt+P"
       },
       "description": "Open Piano Password Creator"
     },
-    "open_chess_password": {
+    "open_connect_the_dots": {
       "suggested_key": {
-        "default": "Alt+B",
-        "mac": "Alt+B"
+        "default": "Alt+C"
       },
-      "description": "Open Chess Password Creator"
+      "description": "Open Connect The Dots Password Creator"
+    },
+    "open_mathematical_expression": {
+      "suggested_key": {
+        "default": "Alt+M"
+      },
+      "description": "Open Mathematical Expression Password Creator"
+    },
+    "open_pixel_art": {
+      "suggested_key": {
+        "default": "Alt+A"
+      },
+      "description": "Open Pixel Art Password Creator"
     }
   },
   "action": {

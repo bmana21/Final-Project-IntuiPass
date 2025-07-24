@@ -23,54 +23,61 @@ class BackgroundService {
   }
 
   private handleCommand(command: string): void {
-  console.log('Command received:', command);
-  
-  switch (command) {
-    case 'open_piano_password':
-      this.openPageIfPasswordDetected('navigate_to_page', 'piano_password');
-      break;
-    case 'open_chess_password':
-      this.openPageIfPasswordDetected('navigate_to_page', 'chess_password');
-  }
-}
+    console.log('Command received:', command);
 
-private async openPageIfPasswordDetected(action: string, page: string): Promise<void> {
-  try {
-    const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    
-    if (!activeTab || !activeTab.id) {
-      console.log('No active tab found');
-      return;
+    switch (command) {
+      case 'open_piano_password':
+        this.openPageIfPasswordDetected('navigate_to_page', 'piano_password');
+        break;
+      case 'open_connect_the_dots':
+        this.openPageIfPasswordDetected('navigate_to_page', 'connect_the_dots');
+        break;
+      case 'open_mathematical_expression':
+        this.openPageIfPasswordDetected('navigate_to_page', 'math_formula');
+        break;
+      case 'open_pixel_art':
+        this.openPageIfPasswordDetected('navigate_to_page', 'pixel_art');
+        break;
     }
-
-    const tabState = this.tabStates.get(activeTab.id);
-    
-    if (tabState && tabState.hasPasswordField) {
-      this.openPage(action, page);
-    } else {
-      alert('Keyboard shortcut ignored - no password fields detected on this page');
-    }
-  } catch (error) {
-    console.error('Error checking password fields:', error);
   }
-}
 
-private openPage(action: string, page: string): void {
-  chrome.action.openPopup().then(() => {
-    setTimeout(() => {
-      chrome.runtime.sendMessage({
-        action: action,
-        page: page,
-        params: { isCreatingPassword: true }
+  private async openPageIfPasswordDetected(action: string, page: string): Promise<void> {
+    try {
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+      if (!activeTab || !activeTab.id) {
+        console.log('No active tab found');
+        return;
+      }
+
+      const tabState = this.tabStates.get(activeTab.id);
+
+      if (tabState && tabState.hasPasswordField) {
+        this.openPage(action, page);
+      } else {
+        alert('Keyboard shortcut ignored - no password fields detected on this page');
+      }
+    } catch (error) {
+      console.error('Error checking password fields:', error);
+    }
+  }
+
+  private openPage(action: string, page: string): void {
+    chrome.action.openPopup().then(() => {
+      setTimeout(() => {
+        chrome.runtime.sendMessage({
+          action: action,
+          page: page,
+          params: { isCreatingPassword: true }
+        });
+      }, 100);
+    }).catch((error) => {
+      console.log('Could not open page:', error);
+      chrome.tabs.create({
+        url: chrome.runtime.getURL('src/pages/popup/index.html')
       });
-    }, 100);
-  }).catch((error) => {
-    console.log('Could not open page:', error);
-    chrome.tabs.create({
-      url: chrome.runtime.getURL('src/pages/popup/index.html')
     });
-  });
-}
+  }
 
   private handleMessage(
     message: any,
@@ -125,7 +132,7 @@ private openPage(action: string, page: string): void {
       case 'PASSWORD_FIELDS_DETECTED':
         if (tabId && message.fieldCount) {
 
-          this.updateTabState(tabId, {hasPasswordField: true});
+          this.updateTabState(tabId, { hasPasswordField: true });
 
           chrome.action.setIcon({
             path: {
