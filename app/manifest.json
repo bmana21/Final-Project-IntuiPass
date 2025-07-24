@@ -3,6 +3,32 @@
   "name": "IntuiPass - Visual Password Manager",
   "version": "1.0",
   "description": "Visual Password Manager - Save and access passwords using visual patterns.",
+  "commands": {
+    "open_piano_password": {
+      "suggested_key": {
+        "default": "Alt+P"
+      },
+      "description": "Open Piano Password Creator"
+    },
+    "open_connect_the_dots": {
+      "suggested_key": {
+        "default": "Alt+C"
+      },
+      "description": "Open Connect The Dots Password Creator"
+    },
+    "open_mathematical_expression": {
+      "suggested_key": {
+        "default": "Alt+M"
+      },
+      "description": "Open Mathematical Expression Password Creator"
+    },
+    "open_pixel_art": {
+      "suggested_key": {
+        "default": "Alt+A"
+      },
+      "description": "Open Pixel Art Password Creator"
+    }
+  },
   "action": {
     "default_popup": "src/pages/popup/index.html",
     "default_icon": "assets/main-icon.png"

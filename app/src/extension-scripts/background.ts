@@ -4,6 +4,7 @@ interface TabPasswordState {
   hasActivePasswordField: boolean;
   fieldInfo?: any;
   lastInteraction?: number;
+  hasPasswordField: boolean;
 }
 
 class BackgroundService {
@@ -18,6 +19,64 @@ class BackgroundService {
     chrome.tabs.onUpdated.addListener(this.handleTabUpdate.bind(this));
     chrome.tabs.onRemoved.addListener(this.handleTabRemoved.bind(this));
     chrome.action.onClicked.addListener(this.handleActionClick.bind(this));
+    chrome.commands.onCommand.addListener(this.handleCommand.bind(this));
+  }
+
+  private handleCommand(command: string): void {
+    console.log('Command received:', command);
+
+    switch (command) {
+      case 'open_piano_password':
+        this.openPageIfPasswordDetected('navigate_to_page', 'piano_password');
+        break;
+      case 'open_connect_the_dots':
+        this.openPageIfPasswordDetected('navigate_to_page', 'connect_the_dots');
+        break;
+      case 'open_mathematical_expression':
+        this.openPageIfPasswordDetected('navigate_to_page', 'math_formula');
+        break;
+      case 'open_pixel_art':
+        this.openPageIfPasswordDetected('navigate_to_page', 'pixel_art');
+        break;
+    }
+  }
+
+  private async openPageIfPasswordDetected(action: string, page: string): Promise<void> {
+    try {
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+      if (!activeTab || !activeTab.id) {
+        console.log('No active tab found');
+        return;
+      }
+
+      const tabState = this.tabStates.get(activeTab.id);
+
+      if (tabState && tabState.hasPasswordField) {
+        this.openPage(action, page);
+      } else {
+        alert('Keyboard shortcut ignored - no password fields detected on this page');
+      }
+    } catch (error) {
+      console.error('Error checking password fields:', error);
+    }
+  }
+
+  private openPage(action: string, page: string): void {
+    chrome.action.openPopup().then(() => {
+      setTimeout(() => {
+        chrome.runtime.sendMessage({
+          action: action,
+          page: page,
+          params: { isCreatingPassword: true }
+        });
+      }, 100);
+    }).catch((error) => {
+      console.log('Could not open page:', error);
+      chrome.tabs.create({
+        url: chrome.runtime.getURL('src/pages/popup/index.html')
+      });
+    });
   }
 
   private handleMessage(
@@ -59,19 +118,22 @@ class BackgroundService {
           });
 
           chrome.action.setIcon({
-          path: {
-            "16": "/assets/main-icon-highlighted.png",
-            "32": "/assets/main-icon-highlighted.png",
-            "48": "/assets/main-icon-highlighted.png",
-            "128": "/assets/main-icon-highlighted.png"
-          },
-          tabId: tabId
-        });
+            path: {
+              "16": "/assets/main-icon-highlighted.png",
+              "32": "/assets/main-icon-highlighted.png",
+              "48": "/assets/main-icon-highlighted.png",
+              "128": "/assets/main-icon-highlighted.png"
+            },
+            tabId: tabId
+          });
         }
         break;
 
       case 'PASSWORD_FIELDS_DETECTED':
         if (tabId && message.fieldCount) {
+
+          this.updateTabState(tabId, { hasPasswordField: true });
+
           chrome.action.setIcon({
             path: {
               "16": "/assets/main-icon-highlighted.png",
@@ -116,6 +178,11 @@ class BackgroundService {
           }
         });
         return true;
+      case 'OPEN_EXTENSION_FROM_ICON':
+        if (tabId) {
+          this.openExtensionFromIcon(tabId, message.fieldInfo);
+        }
+        break;
       default:
         return false;
     }
@@ -123,8 +190,30 @@ class BackgroundService {
     return true;
   }
 
+  private openExtensionFromIcon(tabId: number, fieldInfo: any): void {
+    console.log('Opening extension from icon click', fieldInfo);
+    
+    this.updateTabState(tabId, {
+      hasActivePasswordField: true,
+      fieldInfo: fieldInfo,
+      lastInteraction: Date.now()
+    });
+
+    chrome.action.openPopup().then(() => {
+      setTimeout(() => {
+        chrome.runtime.sendMessage({
+          action: 'navigate_to_page',
+          page: 'password_mode_selection',
+          params: {}
+        });
+      }, 100);
+    }).catch((error) => {
+      console.log('Could not open popup:', error);
+    });
+  }
+
   private updateTabState(tabId: number, state: Partial<TabPasswordState>): void {
-    const currentState = this.tabStates.get(tabId) || { hasActivePasswordField: false };
+    const currentState = this.tabStates.get(tabId) || { hasActivePasswordField: false, hasPasswordField: false };
     this.tabStates.set(tabId, { ...currentState, ...state });
   }
 

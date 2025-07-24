@@ -40,6 +40,7 @@ class PasswordFieldDetector {
   private passwordFields: HTMLInputElement[] = [];
   private usernameFields: HTMLInputElement[] = [];
   private activeUsernameField: HTMLInputElement | null = null;
+  private extensionIcons: HTMLInputElement[] = [];
 
   constructor() {
     this.init();
@@ -62,6 +63,7 @@ class PasswordFieldDetector {
     this.attachEventListeners();
     chrome.runtime.onMessage.addListener(this.handleMessage.bind(this));
     this.updateBadgeOnLoad();
+    this.addExtensionIcons();
   }
 
   private updateBadgeOnLoad(): void {
@@ -95,7 +97,7 @@ class PasswordFieldDetector {
 
   private detectUsernameFields(): void {
     const textInputs = document.querySelectorAll('input:not([type]), input[type="text"], input[type="email"], input[type="search"]') as NodeListOf<HTMLInputElement>;
-    const candidates: Array<{field: HTMLInputElement, priority: number}> = [];
+    const candidates: Array<{ field: HTMLInputElement, priority: number }> = [];
 
     Array.from(textInputs).forEach(input => {
       const priority = this.getUsernameFieldPriority(input);
@@ -295,10 +297,10 @@ class PasswordFieldDetector {
     const id = input.id?.toLowerCase() || '';
     const placeholder = input.placeholder?.toLowerCase() || '';
     const className = input.className?.toLowerCase() || '';
-    
+
     const passwordKeywords = ['password', 'pass', 'pwd', 'secret', 'pin', 'passphrase'];
     const allText = `${name} ${id} ${placeholder} ${className}`;
-    
+
     return passwordKeywords.some(keyword => allText.includes(keyword));
   }
 
@@ -334,14 +336,14 @@ class PasswordFieldDetector {
 
   private isPasswordField(element: HTMLElement): boolean {
     if (!(element instanceof HTMLInputElement)) return false;
-    
-    return element.type === 'password' || 
-           this.passwordFields.includes(element);
+
+    return element.type === 'password' ||
+      this.passwordFields.includes(element);
   }
 
   private handlePasswordFieldClick(field: HTMLInputElement): void {
     this.activePasswordField = field;
-    
+
     chrome.runtime.sendMessage({
       type: 'PASSWORD_FIELD_CLICKED',
       fieldInfo: this.getSerializableFieldInfo(field)
@@ -350,7 +352,7 @@ class PasswordFieldDetector {
 
   private handlePasswordFieldFocus(field: HTMLInputElement): void {
     this.activePasswordField = field;
-    
+
     chrome.runtime.sendMessage({
       type: 'PASSWORD_FIELD_FOCUSED',
       fieldInfo: this.getSerializableFieldInfo(field)
@@ -360,7 +362,7 @@ class PasswordFieldDetector {
   private getSerializableFieldInfo(field: HTMLInputElement): PasswordFieldInfo {
     const rect = field.getBoundingClientRect();
     const form = field.closest('form');
-    
+
     return {
       rect: {
         top: rect.top,
@@ -383,7 +385,7 @@ class PasswordFieldDetector {
   private observeDOM(): void {
     const observer = new MutationObserver((mutations) => {
       let shouldRedetect = false;
-      
+
       mutations.forEach((mutation) => {
         if (mutation.type === 'childList') {
           mutation.addedNodes.forEach((node) => {
@@ -428,7 +430,7 @@ class PasswordFieldDetector {
       case 'PING':
         sendResponse({ success: true, message: 'Content script ready' });
         return true;
-        
+
       case 'GET_ACTIVE_PASSWORD_FIELD':
         if (this.activePasswordField) {
           sendResponse({
@@ -454,16 +456,17 @@ class PasswordFieldDetector {
       case 'READ_USERNAME':
         {
           const username = this.readUsernameValue();
-        if (username !== null) {
-          sendResponse({
-            success: true,
-            username: username,
-            fieldInfo: this.activeUsernameField ? this.getSerializableUsernameFieldInfo(this.activeUsernameField) : null
-          });
-        } else {
-          sendResponse({ success: false, message: 'No username field found or username is empty' });
+          if (username !== null) {
+            sendResponse({
+              success: true,
+              username: username,
+              fieldInfo: this.activeUsernameField ? this.getSerializableUsernameFieldInfo(this.activeUsernameField) : null
+            });
+          } else {
+            sendResponse({ success: false, message: 'No username field found or username is empty' });
+          }
+          return true;
         }
-        return true; }
 
       case 'FILL_USERNAME':
         if (message.username) {
@@ -481,8 +484,8 @@ class PasswordFieldDetector {
       case 'FILL_PASSWORD':
         if (message.password) {
           const filledCount = this.fillAllPasswordFields(message.password);
-          sendResponse({ 
-            success: filledCount > 0, 
+          sendResponse({
+            success: filledCount > 0,
             message: `Filled ${filledCount} password field(s)`,
             fieldsCount: filledCount
           });
@@ -492,77 +495,222 @@ class PasswordFieldDetector {
         return true;
 
       case 'GET_ALL_PASSWORD_FIELDS':
-        { const allFields = this.passwordFields.map(field => this.getSerializableFieldInfo(field));
-        sendResponse({ success: true, fields: allFields });
-        return true; }
+        {
+          const allFields = this.passwordFields.map(field => this.getSerializableFieldInfo(field));
+          sendResponse({ success: true, fields: allFields });
+          return true;
+        }
 
       case 'GET_ALL_USERNAME_FIELDS':
-        { const allUsernameFields = this.usernameFields.map(field => this.getSerializableUsernameFieldInfo(field));
-        sendResponse({ success: true, fields: allUsernameFields });
-        return true; }
+        {
+          const allUsernameFields = this.usernameFields.map(field => this.getSerializableUsernameFieldInfo(field));
+          sendResponse({ success: true, fields: allUsernameFields });
+          return true;
+        }
 
       case 'DETECT_PASSWORD_FIELDS':
-        { this.detectPasswordFields();
-        this.detectUsernameFields();
-        const fields = this.passwordFields.map((field, index) => ({
-          id: field.id || `field-${index}`,
-          name: field.name || `field-${index}`,
-          type: field.type === 'password' ? 'password' : 'text-password',
-          placeholder: field.placeholder || 'Password field'
-        }));
+        {
+          this.detectPasswordFields();
+          this.detectUsernameFields();
+          const fields = this.passwordFields.map((field, index) => ({
+            id: field.id || `field-${index}`,
+            name: field.name || `field-${index}`,
+            type: field.type === 'password' ? 'password' : 'text-password',
+            placeholder: field.placeholder || 'Password field'
+          }));
 
-        const usernameFields = this.usernameFields.map((field, index) => ({
-          id: field.id || `username-field-${index}`,
-          name: field.name || `username-field-${index}`,
-          type: field.type,
-          placeholder: field.placeholder || 'Username field',
-          priority: this.getUsernameFieldPriority(field)
-        }));
+          const usernameFields = this.usernameFields.map((field, index) => ({
+            id: field.id || `username-field-${index}`,
+            name: field.name || `username-field-${index}`,
+            type: field.type,
+            placeholder: field.placeholder || 'Username field',
+            priority: this.getUsernameFieldPriority(field)
+          }));
 
-        sendResponse({
-          passwordFields: fields,
-          usernameFields: usernameFields,
-          passwordCount: fields.length,
-          usernameCount: usernameFields.length
-        });
-        return true; }
+          sendResponse({
+            passwordFields: fields,
+            usernameFields: usernameFields,
+            passwordCount: fields.length,
+            usernameCount: usernameFields.length
+          });
+          return true;
+        }
+      case 'ADD_EXTENSION_ICONS':
+        {
+          const iconCount = this.addExtensionIcons();
+          sendResponse({
+            success: true,
+            iconCount: iconCount,
+            message: `Added ${iconCount} extension icons`
+          });
+          return true;
+        }
+
+      case 'REMOVE_EXTENSION_ICONS':
+        {
+          const removedCount = this.removeExtensionIcons();
+          sendResponse({
+            success: true,
+            removedCount: removedCount,
+            message: `Removed ${removedCount} extension icons`
+          });
+          return true;
+        }
     }
-    
+
     return false;
+  }
+  private addExtensionIcons(): number {
+    this.removeExtensionIcons();
+
+    let iconCount = 0;
+    this.passwordFields.forEach((field, index) => {
+      if (this.addIconToPasswordField(field, index)) {
+        iconCount++;
+      }
+    });
+
+    return iconCount;
+  }
+
+  private addIconToPasswordField(field: HTMLInputElement, index: number): boolean {
+    try {
+      field.setAttribute('data-intuipass-enhanced', 'true');
+      field.setAttribute('data-field-index', index.toString());
+
+      const iconUrl = chrome.runtime.getURL('assets/main-icon-highlighted.png');
+
+      const fieldHeight = field.height;
+      const iconSize = Math.max(16, Math.min(fieldHeight * 0.6, 32));
+      const padding = iconSize + 15;
+
+      field.style.backgroundImage = `url("${iconUrl}")`;
+      field.style.backgroundRepeat = 'no-repeat';
+      field.style.backgroundPosition = `right 10px center`;
+      field.style.backgroundSize = `${iconSize}px ${iconSize}px`;
+      field.style.paddingRight = `${padding}px`;
+
+      const clickHandler = (e: Event) => {
+        const mouseEvent = e as MouseEvent;
+        const rect = field.getBoundingClientRect();
+        const clickX = mouseEvent.clientX;
+        const iconLeft = rect.right - padding;
+
+        if (clickX >= iconLeft) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.openExtensionPopup(field);
+        }
+      };
+
+      const mouseMoveHandler = (e: Event) => {
+        const mouseEvent = e as MouseEvent;
+        const rect = field.getBoundingClientRect();
+        const mouseX = mouseEvent.clientX;
+        const iconLeft = rect.right - padding;
+
+        if (mouseX >= iconLeft) {
+          field.style.cursor = 'pointer';
+        } else {
+          field.style.cursor = 'text';
+        }
+      };
+
+      (field as any).__intuipassClickHandler = clickHandler;
+      (field as any).__intuipassMouseMoveHandler = mouseMoveHandler;
+
+      field.addEventListener('click', clickHandler);
+      field.addEventListener('mousemove', mouseMoveHandler);
+
+      const mouseLeaveHandler = () => {
+        field.style.cursor = 'text';
+      };
+
+      (field as any).__intuipassMouseLeaveHandler = mouseLeaveHandler;
+      field.addEventListener('mouseleave', mouseLeaveHandler);
+
+      this.extensionIcons.push(field);
+
+      return true;
+    } catch (error) {
+      console.error('Error adding icon to password field:', error);
+      return false;
+    }
+  }
+
+  private removeExtensionIcons(): number {
+    let removedCount = 0;
+
+    this.extensionIcons.forEach((field: HTMLInputElement) => {
+      if (field && field.getAttribute('data-intuipass-enhanced') === 'true') {
+        this.restoreOriginalField(field);
+        removedCount++;
+      }
+    });
+
+    this.extensionIcons = [];
+    return removedCount;
+  }
+
+  private restoreOriginalField(field: HTMLInputElement): void {
+    try {
+      const clickHandler = (field as any).__intuipassClickHandler;
+      if (clickHandler) {
+        field.removeEventListener('click', clickHandler);
+        delete (field as any).__intuipassClickHandler;
+      }
+
+      field.placeholder = '';
+      field.removeAttribute('data-intuipass-enhanced');
+      field.removeAttribute('data-field-index');
+    } catch (error) {
+      console.error('Error restoring original field:', error);
+    }
+  }
+
+  private openExtensionPopup(field: HTMLInputElement): void {
+    field.focus();
+
+    this.activePasswordField = field;
+
+    chrome.runtime.sendMessage({
+      type: 'OPEN_EXTENSION_FROM_ICON',
+      fieldInfo: this.getSerializableFieldInfo(field)
+    });
   }
 
   private fillAllPasswordFields(password: string): number {
     let filledCount = 0;
-    
+
     this.detectPasswordFields();
-    
+
     this.passwordFields.forEach((field, index) => {
       if (this.fillSinglePasswordField(field, password, index)) {
         filledCount++;
       }
     });
-    
+
     return filledCount;
   }
 
   private fillSinglePasswordField(field: HTMLInputElement, password: string, index: number = 0): boolean {
     try {
       field.value = '';
-      
+
       field.focus();
-      
+
       field.value = password;
-      
+
       const inputEvent = new Event('input', { bubbles: true });
       const changeEvent = new Event('change', { bubbles: true });
       const keyupEvent = new KeyboardEvent('keyup', { bubbles: true });
-      
+
       field.dispatchEvent(inputEvent);
       field.dispatchEvent(changeEvent);
       field.dispatchEvent(keyupEvent);
-      
+
       this.showFieldFeedback(field, index);
-      
+
       return true;
     } catch (error) {
       console.error('Error filling password field:', error);
@@ -573,10 +721,10 @@ class PasswordFieldDetector {
   private showFieldFeedback(field: HTMLInputElement, index: number): void {
     const originalStyle = field.style.border;
     const originalBackground = field.style.backgroundColor;
-    
+
     setTimeout(() => {
       field.style.border = '2px solid #4CAF50';
-      
+
       setTimeout(() => {
         field.style.border = originalStyle;
         field.style.backgroundColor = originalBackground;
