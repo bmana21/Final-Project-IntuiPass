@@ -6,10 +6,17 @@
   "commands": {
     "open_piano_password": {
       "suggested_key": {
-        "default": "Ctrl+Shift+H",
-        "mac": "Command+Shift+H"
+        "default": "Alt+P",
+        "mac": "Alt+P"
       },
       "description": "Open Piano Password Creator"
+    },
+    "open_chess_password": {
+      "suggested_key": {
+        "default": "Alt+B",
+        "mac": "Alt+B"
+      },
+      "description": "Open Chess Password Creator"
     }
   },
   "action": {
