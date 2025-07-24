@@ -178,11 +178,38 @@ class BackgroundService {
           }
         });
         return true;
+      case 'OPEN_EXTENSION_FROM_ICON':
+        if (tabId) {
+          this.openExtensionFromIcon(tabId, message.fieldInfo);
+        }
+        break;
       default:
         return false;
     }
 
     return true;
+  }
+
+  private openExtensionFromIcon(tabId: number, fieldInfo: any): void {
+    console.log('Opening extension from icon click', fieldInfo);
+    
+    this.updateTabState(tabId, {
+      hasActivePasswordField: true,
+      fieldInfo: fieldInfo,
+      lastInteraction: Date.now()
+    });
+
+    chrome.action.openPopup().then(() => {
+      setTimeout(() => {
+        chrome.runtime.sendMessage({
+          action: 'navigate_to_page',
+          page: 'password_mode_selection',
+          params: {}
+        });
+      }, 100);
+    }).catch((error) => {
+      console.log('Could not open popup:', error);
+    });
   }
 
   private updateTabState(tabId: number, state: Partial<TabPasswordState>): void {

@@ -1,5 +1,6 @@
 export class DomManager {
   private currentTabId: number | null = null;
+  private iconsAdded: boolean = false;
 
   constructor() {
     this.init();
@@ -39,7 +40,7 @@ export class DomManager {
       }
 
       await this.ensureContentScriptLoaded();
-      
+
       await this.sendMessageWithTimeout(
         chrome.tabs.sendMessage(this.currentTabId, {
           type: 'GET_ACTIVE_PASSWORD_FIELD'
@@ -77,7 +78,7 @@ export class DomManager {
   private async sendMessageWithTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
     return Promise.race([
       promise,
-      new Promise<never>((_, reject) => 
+      new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error('Message timeout')), timeoutMs)
       )
     ]);
@@ -127,7 +128,7 @@ export class DomManager {
     if (!this.currentTabId) {
       await this.init();
     }
-    
+
     if (!this.currentTabId) {
       return;
     }
@@ -196,5 +197,57 @@ export class DomManager {
         }
       });
     });
+  }
+
+  async addExtensionIconsToPasswordFields(): Promise<void> {
+    if (!this.currentTabId) {
+      await this.init();
+    }
+
+    if (!this.currentTabId) {
+      return;
+    }
+
+    try {
+      await this.ensureContentScriptLoaded();
+      
+      const response = await chrome.tabs.sendMessage(this.currentTabId, {
+        type: 'ADD_EXTENSION_ICONS'
+      });
+
+      if (response?.success) {
+        this.iconsAdded = true;
+        console.log(`Added icons to ${response.iconCount} password fields`);
+      }
+    } catch (error) {
+      console.error('Error adding extension icons:', error);
+    }
+  }
+
+  async removeExtensionIcons(): Promise<void> {
+    if (!this.currentTabId) {
+      await this.init();
+    }
+
+    if (!this.currentTabId || !this.iconsAdded) {
+      return;
+    }
+
+    try {
+      await chrome.tabs.sendMessage(this.currentTabId, {
+        type: 'REMOVE_EXTENSION_ICONS'
+      });
+      
+      this.iconsAdded = false;
+    } catch (error) {
+      console.error('Error removing extension icons:', error);
+    }
+  }
+
+  async showPasswordFieldIcons(): Promise<void> {
+    console.log('herenika');
+    if (!this.iconsAdded) {
+      await this.addExtensionIconsToPasswordFields();
+    }
   }
 }
