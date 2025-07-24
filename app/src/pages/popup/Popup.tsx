@@ -119,13 +119,13 @@ const Popup: React.FC = () => {
           </button>
 
           <button
-            className="password-type-button"
+            className={styles.passwordTypeButton}
             onClick={handleNavigateToPixelArt}
           >
-            <span className="button-icon">🎨</span>
-            <div className="button-content">
-              <span className="button-title">Pixel Art</span>
-              <span className="button-description">Create patterns with pixel art</span>
+            <span className={styles.buttonIcon}>🎨</span>
+            <div className={styles.buttonContent}>
+              <span className={styles.buttonTitle}>Pixel Art</span>
+              <span className={styles.buttonDescription}>Create patterns with pixel art</span>
             </div>
           </button>
 
