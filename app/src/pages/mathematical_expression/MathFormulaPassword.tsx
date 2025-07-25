@@ -7,6 +7,7 @@ import { ConfigService } from '../../services/config-service.ts';
 import { CredentialsDisplay } from '../cretentials-display/CredentialsDisplay';
 import styles from './MathFormulaPassword.module.css';
 import PasswordControls from '../../components/PasswordControls/PasswordControls.tsx';
+import PasswordDifficulty, { DifficultyLevel, PasswordDifficultyRef } from '../../components/PasswordDifficulty/PasswordDifficulty';
 
 import * as iink from 'iink-ts';
 import katex from 'katex';
@@ -14,6 +15,7 @@ import 'katex/dist/katex.min.css';
 
 const MathFormulaPassword: React.FC = () => {
     const { goBack, getRouteParams } = useNavigation();
+    const difficultyRef = useRef<PasswordDifficultyRef>(null);
 
     const editorRef = useRef<HTMLDivElement>(null);
     const resultRef = useRef<HTMLDivElement>(null);
@@ -22,6 +24,7 @@ const MathFormulaPassword: React.FC = () => {
     const [latexFormula, setLatexFormula] = useState('');
     const [username, setUsername] = useState<string>('');
     const [isUsernameValid, setIsUsernameValid] = useState<boolean>(false);
+    const [currentDifficulty, setCurrentDifficulty] = useState<DifficultyLevel>('Easy');
 
     const [showCredentials, setShowCredentials] = useState<boolean>(false);
     const [retrievedPassword, setRetrievedPassword] = useState<string>('');
@@ -30,6 +33,224 @@ const MathFormulaPassword: React.FC = () => {
     const isCreatingPassword = routeParams?.isCreatingPassword ?? true;
     const isViewingPassword = routeParams?.isViewingPassword ?? false;
     const usernameFromPattern = routeParams?.username;
+
+    const handleDifficultyChange = (difficulty: DifficultyLevel) => {
+        setCurrentDifficulty(difficulty);
+    };
+
+    const assessPasswordDifficulty = (latexFormula: string): DifficultyLevel => {
+        if (!latexFormula || latexFormula.trim().length === 0) return 'Easy';
+
+        const formula = latexFormula.trim();
+        let score = 0;
+
+        const lengthScore = calculateLengthScore(formula);
+        const operatorScore = calculateOperatorScore(formula);
+        const symbolScore = calculateSymbolScore(formula);
+        const symbolCountScore = calculateSymbolCountScore(formula);
+        const structuralScore = calculateStructuralScore(formula);
+        const functionScore = calculateFunctionScore(formula);
+        const nestingScore = calculateNestingScore(formula);
+        const complexityPenalty = calculateComplexityPenalty(formula);
+
+        score = lengthScore + operatorScore + symbolScore + symbolCountScore + structuralScore + functionScore + nestingScore - complexityPenalty;
+
+        if (score >= 24) return 'Hard';
+        else if (score >= 12) return 'Normal';
+        else return 'Easy';
+    };
+
+    const calculateLengthScore = (formula: string): number => {
+        const cleanLength = formula.replace(/\\[a-zA-Z]+/g, 'X').length;
+        
+        if (cleanLength >= 8) return 4;
+        else if (cleanLength >= 6) return 3;
+        else if (cleanLength >= 4) return 2;
+        else if (cleanLength >= 2) return 1;
+        else return 0;
+    };
+
+    const calculateOperatorScore = (formula: string): number => {
+        const advancedOperators = [
+            '\\int', '\\sum', '\\prod', '\\lim', '\\partial', '\\nabla',
+            '\\sqrt', '\\frac', '\\binom', '\\choose'
+        ];
+        
+        let score = 0;
+        advancedOperators.forEach(op => {
+            const matches = (formula.match(new RegExp(`\\${op}`, 'g')) || []).length;
+            score += matches * 2;
+        });
+        
+        return Math.min(score, 8);
+    };
+
+    const calculateSymbolScore = (formula: string): number => {
+        const greekLetters = [
+            '\\alpha', '\\beta', '\\gamma', '\\delta', '\\epsilon', '\\zeta',
+            '\\eta', '\\theta', '\\iota', '\\kappa', '\\lambda', '\\mu',
+            '\\nu', '\\xi', '\\pi', '\\rho', '\\sigma', '\\tau',
+            '\\upsilon', '\\phi', '\\chi', '\\psi', '\\omega'
+        ];
+        
+        const specialSymbols = [
+            '\\infty', '\\pm', '\\mp', '\\times', '\\div', '\\cdot',
+            '\\equiv', '\\approx', '\\neq', '\\leq', '\\geq',
+            '\\subset', '\\supset', '\\in', '\\notin', '\\cup', '\\cap'
+        ];
+        
+        let score = 0;
+        
+        greekLetters.forEach(symbol => {
+            if (formula.includes(symbol)) score += 1;
+        });
+        
+        specialSymbols.forEach(symbol => {
+            if (formula.includes(symbol)) score += 1;
+        });
+        
+        return Math.min(score, 6);
+    };
+
+    const calculateSymbolCountScore = (formula: string): number => {
+        const uniqueSymbols = new Set();
+        
+        const greekLetters = [
+            '\\alpha', '\\beta', '\\gamma', '\\delta', '\\epsilon', '\\zeta',
+            '\\eta', '\\theta', '\\iota', '\\kappa', '\\lambda', '\\mu',
+            '\\nu', '\\xi', '\\pi', '\\rho', '\\sigma', '\\tau',
+            '\\upsilon', '\\phi', '\\chi', '\\psi', '\\omega'
+        ];
+        
+        const specialSymbols = [
+            '\\infty', '\\pm', '\\mp', '\\times', '\\div', '\\cdot',
+            '\\equiv', '\\approx', '\\neq', '\\leq', '\\geq',
+            '\\subset', '\\supset', '\\in', '\\notin', '\\cup', '\\cap'
+        ];
+
+        const operators = [
+            '\\int', '\\sum', '\\prod', '\\lim', '\\partial', '\\nabla',
+            '\\sqrt', '\\frac', '\\binom', '\\choose'
+        ];
+
+        const functions = [
+            '\\sin', '\\cos', '\\tan', '\\sec', '\\csc', '\\cot',
+            '\\log', '\\ln', '\\lg', '\\sinh', '\\cosh', '\\tanh',
+            '\\exp', '\\max', '\\min', '\\gcd', '\\lcm'
+        ];
+
+        const allSymbols = [...greekLetters, ...specialSymbols, ...operators, ...functions];
+        
+        allSymbols.forEach(symbol => {
+            if (formula.includes(symbol)) {
+                uniqueSymbols.add(symbol);
+            }
+        });
+
+        const basicChars = formula.replace(/\\[a-zA-Z]+/g, '').split('');
+        basicChars.forEach(char => {
+            if (char.match(/[a-zA-Z0-9+\-*\/=(){}^_]/)) {
+                uniqueSymbols.add(char);
+            }
+        });
+
+        const uniqueCount = uniqueSymbols.size;
+        
+        return uniqueCount;
+    };
+
+    const calculateStructuralScore = (formula: string): number => {
+        let score = 0;
+        
+        const superscripts = (formula.match(/\^/g) || []).length;
+        const subscripts = (formula.match(/_/g) || []).length;
+        const fractions = (formula.match(/\\frac/g) || []).length;
+        
+        score += Math.min(superscripts, 3);
+        score += Math.min(subscripts, 3);
+        score += fractions * 2;
+        
+        if (formula.includes('\\begin{')) score += 3;
+        if (formula.includes('\\matrix') || formula.includes('\\pmatrix')) score += 2;
+        
+        return Math.min(score, 8);
+    };
+
+    const calculateFunctionScore = (formula: string): number => {
+        const trigFunctions = ['\\sin', '\\cos', '\\tan', '\\sec', '\\csc', '\\cot'];
+        const logFunctions = ['\\log', '\\ln', '\\lg'];
+        const hyperbolicFunctions = ['\\sinh', '\\cosh', '\\tanh'];
+        const otherFunctions = ['\\exp', '\\max', '\\min', '\\gcd', '\\lcm'];
+        
+        let score = 0;
+        
+        [...trigFunctions, ...logFunctions, ...hyperbolicFunctions, ...otherFunctions].forEach(func => {
+            const matches = (formula.match(new RegExp(`\\${func}`, 'g')) || []).length;
+            score += matches;
+        });
+        
+        return Math.min(score, 6);
+    };
+
+    const calculateNestingScore = (formula: string): number => {
+        let maxDepth = 0;
+        let currentDepth = 0;
+        
+        for (let i = 0; i < formula.length; i++) {
+            if (formula[i] === '{' || formula[i] === '(') {
+                currentDepth++;
+                maxDepth = Math.max(maxDepth, currentDepth);
+            } else if (formula[i] === '}' || formula[i] === ')') {
+                currentDepth--;
+            }
+        }
+        
+        if (maxDepth >= 4) return 3;
+        else if (maxDepth >= 3) return 2;
+        else if (maxDepth >= 2) return 1;
+        else return 0;
+    };
+
+    const calculateComplexityPenalty = (formula: string): number => {
+        let penalty = 0;
+        
+        const simplePatterns = [
+            /^[a-zA-Z]\s*=\s*[a-zA-Z0-9]+$/,
+            /^[a-zA-Z]\s*\+\s*[a-zA-Z0-9]+$/,
+            /^[0-9]+\s*[\+\-\*\/]\s*[0-9]+$/
+        ];
+        
+        const isVerySimple = simplePatterns.some(pattern => pattern.test(formula.replace(/\\/g, '')));
+        if (isVerySimple) penalty += 3;
+        
+        const hasOnlyBasicOps = !/\\[a-zA-Z]/.test(formula);
+        if (hasOnlyBasicOps && formula.length < 10) penalty += 2;
+        
+        const isSymmetric = checkForSymmetry(formula);
+        if (isSymmetric) penalty += 1;
+        
+        return penalty;
+    };
+
+    const checkForSymmetry = (formula: string): boolean => {
+        const cleanFormula = formula.replace(/\s/g, '');
+        const reversedFormula = cleanFormula.split('').reverse().join('');
+        
+        const symmetricPatterns = [
+            /^(.+)\s*=\s*\1$/,
+            /^(.+)\s*\+\s*(.+)\s*=\s*\2\s*\+\s*\1$/
+        ];
+        
+        return symmetricPatterns.some(pattern => pattern.test(cleanFormula)) || 
+               cleanFormula === reversedFormula;
+    };
+
+    useEffect(() => {
+        if (isCreatingPassword && difficultyRef.current) {
+            const difficulty = assessPasswordDifficulty(latexFormula);
+            difficultyRef.current.setDifficulty(difficulty);
+        }
+    }, [latexFormula, isCreatingPassword]);
 
     useEffect(() => {
         loadEditor();
@@ -144,6 +365,10 @@ const MathFormulaPassword: React.FC = () => {
         }
         setShowCredentials(false);
         setRetrievedPassword('');
+
+        if (isCreatingPassword && difficultyRef.current) {
+            difficultyRef.current.setDifficulty('Easy');
+        }
     };
 
     const handleUndo = () => {
@@ -162,7 +387,7 @@ const MathFormulaPassword: React.FC = () => {
         const hasFormula = latexFormula.length > 0;
 
         if (isCreatingPassword) {
-            return isUsernameValid && hasFormula;
+            return isUsernameValid && hasFormula && currentDifficulty !== 'Easy';
         } else {
             return hasFormula;
         }
@@ -253,6 +478,10 @@ const MathFormulaPassword: React.FC = () => {
                 />
             )}
 
+            {isCreatingPassword && (
+                <PasswordDifficulty ref={difficultyRef} onChange={handleDifficultyChange} />
+            )}
+
             <div className={styles.instructions}>
                 <p>
                     {isCreatingPassword
@@ -314,7 +543,6 @@ const MathFormulaPassword: React.FC = () => {
                 isViewingPassword={isViewingPassword}
             />
 
-            {/* Add the CredentialsDisplay component here */}
             {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
                 <CredentialsDisplay
                     username={usernameFromPattern}
