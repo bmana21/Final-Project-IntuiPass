@@ -4,8 +4,9 @@ import { PasswordIntegrationService } from "../../services/password-integration-
 import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
 import { ConfigService } from '../../services/config-service.ts';
-import {CredentialsDisplay} from '../cretentials-display/CredentialsDisplay';
+import { CredentialsDisplay } from '../cretentials-display/CredentialsDisplay';
 import styles from './MathFormulaPassword.module.css';
+import PasswordControls from '../../components/PasswordControls/PasswordControls.tsx';
 
 import * as iink from 'iink-ts';
 import katex from 'katex';
@@ -263,9 +264,6 @@ const MathFormulaPassword: React.FC = () => {
 
             <div className={styles.mathEditorSection}>
                 <div className={styles.controls}>
-                    <button onClick={handleClear} disabled={isLoading} className={styles.clearButton}>
-                        Clear
-                    </button>
                     <button onClick={handleUndo} disabled={isLoading} className={styles.undoButton}>
                         Undo
                     </button>
@@ -308,16 +306,13 @@ const MathFormulaPassword: React.FC = () => {
                     }}
                 />
             </div>
-
-            <div className={styles.controls}>
-                <button
-                    onClick={savePassword}
-                    className={`${styles.saveButton} ${!canProceed() ? 'disabled' : ''}`}
-                    disabled={!canProceed()}
-                >
-                    {isCreatingPassword ? "Save Pattern" : (isViewingPassword ? "View Password" : "Fill Password")}
-                </button>
-            </div>
+            <PasswordControls
+                onClear={handleClear}
+                onSave={savePassword}
+                canProceed={canProceed}
+                isCreatingPassword={isCreatingPassword}
+                isViewingPassword={isViewingPassword}
+            />
 
             {/* Add the CredentialsDisplay component here */}
             {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (

@@ -5,6 +5,7 @@ import { PasswordIntegrationService } from "../../services/password-integration-
 import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
 import {CredentialsDisplay} from '../cretentials-display/CredentialsDisplay';
+import PasswordControls from '../../components/PasswordControls/PasswordControls.tsx';
 
 interface PixelGrid {
   [key: string]: boolean;
@@ -235,22 +236,14 @@ const PixelArt: React.FC = () => {
       <div className={styles.patternInfo}>
         <p>Selected pixels: {Object.values(pixelGrid).filter(Boolean).length}</p>
       </div>
+          <PasswordControls
+        onClear={clearGrid}
+        onSave={savePassword}
+        canProceed={canProceed}
+        isCreatingPassword={isCreatingPassword}
+        isViewingPassword={isViewingPassword}
+      />
 
-      <div className={styles.controls}>
-        <button onClick={clearGrid} className={styles.clearButton}>
-          Clear Grid
-        </button>
-        
-        <button 
-          onClick={savePassword} 
-          className={`${styles.saveButton} ${!canProceed() ? 'disabled' : ''}`}
-          disabled={!canProceed()}
-        >
-          {isCreatingPassword ? "Save Pattern" : (isViewingPassword ? "View Password" : "Fill Password")}
-        </button>
-      </div>
-
-      {/* Add the CredentialsDisplay component here */}
       {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
         <CredentialsDisplay
           username={usernameFromPattern}

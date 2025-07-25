@@ -1,10 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useNavigation } from '../../components/AppRouter';
 import styles from './PianoPassword.module.css';
 import { PasswordIntegrationService } from "../../services/password-integration-service.ts";
 import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
 import { CredentialsDisplay } from '../cretentials-display/CredentialsDisplay';
+import PasswordDifficulty, { DifficultyLevel, PasswordDifficultyRef } from '../../components/PasswordDifficulty/PasswordDifficulty';
+import PasswordControls from '../../components/PasswordControls/PasswordControls.tsx';
+
 
 interface PianoKey {
   id: string;
@@ -16,6 +19,7 @@ interface PianoKey {
 
 const PianoPassword: React.FC = () => {
   const { goBack, getRouteParams } = useNavigation();
+  const difficultyRef = useRef<PasswordDifficultyRef>(null);
 
   const routeParams = getRouteParams();
   const isCreatingPassword = routeParams?.isCreatingPassword ?? true;
@@ -54,7 +58,42 @@ const PianoPassword: React.FC = () => {
     }
   }, [isCreatingPassword, usernameFromPattern]);
 
-  // Helper function to check if user is typing in an input field
+  const assessPasswordDifficulty = (sequence: string[]): DifficultyLevel => {
+    if (sequence.length === 0) return 'Easy';
+
+    const length = sequence.length;
+    const uniqueNotes = new Set(sequence).size;
+
+    const blackKeyCount = sequence.filter(noteId => {
+      const key = pianoKeys.find(k => k.id === noteId);
+      return key?.isBlack;
+    }).length;
+
+    let score = 0;
+
+    if (length >= 8) score += 3;
+    else if (length >= 5) score += 2;
+    else score += 1;
+
+    if (uniqueNotes >= 4) score += 3;
+    else if (uniqueNotes >= 2) score += 2;
+    else score += 1;
+
+    if (blackKeyCount >= 4) score += 2;
+    else if (blackKeyCount >= 2) score += 1;
+
+    if (score >= 8) return 'Hard';
+    else if (score >= 6) return 'Normal';
+    else return 'Easy';
+  };
+
+  useEffect(() => {
+    if (isCreatingPassword && difficultyRef.current) {
+      const difficulty = assessPasswordDifficulty(sequence);
+      difficultyRef.current.setDifficulty(difficulty);
+    }
+  }, [sequence, isCreatingPassword]);
+
   const isTypingInInput = () => {
     const activeElement = document.activeElement;
     return activeElement && (
@@ -73,7 +112,6 @@ const PianoPassword: React.FC = () => {
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Don't play piano keys if user is typing in an input field
       if (isTypingInInput()) {
         return;
       }
@@ -87,7 +125,6 @@ const PianoPassword: React.FC = () => {
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
-      // Don't handle key up for piano keys if user is typing in an input field
       if (isTypingInInput()) {
         return;
       }
@@ -173,13 +210,17 @@ const PianoPassword: React.FC = () => {
     setPressedKeys(new Set());
     setShowCredentials(false);
     setRetrievedPassword('');
+
+    if (isCreatingPassword && difficultyRef.current) {
+      difficultyRef.current.setDifficulty('Easy');
+    }
   };
 
   const canProceed = () => {
     const hasSequence = sequence.length > 0;
 
     if (isCreatingPassword) {
-      return isUsernameValid && hasSequence;
+      return isUsernameValid && hasSequence && difficultyRef.current?.getDifficulty() != 'Easy';
     } else {
       return hasSequence;
     }
@@ -272,6 +313,10 @@ const PianoPassword: React.FC = () => {
         />
       )}
 
+      {isCreatingPassword && (
+        <PasswordDifficulty ref={difficultyRef} />
+      )}
+
       <div className={styles.instructions}>
         <p>
           {isCreatingPassword
@@ -301,21 +346,14 @@ const PianoPassword: React.FC = () => {
         </div>
       </div>
 
-      <div className={styles.controls}>
-        <button onClick={clearSequence} className={styles.clearButton}>
-          Clear Sequence
-        </button>
+      <PasswordControls
+        onClear={clearSequence}
+        onSave={savePassword}
+        canProceed={canProceed}
+        isCreatingPassword={isCreatingPassword}
+        isViewingPassword={isViewingPassword}
+      />
 
-        <button
-          onClick={savePassword}
-          className={`${styles.saveButton} ${!canProceed() ? styles.disabled : ''}`}
-          disabled={!canProceed()}
-        >
-          {isCreatingPassword ? "Save Sequence" : (isViewingPassword ? "View Password" : "Fill Password")}
-        </button>
-      </div>
-
-      {/* Add the CredentialsDisplay component here */}
       {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
         <CredentialsDisplay
           username={usernameFromPattern}
