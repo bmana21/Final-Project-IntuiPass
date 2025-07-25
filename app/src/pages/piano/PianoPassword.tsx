@@ -32,6 +32,7 @@ const PianoPassword: React.FC = () => {
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [username, setUsername] = useState<string>('');
   const [isUsernameValid, setIsUsernameValid] = useState<boolean>(false);
+  const [currentDifficulty, setCurrentDifficulty] = useState<DifficultyLevel>('Easy');
 
   const [showCredentials, setShowCredentials] = useState<boolean>(false);
   const [retrievedPassword, setRetrievedPassword] = useState<string>('');
@@ -220,7 +221,7 @@ const PianoPassword: React.FC = () => {
     const hasSequence = sequence.length > 0;
 
     if (isCreatingPassword) {
-      return isUsernameValid && hasSequence && difficultyRef.current?.getDifficulty() != 'Easy';
+      return isUsernameValid && hasSequence && currentDifficulty != 'Easy';
     } else {
       return hasSequence;
     }
@@ -314,7 +315,7 @@ const PianoPassword: React.FC = () => {
       )}
 
       {isCreatingPassword && (
-        <PasswordDifficulty ref={difficultyRef} />
+        <PasswordDifficulty ref={difficultyRef} onChange={setCurrentDifficulty}/>
       )}
 
       <div className={styles.instructions}>

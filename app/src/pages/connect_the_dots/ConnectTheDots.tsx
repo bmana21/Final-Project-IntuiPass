@@ -32,6 +32,7 @@ const ConnectTheDots: React.FC = () => {
   const [passwordPattern, setPasswordPattern] = useState<string>('');
   const [username, setUsername] = useState<string>('');
   const [isUsernameValid, setIsUsernameValid] = useState<boolean>(false);
+  const [currentDifficulty, setCurrentDifficulty] = useState<DifficultyLevel>('Easy');
 
   const [showCredentials, setShowCredentials] = useState<boolean>(false);
   const [retrievedPassword, setRetrievedPassword] = useState<string>('');
@@ -388,7 +389,7 @@ const ConnectTheDots: React.FC = () => {
     const hasPattern = connections.length > 0 && passwordPattern.length > 0;
 
     if (isCreatingPassword) {
-      return isUsernameValid && hasPattern && difficultyRef.current?.getDifficulty() != 'Easy';
+      return isUsernameValid && hasPattern && currentDifficulty != 'Easy';
     } else {
       return hasPattern;
     }
@@ -481,7 +482,7 @@ const ConnectTheDots: React.FC = () => {
       )}
 
       {isCreatingPassword && (
-        <PasswordDifficulty ref={difficultyRef} />
+        <PasswordDifficulty ref={difficultyRef} onChange={setCurrentDifficulty} />
       )}
 
       <div className={styles.instructions}>
@@ -516,8 +517,6 @@ const ConnectTheDots: React.FC = () => {
         canProceed={canProceed}
         isCreatingPassword={isCreatingPassword}
         isViewingPassword={isViewingPassword}
-        clearButtonText="Clear All"
-        className=""
       />
 
       {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (

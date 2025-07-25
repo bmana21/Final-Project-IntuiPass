@@ -11,15 +11,17 @@ export interface PasswordDifficultyRef {
 interface PasswordDifficultyProps {
   initialDifficulty?: DifficultyLevel;
   className?: string;
+  onChange: (difficulty: DifficultyLevel) => void;
 }
 
 const PasswordDifficulty = forwardRef<PasswordDifficultyRef, PasswordDifficultyProps>(
-  ({ initialDifficulty = 'Easy', className = '' }, ref) => {
+  ({ initialDifficulty = 'Easy', className = '', onChange}, ref) => {
     const [difficulty, setDifficultyState] = useState<DifficultyLevel>(initialDifficulty);
 
     useImperativeHandle(ref, () => ({
       setDifficulty: (level: DifficultyLevel) => {
         setDifficultyState(level);
+        onChange(level);
       },
       getDifficulty: () => difficulty,
     }));
