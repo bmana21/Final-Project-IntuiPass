@@ -95,13 +95,21 @@ class PasswordFieldDetector {
     });
   }
 
+  private isVisible(input: HTMLInputElement) {
+    const style = window.getComputedStyle(input);
+    return (
+        style.visibility !== 'hidden' &&
+        style.display !== 'none'
+    );
+  }
+
   private detectUsernameFields(): void {
     const textInputs = document.querySelectorAll('input:not([type]), input[type="text"], input[type="email"], input[type="search"]') as NodeListOf<HTMLInputElement>;
     const candidates: Array<{ field: HTMLInputElement, priority: number }> = [];
 
     Array.from(textInputs).forEach(input => {
       const priority = this.getUsernameFieldPriority(input);
-      if (priority > 0) {
+      if (priority > 0 && this.isVisible(input)) {
         candidates.push({ field: input, priority });
       }
     });
@@ -152,7 +160,7 @@ class PasswordFieldDetector {
     let priority = 0;
 
     if (highPriorityKeywords.some(keyword => allText.includes(keyword))) {
-      priority += 100;
+      priority += 90;
     }
 
     if (mediumPriorityKeywords.some(keyword => allText.includes(keyword))) {
