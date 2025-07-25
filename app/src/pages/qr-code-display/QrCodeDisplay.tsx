@@ -5,9 +5,12 @@ import {useNavigation} from "../../components/AppRouter.tsx";
 
 const QrCodeDisplay: React.FC = () => {
     // @ts-ignore
-    const {goBack} = useNavigation();
+    const {goBack, getRouteParams} = useNavigation();
+    const routeParams = getRouteParams();
+    const plainTextPassword = routeParams?.plainTextPassword ?? '';
+
     return (
-        <h2>Hello</h2>
+        <h2>{plainTextPassword}</h2>
     )
 }
 

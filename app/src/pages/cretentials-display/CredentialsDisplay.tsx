@@ -61,7 +61,9 @@ export const CredentialsDisplay: React.FC<CredentialsDisplayProps> = ({
 
     const handleWarningOk = () => {
         setShowWarningModal(false);
-        navigateTo('qr-code');
+        navigateTo('qr-code', {
+            plainTextPassword: password
+        });
     };
 
     return (
