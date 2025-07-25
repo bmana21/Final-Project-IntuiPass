@@ -2,7 +2,7 @@
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
-    padding: 20px;
+    padding: 16px;
     margin: 0;
     width: 100%;
     min-height: 100vh;
@@ -10,21 +10,21 @@
     backdrop-filter: blur(10px);
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 14px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .qr-header {
     text-align: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    padding-bottom: 16px;
+    padding-bottom: 12px;
 }
 
 .qr-title {
     font-size: 18px;
     font-weight: 600;
     color: #fff;
-    margin: 0 0 8px 0;
+    margin: 0 0 6px 0;
 }
 
 .timer-display {
@@ -43,14 +43,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 18px;
+    gap: 14px;
     flex: 1;
     justify-content: center;
 }
 
 .qr-code-wrapper {
     background: white;
-    padding: 16px;
+    padding: 12px;
     border-radius: 10px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
@@ -70,7 +70,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 12px;
     color: #666;
 }
 
@@ -96,7 +96,7 @@
 .instruction-text {
     font-size: 16px;
     color: #fff;
-    margin: 0 0 6px 0;
+    margin: 0 0 4px 0;
     font-weight: 500;
 }
 
@@ -109,11 +109,11 @@
 .security-notice {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
+    gap: 8px;
     background: rgba(255, 193, 7, 0.15);
     border: 1px solid rgba(255, 193, 7, 0.4);
     border-radius: 8px;
-    padding: 12px;
+    padding: 10px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -137,13 +137,13 @@
     display: flex;
     gap: 12px;
     justify-content: space-between;
-    padding-top: 16px;
+    padding-top: 12px;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .action-button {
     flex: 1;
-    padding: 12px 16px;
+    padding: 10px 16px;
     border: none;
     border-radius: 8px;
     font-size: 15px;
@@ -178,33 +178,87 @@
     transform: translateY(-1px);
 }
 
-/* Chrome Extension Sizing */
-@media (max-width: 400px), (max-height: 600px) {
+/* Chrome Extension Sizing - More generous for typical extension popup */
+@media (max-width: 400px) {
     .qr-display-container {
-        padding: 12px;
-        gap: 10px;
+        padding: 16px;
+        gap: 16px;
         min-height: auto;
     }
 
     .qr-header {
-        padding-bottom: 8px;
+        padding-bottom: 12px;
     }
 
     .qr-title {
-        font-size: 14px;
-        margin: 0 0 4px 0;
+        font-size: 16px;
+        margin: 0 0 6px 0;
     }
 
     .timer-display {
-        font-size: 11px;
+        font-size: 13px;
     }
 
     .qr-content {
-        gap: 8px;
+        gap: 14px;
     }
 
     .qr-code-wrapper {
-        padding: 8px;
+        padding: 12px;
+    }
+
+    .qr-code-image,
+    .qr-loading {
+        width: 160px;
+        height: 160px;
+    }
+
+    .instruction-text {
+        font-size: 14px;
+    }
+
+    .instruction-subtitle {
+        font-size: 12px;
+    }
+
+    .security-notice {
+        padding: 10px;
+        gap: 8px;
+    }
+
+    .notice-icon {
+        font-size: 16px;
+    }
+
+    .notice-text {
+        font-size: 12px;
+    }
+
+    .qr-actions {
+        gap: 10px;
+        padding-top: 12px;
+    }
+
+    .action-button {
+        padding: 10px 12px;
+        font-size: 13px;
+        gap: 4px;
+    }
+}
+
+/* Only for very constrained windows */
+@media (max-width: 320px) {
+    .qr-display-container {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .qr-title {
+        font-size: 15px;
+    }
+
+    .timer-display {
+        font-size: 12px;
     }
 
     .qr-code-image,
@@ -213,70 +267,24 @@
         height: 140px;
     }
 
-    .instruction-text {
-        font-size: 11px;
-    }
-
-    .instruction-subtitle {
-        font-size: 10px;
-    }
-
-    .security-notice {
-        padding: 6px;
-        gap: 6px;
-    }
-
-    .notice-icon {
-        font-size: 14px;
-    }
-
-    .notice-text {
-        font-size: 10px;
-    }
-
-    .qr-actions {
-        gap: 6px;
-        padding-top: 8px;
-    }
-
-    .action-button {
-        padding: 6px 8px;
-        font-size: 11px;
-        gap: 3px;
-    }
-}
-
-/* Very small extension windows */
-@media (max-width: 320px), (max-height: 500px) {
-    .qr-display-container {
-        padding: 8px;
-        gap: 6px;
-    }
-
-    .qr-code-image,
-    .qr-loading {
-        width: 120px;
-        height: 120px;
-    }
-
     .qr-code-wrapper {
-        padding: 6px;
+        padding: 10px;
     }
 
     .instruction-text {
-        font-size: 10px;
+        font-size: 13px;
     }
 
     .instruction-subtitle {
-        font-size: 9px;
+        font-size: 11px;
     }
 
     .notice-text {
-        font-size: 9px;
+        font-size: 11px;
     }
 
     .action-button {
-        padding: 5px 6px;
-        font-size: 10px;
+        padding: 8px 10px;
+        font-size: 12px;
     }
 }
