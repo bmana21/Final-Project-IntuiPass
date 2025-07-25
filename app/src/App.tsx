@@ -11,6 +11,7 @@ import MathFormulaPassword from './pages/mathematical_expression/MathFormulaPass
 import PixelArt from './pages/pixel_art/PixelArt';
 import { InitService } from './services/init-service';
 import PasswordManager from './pages/password_manager/PasswordManager';
+import QrCodeDisplay from './pages/qr-code-display/QrCodeDisplay'
 
 
 const App: React.FC = () => {
@@ -28,6 +29,7 @@ const App: React.FC = () => {
         <Route path="chess_password" component={ChessPassword} />
         <Route path="math_formula" component={MathFormulaPassword} />
         <Route path="pixel_art" component={PixelArt} />
+        <Route path="qr-code" component = {QrCodeDisplay} />
       </div>
     </AppRouter>
   );
