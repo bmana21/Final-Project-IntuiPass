@@ -6,6 +6,7 @@ import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
 import { CredentialsDisplay } from '../cretentials-display/CredentialsDisplay.tsx';
 import PasswordDifficulty, { DifficultyLevel, PasswordDifficultyRef } from '../../components/PasswordDifficulty/PasswordDifficulty';
+import PasswordControls from '../../components/PasswordControls/PasswordControls.tsx';
 
 interface Point {
   x: number;
@@ -71,23 +72,23 @@ const ConnectTheDots: React.FC = () => {
 
   const checkForSimpleLines = (path: number[]): boolean => {
     if (path.length < 3) return false;
-    
+
     const straightLines = [
       [1, 2, 3], [4, 5, 6], [7, 8, 9],
       [1, 4, 7], [2, 5, 8], [3, 6, 9],
       [1, 5, 9], [3, 5, 7]
     ];
-    
+
     for (let i = 0; i <= path.length - 3; i++) {
       const segment = path.slice(i, i + 3);
       for (const line of straightLines) {
-        if (JSON.stringify(segment) === JSON.stringify(line) || 
-            JSON.stringify(segment) === JSON.stringify(line.reverse())) {
+        if (JSON.stringify(segment) === JSON.stringify(line) ||
+          JSON.stringify(segment) === JSON.stringify(line.reverse())) {
           return true;
         }
       }
     }
-    
+
     return false;
   };
 
@@ -104,8 +105,8 @@ const ConnectTheDots: React.FC = () => {
       const p2 = getPointPosition(line2.from);
       const q2 = getPointPosition(line2.to);
 
-      if (line1.from === line2.from || line1.from === line2.to || 
-          line1.to === line2.from || line1.to === line2.to) {
+      if (line1.from === line2.from || line1.from === line2.to ||
+        line1.to === line2.from || line1.to === line2.to) {
         return false;
       }
 
@@ -509,19 +510,15 @@ const ConnectTheDots: React.FC = () => {
         />
       </div>
 
-      <div className={styles.controls}>
-        <button onClick={clearConnections} className={styles.clearButton}>
-          Clear All
-        </button>
-
-        <button
-          onClick={savePassword}
-          className={`${styles.saveButton} ${!canProceed() ? 'disabled' : ''}`}
-          disabled={!canProceed()}
-        >
-          {isCreatingPassword ? "Save Pattern" : (isViewingPassword ? "View Password" : "Fill Password")}
-        </button>
-      </div>
+      <PasswordControls
+        onClear={clearConnections}
+        onSave={savePassword}
+        canProceed={canProceed}
+        isCreatingPassword={isCreatingPassword}
+        isViewingPassword={isViewingPassword}
+        clearButtonText="Clear All"
+        className=""
+      />
 
       {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
         <CredentialsDisplay

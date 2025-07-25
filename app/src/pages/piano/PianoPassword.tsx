@@ -6,6 +6,8 @@ import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
 import { CredentialsDisplay } from '../cretentials-display/CredentialsDisplay';
 import PasswordDifficulty, { DifficultyLevel, PasswordDifficultyRef } from '../../components/PasswordDifficulty/PasswordDifficulty';
+import PasswordControls from '../../components/PasswordControls/PasswordControls.tsx';
+
 
 interface PianoKey {
   id: string;
@@ -208,7 +210,7 @@ const PianoPassword: React.FC = () => {
     setPressedKeys(new Set());
     setShowCredentials(false);
     setRetrievedPassword('');
-    
+
     if (isCreatingPassword && difficultyRef.current) {
       difficultyRef.current.setDifficulty('Easy');
     }
@@ -344,19 +346,13 @@ const PianoPassword: React.FC = () => {
         </div>
       </div>
 
-      <div className={styles.controls}>
-        <button onClick={clearSequence} className={styles.clearButton}>
-          Clear Sequence
-        </button>
-
-        <button
-          onClick={savePassword}
-          className={`${styles.saveButton} ${!canProceed() ? styles.disabled : ''}`}
-          disabled={!canProceed()}
-        >
-          {isCreatingPassword ? "Save Sequence" : (isViewingPassword ? "View Password" : "Fill Password")}
-        </button>
-      </div>
+      <PasswordControls
+        onClear={clearSequence}
+        onSave={savePassword}
+        canProceed={canProceed}
+        isCreatingPassword={isCreatingPassword}
+        isViewingPassword={isViewingPassword}
+      />
 
       {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
         <CredentialsDisplay

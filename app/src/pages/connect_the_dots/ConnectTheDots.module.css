@@ -95,53 +95,57 @@
 
 .controls {
   display: flex;
-  gap: 15px;
   justify-content: center;
-  margin-bottom: 20px;
+  gap: 16px;
+  margin-bottom: 30px;
 }
 
 .clearButton,
 .saveButton {
   padding: 12px 24px;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
+  border-radius: 12px;
   cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
   transition: all 0.3s ease;
-  min-width: 120px;
 }
 
 .clearButton {
-  background: #f44336;
-  color: white;
+  background: #f8f9fa;
+  color: #6c757d;
+  border: 2px solid #dee2e6;
 }
 
 .clearButton:hover {
-  background: #d32f2f;
+  background: #e9ecef;
+  border-color: #adb5bd;
   transform: translateY(-2px);
 }
 
 .saveButton {
-  background: #4CAF50;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
   color: white;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
 .saveButton:hover {
-  background: #45a049;
   transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
 }
 
 .saveButton.disabled {
-  background: #ccc;
-  color: #999;
-  cursor: not-allowed;
+  background: #ccc !important;
+  color: #999 !important;
+  cursor: not-allowed !important;
   opacity: 0.6;
+  box-shadow: none !important;
 }
 
 .saveButton.disabled:hover {
-  background: #ccc;
-  transform: none;
+  background: #ccc !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .patternDisplay {
