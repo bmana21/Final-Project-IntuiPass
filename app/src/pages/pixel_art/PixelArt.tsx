@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigation } from '../../components/AppRouter';
 import styles from './PixelArt.module.css';
 import { PasswordIntegrationService } from "../../services/password-integration-service.ts";
@@ -6,6 +6,7 @@ import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
 import {CredentialsDisplay} from '../cretentials-display/CredentialsDisplay';
 import PasswordControls from '../../components/PasswordControls/PasswordControls.tsx';
+import PasswordDifficulty, { DifficultyLevel, PasswordDifficultyRef } from '../../components/PasswordDifficulty/PasswordDifficulty';
 
 interface PixelGrid {
   [key: string]: boolean;
@@ -15,6 +16,7 @@ const GRID_SIZE = 8;
 
 const PixelArt: React.FC = () => {
   const { goBack, getRouteParams } = useNavigation();
+  const difficultyRef = useRef<PasswordDifficultyRef>(null);
   
   const routeParams = getRouteParams();
   const isCreatingPassword = routeParams?.isCreatingPassword ?? true;
@@ -28,9 +30,155 @@ const PixelArt: React.FC = () => {
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
   const [drawMode, setDrawMode] = useState<'draw' | 'erase'>('draw');
   const [isInitialClick, setIsInitialClick] = useState<boolean>(false);
+  const [currentDifficulty, setCurrentDifficulty] = useState<DifficultyLevel>('Easy');
 
   const [showCredentials, setShowCredentials] = useState<boolean>(false);
   const [retrievedPassword, setRetrievedPassword] = useState<string>('');
+
+  const assessPasswordDifficulty = (pixelGrid: PixelGrid): DifficultyLevel => {
+    const selectedPixels = Object.entries(pixelGrid)
+      .filter(([_, isSelected]) => isSelected)
+      .map(([position, _]) => position);
+
+    if (selectedPixels.length === 0) return 'Easy';
+
+    const pixelCount = selectedPixels.length;
+    const coverage = pixelCount / (GRID_SIZE * GRID_SIZE);
+    
+    const hasComplexShapes = checkForComplexShapes(selectedPixels);
+    const hasSymmetry = checkForSymmetry(selectedPixels);
+    const hasConnectedRegions = checkForConnectedRegions(selectedPixels);
+    const edgePixelCount = countEdgePixels(selectedPixels);
+    const centerPixelCount = countCenterPixels(selectedPixels);
+
+    let score = 0;
+
+    if (pixelCount >= 20) score += 4;
+    else if (pixelCount >= 12) score += 3;
+    else if (pixelCount >= 6) score += 2;
+    else score += 1;
+
+    if (coverage >= 0.4) score += 2;
+    else if (coverage >= 0.2) score += 1;
+
+    if (hasComplexShapes) score += 3;
+    if (hasSymmetry) score += 2;
+    if (hasConnectedRegions) score += 2;
+
+    const edgeRatio = edgePixelCount / pixelCount;
+    if (edgeRatio < 0.3) score += 2;
+    else if (edgeRatio < 0.5) score += 1;
+
+    if (centerPixelCount >= 3) score += 2;
+
+    if (score >= 12) return 'Hard';
+    else if (score >= 8) return 'Normal';
+    else return 'Easy';
+  };
+
+  const checkForComplexShapes = (selectedPixels: string[]): boolean => {
+    const pixelSet = new Set(selectedPixels);
+    let diagonalConnections = 0;
+    let lShapes = 0;
+
+    for (const pixel of selectedPixels) {
+      const [row, col] = pixel.split('-').map(Number);
+
+      const diagonalNeighbors = [
+        `${row-1}-${col-1}`, `${row-1}-${col+1}`,
+        `${row+1}-${col-1}`, `${row+1}-${col+1}`
+      ];
+
+      diagonalConnections += diagonalNeighbors.filter(n => pixelSet.has(n)).length;
+
+      const rightDown = pixelSet.has(`${row}-${col+1}`) && pixelSet.has(`${row+1}-${col}`);
+      const rightUp = pixelSet.has(`${row}-${col+1}`) && pixelSet.has(`${row-1}-${col}`);
+      const leftDown = pixelSet.has(`${row}-${col-1}`) && pixelSet.has(`${row+1}-${col}`);
+      const leftUp = pixelSet.has(`${row}-${col-1}`) && pixelSet.has(`${row-1}-${col}`);
+
+      if (rightDown || rightUp || leftDown || leftUp) lShapes++;
+    }
+
+    return diagonalConnections >= 3 || lShapes >= 2;
+  };
+
+  const checkForSymmetry = (selectedPixels: string[]): boolean => {
+    const pixelSet = new Set(selectedPixels);
+
+    const hasVerticalSymmetry = selectedPixels.every(pixel => {
+      const [row, col] = pixel.split('-').map(Number);
+      const mirrorCol = GRID_SIZE - 1 - col;
+      return pixelSet.has(`${row}-${mirrorCol}`);
+    });
+
+    const hasHorizontalSymmetry = selectedPixels.every(pixel => {
+      const [row, col] = pixel.split('-').map(Number);
+      const mirrorRow = GRID_SIZE - 1 - row;
+      return pixelSet.has(`${mirrorRow}-${col}`);
+    });
+
+    return hasVerticalSymmetry || hasHorizontalSymmetry;
+  };
+
+  const checkForConnectedRegions = (selectedPixels: string[]): boolean => {
+    if (selectedPixels.length === 0) return false;
+
+    const pixelSet = new Set(selectedPixels);
+    const visited = new Set<string>();
+    let regions = 0;
+
+    for (const pixel of selectedPixels) {
+      if (!visited.has(pixel)) {
+        regions++;
+        const queue = [pixel];
+        
+        while (queue.length > 0) {
+          const current = queue.shift()!;
+          if (visited.has(current)) continue;
+          
+          visited.add(current);
+          const [row, col] = current.split('-').map(Number);
+          
+          const neighbors = [
+            `${row-1}-${col}`, `${row+1}-${col}`,
+            `${row}-${col-1}`, `${row}-${col+1}`
+          ];
+
+          for (const neighbor of neighbors) {
+            if (pixelSet.has(neighbor) && !visited.has(neighbor)) {
+              queue.push(neighbor);
+            }
+          }
+        }
+      }
+    }
+
+    return regions >= 2;
+  };
+
+  const countEdgePixels = (selectedPixels: string[]): number => {
+    return selectedPixels.filter(pixel => {
+      const [row, col] = pixel.split('-').map(Number);
+      return row === 0 || row === GRID_SIZE - 1 || col === 0 || col === GRID_SIZE - 1;
+    }).length;
+  };
+
+  const countCenterPixels = (selectedPixels: string[]): number => {
+    const centerStart = Math.floor(GRID_SIZE / 4);
+    const centerEnd = GRID_SIZE - centerStart - 1;
+    
+    return selectedPixels.filter(pixel => {
+      const [row, col] = pixel.split('-').map(Number);
+      return row >= centerStart && row <= centerEnd && col >= centerStart && col <= centerEnd;
+    }).length;
+  };
+
+  useEffect(() => {
+    if (isCreatingPassword && difficultyRef.current) {
+      const difficulty = assessPasswordDifficulty(pixelGrid);
+      difficultyRef.current.setDifficulty(difficulty);
+    }
+  }, [pixelGrid, isCreatingPassword]);
 
   useEffect(() => {
     if (usernameFromPattern && !isCreatingPassword) {
@@ -91,13 +239,17 @@ const PixelArt: React.FC = () => {
     setPasswordPattern('');
     setShowCredentials(false);
     setRetrievedPassword('');
+
+    if (isCreatingPassword && difficultyRef.current) {
+      difficultyRef.current.setDifficulty('Easy');
+    }
   };
 
   const canProceed = () => {
     const hasPattern = Object.values(pixelGrid).some(selected => selected);
     
     if (isCreatingPassword) {
-      return isUsernameValid && hasPattern;
+      return isUsernameValid && hasPattern && currentDifficulty !== 'Easy';
     } else {
       return hasPattern;
     }
@@ -211,6 +363,10 @@ const PixelArt: React.FC = () => {
           onChange={setUsername}
           onValidation={setIsUsernameValid}
         />
+      )}
+
+      {isCreatingPassword && (
+        <PasswordDifficulty ref={difficultyRef} onChange={setCurrentDifficulty} />
       )}
 
       <div className={styles.instructions}>
