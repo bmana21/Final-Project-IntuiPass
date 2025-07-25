@@ -13,6 +13,8 @@ const PasswordManager: React.FC = () => {
     const [userPasswords, setUserPasswords] = useState<UserPatternData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [authChecked, setAuthChecked] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [passwordToDelete, setPasswordToDelete] = useState<UserPatternData | null>(null);
 
     const fetchPasswords = async (retryCount = 0) => {
         try {
@@ -103,18 +105,29 @@ const PasswordManager: React.FC = () => {
         });
     };
 
-    const handlePasswordDelete = async (e: React.MouseEvent, password: UserPatternData) => {
+    const handlePasswordDelete = (e: React.MouseEvent, password: UserPatternData) => {
         e.stopPropagation();
+        setPasswordToDelete(password);
+        setShowDeleteModal(true);
+    };
 
-        if (window.confirm(`Are you sure you want to delete the password for ${password.username} on ${password.website_url}?`)) {
-            try {
-                await (new UserPatternService()).deleteUserPatternData(password.uuid);
-                await fetchPasswords();
-            } catch (error) {
-                console.error('Error deleting password:', error);
-                alert('Failed to delete password. Please try again.');
-            }
+    const confirmDelete = async () => {
+        if (!passwordToDelete) return;
+
+        try {
+            await (new UserPatternService()).deleteUserPatternData(passwordToDelete.uuid);
+            await fetchPasswords();
+            setShowDeleteModal(false);
+            setPasswordToDelete(null);
+        } catch (error) {
+            console.error('Error deleting password:', error);
+            alert('Failed to delete password. Please try again.');
         }
+    };
+
+    const cancelDelete = () => {
+        setShowDeleteModal(false);
+        setPasswordToDelete(null);
     };
 
     if (!authChecked || isLoading) {
@@ -170,82 +183,121 @@ const PasswordManager: React.FC = () => {
     }
 
     return (
-        <div className="manager-container">
-            <div className="header">
-                <button className="back-button" onClick={goBack}>
-                    ← Back
-                </button>
-                <h1 className="page-title">Password Manager</h1>
-                <button className="refresh-button" onClick={handleRefresh} disabled={isLoading}>
-                    🔄
-                </button>
-            </div>
+        <>
+            <div className="manager-container">
+                <div className="header">
+                    <button className="back-button" onClick={goBack}>
+                        ← Back
+                    </button>
+                    <h1 className="page-title">Password Manager</h1>
+                    <button className="refresh-button" onClick={handleRefresh} disabled={isLoading}>
+                        🔄
+                    </button>
+                </div>
 
-            <div className="passwords-container">
-                {Object.keys(groupedPasswords).length === 0 ? (
-                    <div className="no-passwords">
-                        <div className="no-passwords-icon">🔐</div>
-                        <h3>No passwords saved yet</h3>
-                        <p>Start by creating your first password</p>
-                        <button className="refresh-button" onClick={handleRefresh} style={{marginTop: '20px'}}>
-                            Refresh
-                        </button>
-                    </div>
-                ) : (
-                    <div className="passwords-list">
-                        {Object.entries(groupedPasswords).map(([domain, passwords]) => (
-                            <div key={domain} className="password-group">
-                                <div className="password-header" onClick={() => toggleWebsiteExpansion(domain)}>
-                                    <div className="website-info">
-                                        <div className="website-icon">🌐</div>
-                                        <div className="website-details">
-                                            <div className="website-name">{domain}</div>
-                                            <div className="password-count">{passwords.length} passwords saved</div>
+                <div className="passwords-container">
+                    {Object.keys(groupedPasswords).length === 0 ? (
+                        <div className="no-passwords">
+                            <div className="no-passwords-icon">🔐</div>
+                            <h3>No passwords saved yet</h3>
+                            <p>Start by creating your first password</p>
+                            <button className="refresh-button" onClick={handleRefresh} style={{marginTop: '20px'}}>
+                                Refresh
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="passwords-list">
+                            {Object.entries(groupedPasswords).map(([domain, passwords]) => (
+                                <div key={domain} className="password-group">
+                                    <div className="password-header" onClick={() => toggleWebsiteExpansion(domain)}>
+                                        <div className="website-info">
+                                            <div className="website-icon">🌐</div>
+                                            <div className="website-details">
+                                                <div className="website-name">{domain}</div>
+                                                <div className="password-count">{passwords.length} passwords saved</div>
+                                            </div>
+                                        </div>
+                                        <div className="expand-icon">
+                                            {expandedWebsites.has(domain) ? '▼' : '▶'}
                                         </div>
                                     </div>
-                                    <div className="expand-icon">
-                                        {expandedWebsites.has(domain) ? '▼' : '▶'}
-                                    </div>
-                                </div>
 
-                                {expandedWebsites.has(domain) && (
-                                    <div className="password-details-group">
-                                        {passwords.map((password) => (
-                                            <div
-                                                key={password.uuid}
-                                                className="password-tile"
-                                                onClick={() => handlePasswordView(password)}
-                                            >
-                                                <div className="pattern-type-icon">
-                                                    {getPatternTypeDisplay(password.pattern_type).icon}
-                                                </div>
-                                                <div className="password-info">
-                                                    <div className="password-main-text">
-                                                        {getPatternTypeDisplay(password.pattern_type).name}
-                                                        <br/>
-                                                        {password.username}
-                                                    </div>
-                                                    <div className="password-date-text">
-                                                        {new Date(password.createdAt).toLocaleDateString()}
-                                                    </div>
-                                                </div>
-                                                <button
-                                                    className="delete-button"
-                                                    onClick={(e) => handlePasswordDelete(e, password)}
-                                                    title="Delete password"
+                                    {expandedWebsites.has(domain) && (
+                                        <div className="password-details-group">
+                                            {passwords.map((password) => (
+                                                <div
+                                                    key={password.uuid}
+                                                    className="password-tile"
+                                                    onClick={() => handlePasswordView(password)}
                                                 >
-                                                    ❌️
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                )}
+                                                    <div className="pattern-type-icon">
+                                                        {getPatternTypeDisplay(password.pattern_type).icon}
+                                                    </div>
+                                                    <div className="password-info">
+                                                        <div className="password-main-text">
+                                                            {getPatternTypeDisplay(password.pattern_type).name}
+                                                            <br/>
+                                                            {password.username}
+                                                        </div>
+                                                        <div className="password-date-text">
+                                                            {new Date(password.createdAt).toLocaleDateString()}
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        className="delete-button"
+                                                        onClick={(e) => handlePasswordDelete(e, password)}
+                                                        title="Delete password"
+                                                    >
+                                                        ❌️
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+
+            {showDeleteModal && passwordToDelete && (
+                <div className="modal-overlay">
+                    <div className="delete-confirmation-modal">
+                        <div className="modal-header">
+                            <div className="modal-icon">⚠️</div>
+                            <h3 className="modal-title">Delete Password</h3>
+                        </div>
+
+                        <div className="modal-content">
+                            <p className="modal-message">
+                                Are you sure you want to delete the password for{' '}
+                                <strong>{passwordToDelete.username}</strong> on{' '}
+                                <strong>{passwordToDelete.website_url}</strong>?
+                            </p>
+                            <p className="modal-warning">
+                                This action cannot be undone.
+                            </p>
+                        </div>
+
+                        <div className="modal-actions">
+                            <button
+                                className="modal-button secondary"
+                                onClick={cancelDelete}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="modal-button danger"
+                                onClick={confirmDelete}
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 };
 

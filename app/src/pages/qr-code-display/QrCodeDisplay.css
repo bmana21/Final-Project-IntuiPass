@@ -178,7 +178,6 @@
     transform: translateY(-1px);
 }
 
-/* Chrome Extension Sizing - More generous for typical extension popup */
 @media (max-width: 400px) {
     .qr-display-container {
         padding: 16px;
@@ -246,7 +245,6 @@
     }
 }
 
-/* Only for very constrained windows */
 @media (max-width: 320px) {
     .qr-display-container {
         padding: 12px;
