@@ -50,7 +50,7 @@ const ConnectTheDots: React.FC = () => {
     const hasCrossings = checkForCrossings(connections);
     const hasCornerUsage = checkForCornerUsage(pathArray);
     const directionChanges = countDirectionChanges(pathArray);
-
+    
     let score = 0;
 
     if (length >= 7) score += 5;
