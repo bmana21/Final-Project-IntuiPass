@@ -50,7 +50,7 @@ const ConnectTheDots: React.FC = () => {
     const hasCrossings = checkForCrossings(connections);
     const hasCornerUsage = checkForCornerUsage(pathArray);
     const directionChanges = countDirectionChanges(pathArray);
-    
+
     let score = 0;
 
     if (length >= 7) score += 5;
@@ -387,7 +387,7 @@ const ConnectTheDots: React.FC = () => {
     const hasPattern = connections.length > 0 && passwordPattern.length > 0;
 
     if (isCreatingPassword) {
-      return isUsernameValid && hasPattern && difficultyRef.current?.getDifficulty() == 'Easy';
+      return isUsernameValid && hasPattern && difficultyRef.current?.getDifficulty() != 'Easy';
     } else {
       return hasPattern;
     }
