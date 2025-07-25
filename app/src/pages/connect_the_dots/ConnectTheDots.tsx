@@ -365,11 +365,10 @@ const ConnectTheDots: React.FC = () => {
             className={`${styles.saveButton} ${!canProceed() ? 'disabled' : ''}`}
             disabled={!canProceed()}
           >
-            {isCreatingPassword ? "Save Pattern" : "Fill Password"}
+            {isCreatingPassword ? "Save Pattern" : (isViewingPassword ? "View Password" : "Fill Password")}
           </button>
         </div>
 
-        {/* Add the CredentialsDisplay component here */}
         {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
           <CredentialsDisplay
             username={usernameFromPattern}
