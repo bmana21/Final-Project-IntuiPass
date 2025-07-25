@@ -69,9 +69,9 @@ const PixelArt: React.FC = () => {
     if (edgeRatio < 0.3) score += 2;
     else if (edgeRatio < 0.5) score += 1;
 
-    if (centerPixelCount >= 2) score += 1;
+    if (centerPixelCount >= 3) score += 2;
 
-    if (score >= 10) return 'Hard';
+    if (score >= 12) return 'Hard';
     else if (score >= 8) return 'Normal';
     else return 'Easy';
   };

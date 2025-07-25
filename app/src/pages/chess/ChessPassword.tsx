@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigation } from '../../components/AppRouter';
 import styles from './ChessPassword.module.css';
 import { PasswordIntegrationService } from "../../services/password-integration-service.ts";
@@ -6,6 +6,7 @@ import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
 import { CredentialsDisplay } from '../cretentials-display/CredentialsDisplay';
 import PasswordControls from '../../components/PasswordControls/PasswordControls.tsx';
+import PasswordDifficulty, { DifficultyLevel, PasswordDifficultyRef } from '../../components/PasswordDifficulty/PasswordDifficulty';
 
 interface ChessPiece {
   id: string;
@@ -25,6 +26,7 @@ interface PlacedPiece {
 
 const ChessPassword: React.FC = () => {
   const { goBack, getRouteParams } = useNavigation();
+  const difficultyRef = useRef<PasswordDifficultyRef>(null);
 
   const routeParams = getRouteParams();
   const isCreatingPassword = routeParams?.isCreatingPassword ?? true;
@@ -39,9 +41,168 @@ const ChessPassword: React.FC = () => {
   const [dragOverSquare, setDragOverSquare] = useState<string | null>(null);
   const [draggedFromBoard, setDraggedFromBoard] = useState<{ position: string, piece: PlacedPiece } | null>(null);
   const [draggedPieceId, setDraggedPieceId] = useState<string | null>(null);
+  const [currentDifficulty, setCurrentDifficulty] = useState<DifficultyLevel>('Easy');
 
   const [showCredentials, setShowCredentials] = useState<boolean>(false);
   const [retrievedPassword, setRetrievedPassword] = useState<string>('');
+
+  const handleDifficultyChange = (difficulty: DifficultyLevel) => {
+    setCurrentDifficulty(difficulty);
+  };
+
+  const assessPasswordDifficulty = (placedPieces: PlacedPiece[]): DifficultyLevel => {
+    if (placedPieces.length === 0) return 'Easy';
+
+    const pieceCount = placedPieces.length;
+    const uniquePieceTypes = new Set(placedPieces.map(p => p.piece.name)).size;
+    const colorMix = checkForColorMix(placedPieces);
+    const hasHighValuePieces = checkForHighValuePieces(placedPieces);
+    const hasSymmetricPlacement = checkForSymmetricPlacement(placedPieces);
+    const hasEdgePlacement = checkForEdgePlacement(placedPieces);
+    const hasCenterControl = checkForCenterControl(placedPieces);
+    const hasAdvancedPositioning = checkForAdvancedPositioning(placedPieces);
+    const pieceValueSum = checkForPieceValues(placedPieces);
+
+    let score = 0;
+
+    if (pieceCount >= 8) score += 4;
+    else if (pieceCount >= 5) score += 3;
+    else if (pieceCount >= 3) score += 2;
+    else score += 1;
+
+    if (uniquePieceTypes >= 4) score += 3;
+    else if (uniquePieceTypes >= 3) score += 2;
+    else if (uniquePieceTypes >= 2) score += 1;
+
+    score += pieceValueSum / 5;
+
+    if (colorMix) score += 2;
+    if (hasHighValuePieces) score += 2;
+    if (hasSymmetricPlacement) score -= 2;
+    if (hasEdgePlacement) score += 1;
+    if (hasCenterControl) score += 2;
+    if (hasAdvancedPositioning) score += 3;
+
+    if (score >= 24) return 'Hard';
+    else if (score >= 16) return 'Normal';
+    else return 'Easy';
+  };
+
+  const checkForColorMix = (pieces: PlacedPiece[]): boolean => {
+    const colors = new Set(pieces.map(p => p.piece.color));
+    return colors.size === 2;
+  };
+
+  const checkForHighValuePieces = (pieces: PlacedPiece[]): boolean => {
+    const highValuePieces = ['Queen', 'King', 'Rook'];
+    return pieces.some(p => highValuePieces.includes(p.piece.name));
+  };
+
+  const checkForSymmetricPlacement = (pieces: PlacedPiece[]): boolean => {
+    if (pieces.length < 2) return false;
+
+    const hasVerticalSymmetry = pieces.every(piece => {
+      const mirrorCol = 7 - piece.col;
+      return pieces.some(p => p.row === piece.row && p.col === mirrorCol);
+    });
+
+    const hasHorizontalSymmetry = pieces.every(piece => {
+      const mirrorRow = 7 - piece.row;
+      return pieces.some(p => p.row === mirrorRow && p.col === piece.col);
+    });
+
+    return hasVerticalSymmetry || hasHorizontalSymmetry;
+  };
+
+  const checkForEdgePlacement = (pieces: PlacedPiece[]): boolean => {
+    return pieces.some(p => 
+      p.row === 0 || p.row === 7 || p.col === 0 || p.col === 7
+    );
+  };
+
+  const checkForCenterControl = (pieces: PlacedPiece[]): boolean => {
+    const centerSquares = [
+      [3, 3], [3, 4], [4, 3], [4, 4]
+    ];
+    
+    return pieces.some(p => 
+      centerSquares.some(([row, col]) => p.row === row && p.col === col)
+    );
+  };
+
+  const checkForAdvancedPositioning = (pieces: PlacedPiece[]): boolean => {
+    let advancedCount = 0;
+
+    for (const piece of pieces) {
+      if (piece.piece.name === 'Knight') {
+        const knightMoves = getKnightMoves(piece.row, piece.col);
+        if (knightMoves.some(([r, c]) => pieces.some(p => p.row === r && p.col === c))) {
+          advancedCount++;
+        }
+      }
+      
+      if (piece.piece.name === 'Bishop') {
+        const diagonalSquares = getDiagonalSquares(piece.row, piece.col);
+        if (diagonalSquares.some(([r, c]) => pieces.some(p => p.row === r && p.col === c))) {
+          advancedCount++;
+        }
+      }
+
+      if ((piece.row + piece.col) % 2 === 0 && piece.piece.color === 'white') {
+        advancedCount++;
+      }
+      if ((piece.row + piece.col) % 2 === 1 && piece.piece.color === 'black') {
+        advancedCount++;
+      }
+    }
+
+    return advancedCount >= 2;
+  };
+
+  const getKnightMoves = (row: number, col: number): number[][] => {
+    const moves = [
+      [-2, -1], [-2, 1], [-1, -2], [-1, 2],
+      [1, -2], [1, 2], [2, -1], [2, 1]
+    ];
+    
+    return moves
+      .map(([dr, dc]) => [row + dr, col + dc])
+      .filter(([r, c]) => r >= 0 && r < 8 && c >= 0 && c < 8);
+  };
+
+  const getDiagonalSquares = (row: number, col: number): number[][] => {
+    const diagonals = [];
+    const directions = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+    
+    for (const [dr, dc] of directions) {
+      for (let i = 1; i < 8; i++) {
+        const newRow = row + dr * i;
+        const newCol = col + dc * i;
+        if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
+          diagonals.push([newRow, newCol]);
+        } else {
+          break;
+        }
+      }
+    }
+    
+    return diagonals;
+  };
+
+  const checkForPieceValues = (pieces: PlacedPiece[]): number => {
+    const pieceValues: { [key: string]: number } = {
+      'Pawn': 1,
+      'Knight': 3,
+      'Bishop': 3,
+      'Rook': 5,
+      'Queen': 9,
+      'King': 4
+    };
+
+    return pieces.reduce((sum, piece) => {
+      return sum + (pieceValues[piece.piece.name] || 0);
+    }, 0);
+  };
 
   const whitePieces: ChessPiece[] = [
     { id: 'white-king', name: 'King', whiteSymbol: '♔', blackSymbol: '♚', value: 'K', color: 'white' },
@@ -60,6 +221,13 @@ const ChessPassword: React.FC = () => {
     { id: 'black-knight', name: 'Knight', whiteSymbol: '♘', blackSymbol: '♞', value: 'n', color: 'black' },
     { id: 'black-pawn', name: 'Pawn', whiteSymbol: '♙', blackSymbol: '♟', value: 'p', color: 'black' },
   ];
+
+  useEffect(() => {
+    if (isCreatingPassword && difficultyRef.current) {
+      const difficulty = assessPasswordDifficulty(placedPieces);
+      difficultyRef.current.setDifficulty(difficulty);
+    }
+  }, [placedPieces, isCreatingPassword]);
 
   useEffect(() => {
     if (usernameFromPattern && !isCreatingPassword) {
@@ -215,13 +383,17 @@ const ChessPassword: React.FC = () => {
     setPasswordPattern('');
     setShowCredentials(false);
     setRetrievedPassword('');
+
+    if (isCreatingPassword && difficultyRef.current) {
+      difficultyRef.current.setDifficulty('Easy');
+    }
   };
 
   const canProceed = () => {
     const hasPieces = placedPieces.length > 0;
 
     if (isCreatingPassword) {
-      return isUsernameValid && hasPieces;
+      return isUsernameValid && hasPieces && currentDifficulty !== 'Easy';
     } else {
       return hasPieces;
     }
@@ -382,6 +554,10 @@ const ChessPassword: React.FC = () => {
           onChange={setUsername}
           onValidation={setIsUsernameValid}
         />
+      )}
+
+      {isCreatingPassword && (
+        <PasswordDifficulty ref={difficultyRef} onChange={handleDifficultyChange} />
       )}
 
       <div className={styles.instructions}>
