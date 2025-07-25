@@ -4,7 +4,8 @@ import styles from './ChessPassword.module.css';
 import { PasswordIntegrationService } from "../../services/password-integration-service.ts";
 import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
-import {CredentialsDisplay} from '../cretentials-display/CredentialsDisplay';
+import { CredentialsDisplay } from '../cretentials-display/CredentialsDisplay';
+import PasswordControls from '../../components/PasswordControls/PasswordControls.tsx';
 
 interface ChessPiece {
   id: string;
@@ -36,7 +37,7 @@ const ChessPassword: React.FC = () => {
   const [isUsernameValid, setIsUsernameValid] = useState<boolean>(false);
   const [draggedPiece, setDraggedPiece] = useState<ChessPiece | null>(null);
   const [dragOverSquare, setDragOverSquare] = useState<string | null>(null);
-  const [draggedFromBoard, setDraggedFromBoard] = useState<{position: string, piece: PlacedPiece} | null>(null);
+  const [draggedFromBoard, setDraggedFromBoard] = useState<{ position: string, piece: PlacedPiece } | null>(null);
   const [draggedPieceId, setDraggedPieceId] = useState<string | null>(null);
 
   const [showCredentials, setShowCredentials] = useState<boolean>(false);
@@ -266,10 +267,10 @@ const ChessPassword: React.FC = () => {
 
       if (!isViewingPassword) {
         const success = await passwordIntegrationService.processPassword(
-            passwordPattern,
-            PatternType.CHESS_BOARD,
-            isCreatingPassword,
-            finalUsername
+          passwordPattern,
+          PatternType.CHESS_BOARD,
+          isCreatingPassword,
+          finalUsername
         );
 
         if (success) {
@@ -303,7 +304,7 @@ const ChessPassword: React.FC = () => {
         const isDragOver = dragOverSquare === position;
         const isPieceDragging = piece && draggedPieceId === `board-${piece.position}`;
         const squareClass = `${styles.chessSquare} ${isLight ? styles.light : styles.dark} ${isDragOver ? styles.dragOver : ''}`;
-        
+
         squares.push(
           <div
             key={`${row}-${col}`}
@@ -315,7 +316,7 @@ const ChessPassword: React.FC = () => {
             title={getSquarePosition(row, col)}
           >
             {piece && (
-              <span 
+              <span
                 className={`${styles.chessPiece} ${piece.piece.color === styles.white ? styles.whitePiece : styles.blackPiece} ${isPieceDragging ? styles.dragging : ''}`}
                 draggable
                 onDragStart={(e) => handleBoardPieceDragStart(piece, e)}
@@ -406,35 +407,27 @@ const ChessPassword: React.FC = () => {
           {renderBoard()}
         </div>
       </div>
+      <PasswordControls
+        onClear={clearBoard}
+        onSave={savePassword}
+        canProceed={canProceed}
+        isCreatingPassword={isCreatingPassword}
+        isViewingPassword={isViewingPassword}
+      />
 
-        <div className={styles.controls}>
-          <button onClick={clearBoard} className={styles.clearButton}>
-            Clear Board
-          </button>
+      {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
+        <CredentialsDisplay
+          username={usernameFromPattern}
+          password={retrievedPassword}
+        />
+      )}
 
-          <button
-              onClick={savePassword}
-              className={`${styles.saveButton} ${!canProceed() ? 'disabled' : ''}`}
-              disabled={!canProceed()}
-          >
-            {isCreatingPassword ? "Save Pattern" : (isViewingPassword ? "View Password" : "Fill Password")}
-          </button>
-        </div>
-
-        {/* Add the CredentialsDisplay component here */}
-        {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
-            <CredentialsDisplay
-                username={usernameFromPattern}
-                password={retrievedPassword}
-            />
-        )}
-
-        {placedPieces.length > 0 && (
-            <div className={styles.patternDisplay}>
-              <p><strong>Placed Pieces:</strong></p>
-              <div className="pattern-pieces">
-                {getSortedPlacedPieces().map((piece, index) => (
-                    <span key={index} className="pattern-piece">
+      {placedPieces.length > 0 && (
+        <div className={styles.patternDisplay}>
+          <p><strong>Placed Pieces:</strong></p>
+          <div className="pattern-pieces">
+            {getSortedPlacedPieces().map((piece, index) => (
+              <span key={index} className="pattern-piece">
                 <span className={piece.piece.color === 'white' ? 'white-piece' : 'black-piece'}>
                   {piece.piece.color === 'white' ? piece.piece.whiteSymbol : piece.piece.blackSymbol}
                 </span> {piece.position}
