@@ -91,7 +91,7 @@ const QrCodeDisplay: React.FC = () => {
 
                 <div className="qr-instructions">
                     <p className="instruction-text">
-                        📱 Open your phone's camera app and point it at the QR code above
+                        Open your phone's camera app and point it at the QR code above
                     </p>
                     <p className="instruction-subtitle">
                         Your password will appear on your phone's screen
