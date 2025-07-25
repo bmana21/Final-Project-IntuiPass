@@ -132,9 +132,12 @@ export const CredentialsDisplay: React.FC<CredentialsDisplayProps> = ({
                             <h3 className="warning-title">Security Warning</h3>
                         </div>
                         <p className="warning-message">
-                            You're about to display your password as a QR code. Make sure no one else can see your screen,
-                            as anyone who scans this QR code will have access to your password. The QR code will automatically
-                            disappear after 60 seconds for your security.
+                            The QR code will contain your generated password in plain text.
+                            Only display it if you are in a private, secure environment.
+
+                            Anyone who sees the QR code can access your password.
+
+                            Do you want to continue?
                         </p>
                         <div className="warning-buttons">
                             <button
