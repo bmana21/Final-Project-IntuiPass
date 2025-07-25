@@ -42,16 +42,15 @@ const ConnectTheDots: React.FC = () => {
   const isViewingPassword = routeParams?.isViewingPassword ?? false;
   const usernameFromPattern = routeParams?.username;
 
-  const assessPasswordDifficulty = (connections: Connection[], pattern: string): DifficultyLevel => {
-    if (connections.length === 0) return 'Easy';
+  const assessPasswordDifficulty = (selectedPath: number[]): DifficultyLevel => {
+    if (selectedPath.length === 0) return 'Easy';
 
-    const pathArray = pattern.split('-').map(Number);
-    const length = pathArray.length;
+    const length = selectedPath.length;
 
-    const hasSimpleLines = checkForSimpleLines(pathArray);
-    const hasCrossings = checkForCrossings(connections);
-    const hasCornerUsage = checkForCornerUsage(pathArray);
-    const directionChanges = countDirectionChanges(pathArray);
+    const hasSimpleLines = checkForSimpleLines(selectedPath);
+    const hasCrossings = checkForCrossings(selectedPath);
+    const hasCornerUsage = checkForCornerUsage(selectedPath);
+    const directionChanges = countDirectionChanges(selectedPath);
 
     let score = 0;
 
@@ -93,21 +92,21 @@ const ConnectTheDots: React.FC = () => {
     return false;
   };
 
-  const checkForCrossings = (connections: Connection[]): boolean => {
+  const checkForCrossings = (selectedPath: number[]): boolean => {
     const getPointPosition = (id: number) => {
       const row = Math.floor((id - 1) / 3);
       const col = (id - 1) % 3;
       return { row, col };
     };
 
-    const linesIntersect = (line1: Connection, line2: Connection): boolean => {
-      const p1 = getPointPosition(line1.from);
-      const q1 = getPointPosition(line1.to);
-      const p2 = getPointPosition(line2.from);
-      const q2 = getPointPosition(line2.to);
+    const linesIntersect = (line1X: number, line1Y: number, line2X: number, line2Y: number): boolean => {
+      const p1 = getPointPosition(line1X);
+      const q1 = getPointPosition(line1Y);
+      const p2 = getPointPosition(line2X);
+      const q2 = getPointPosition(line2Y);
 
-      if (line1.from === line2.from || line1.from === line2.to ||
-        line1.to === line2.from || line1.to === line2.to) {
+      if (line1X === line2X || line1X === line2Y ||
+        line1Y === line2X || line1Y === line2Y) {
         return false;
       }
 
@@ -125,9 +124,9 @@ const ConnectTheDots: React.FC = () => {
       return (o1 !== o2 && o3 !== o4);
     };
 
-    for (let i = 0; i < connections.length; i++) {
-      for (let j = i + 1; j < connections.length; j++) {
-        if (linesIntersect(connections[i], connections[j])) {
+    for (let i = 0; i < selectedPath.length - 1; i++) {
+      for (let j = i + 1; j < selectedPath.length - 1; j++) {
+        if (linesIntersect(selectedPath[i], selectedPath[i + 1], selectedPath[j], selectedPath[j + 1])) {
           return true;
         }
       }
@@ -181,10 +180,10 @@ const ConnectTheDots: React.FC = () => {
 
   useEffect(() => {
     if (isCreatingPassword && difficultyRef.current) {
-      const difficulty = assessPasswordDifficulty(connections, passwordPattern);
+      const difficulty = assessPasswordDifficulty(selectedPath);
       difficultyRef.current.setDifficulty(difficulty);
     }
-  }, [connections, passwordPattern, isCreatingPassword]);
+  }, [selectedPath, isCreatingPassword]);
 
   useEffect(() => {
     console.log("creating password is: ", isCreatingPassword);
@@ -328,7 +327,6 @@ const ConnectTheDots: React.FC = () => {
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
-
     const coords = getCanvasCoordinates(event);
     setCurrentMousePos(coords);
 
@@ -360,7 +358,6 @@ const ConnectTheDots: React.FC = () => {
     const patternString = selectedPath.join('-');
     setPasswordPattern(patternString);
 
-    setSelectedPath([]);
     setIsDrawing(false);
     setCurrentMousePos(null);
   };
