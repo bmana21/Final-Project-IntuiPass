@@ -123,7 +123,7 @@ export const CredentialsDisplay: React.FC<CredentialsDisplayProps> = ({
                         className="qr-share-button"
                         onClick={handleQRShareClick}
                     >
-                        📱 Share with QR Code
+                        Share with QR Code
                     </button>
                 </div>
             </div>
