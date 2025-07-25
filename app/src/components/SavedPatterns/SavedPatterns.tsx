@@ -50,10 +50,10 @@ const SavedPatterns: React.FC = () => {
           resolve(user);
         });
       });
-      
+
       const user = firebaseApp.auth().currentUser;
       console.log('Current user in loadSavedPatterns:', user?.uid);
-      
+
       if (!user) {
         console.log('No user logged in');
         setSavedPatterns([]);
@@ -68,7 +68,7 @@ const SavedPatterns: React.FC = () => {
 
       const patternService = new UserPatternService();
       console.log('Querying patterns for user:', user.uid, 'website:', websiteUrl);
-      
+
       const patterns = await patternService.getUserPatternDataByUUIDAndURL(
         user.uid,
         websiteUrl
@@ -83,7 +83,7 @@ const SavedPatterns: React.FC = () => {
 
       console.log('Final saved patterns list:', savedPatternsList);
       setSavedPatterns(savedPatternsList);
-      
+
     } catch (error) {
       console.error('Error loading saved patterns:', error);
       setSavedPatterns([]);
@@ -93,58 +93,69 @@ const SavedPatterns: React.FC = () => {
   };
 
   const handleFillPassword = (pattern: SavedPattern) => {
- const patternType = pattern.patternData.pattern_type;
- const username = pattern.patternData.username;
- 
- switch (patternType) {
-   case PatternType.CONNECT_DOTS:
-     navigateTo('connect_the_dots', { 
-       isCreatingPassword: false,
-       username: username
-     });
-     break;
-   case PatternType.PIANO_SEQUENCE:
-     navigateTo('piano_password', { 
-       isCreatingPassword: false,
-       username: username
-     });
-     break;
-   case PatternType.CHESS_BOARD:
-     navigateTo('chess_password', {
-       isCreatingPassword: false,
-       username: username
-     });
-     break;
-   case PatternType.PIXEL_ART:
-     navigateTo('pixel_art', { 
-       isCreatingPassword: false,
-       username: username
-     });
-  break;
+    const patternType = pattern.patternData.pattern_type;
+    const username = pattern.patternData.username;
 
-case PatternType.PIXEL_ART:
-  return { icon: '🎨', name: 'Pixel Art' };
-   default:
-     console.warn('Unknown pattern type:', patternType);
-     navigateTo('connect_the_dots', { 
-       isCreatingPassword: false,
-       username: username
-     });
- }
-};
+    switch (patternType) {
+      case PatternType.CONNECT_DOTS:
+        navigateTo('connect_the_dots', {
+          isCreatingPassword: false,
+          username: username
+        });
+        break;
+      case PatternType.PIANO_SEQUENCE:
+        navigateTo('piano_password', {
+          isCreatingPassword: false,
+          username: username
+        });
+        break;
+      case PatternType.CHESS_BOARD:
+        navigateTo('chess_password', {
+          isCreatingPassword: false,
+          username: username
+        });
+        break;
+      case PatternType.PIXEL_ART:
+        navigateTo('pixel_art', {
+          isCreatingPassword: false,
+          username: username
+        });
+        break;
+
+      case PatternType.MATHEMATICAL_FORMULA:
+        navigateTo('math_formula', {
+          isCreatingPassword: false,
+          username: username
+        })
+        break;
+
+      case PatternType.PIXEL_ART:
+        navigateTo('pixel_art', {
+          isCreatingPassword: false,
+          username: username
+        })
+        break;
+      default:
+        console.warn('Unknown pattern type:', patternType);
+        navigateTo('connect_the_dots', {
+          isCreatingPassword: false,
+          username: username
+        });
+    }
+  };
 
   const getPatternTypeDisplay = (type: PatternType) => {
     switch (type) {
       case PatternType.CONNECT_DOTS:
         return { icon: '⚫', name: 'Connect The Dots' };
       case PatternType.PIANO_SEQUENCE:
-        return { icon: '🎹', name: 'Piano'};
+        return { icon: '🎹', name: 'Piano' };
       case PatternType.CHESS_BOARD:
-        return { icon: '♔', name: 'Chess Board'};
+        return { icon: '♔', name: 'Chess Board' };
       case PatternType.MATHEMATICAL_FORMULA:
-        return { icon: '∫', name: 'Mathematical Formula'};
+        return { icon: '∫', name: 'Mathematical Formula' };
       case PatternType.PIXEL_ART:
-        return { icon: '🎨', name: 'Pixel Art'};
+        return { icon: '🎨', name: 'Pixel Art' };
       default:
         return { icon: '🔐', name: 'Pattern' };
     }
@@ -181,7 +192,7 @@ case PatternType.PIXEL_ART:
       <div className="patterns-list">
         {savedPatterns.map((pattern) => {
           const patternType = getPatternTypeDisplay(pattern.patternData.pattern_type);
-          
+
           return (
             <div key={pattern.patternData.uuid} className="pattern-item">
               <div className="pattern-info">
@@ -193,7 +204,7 @@ case PatternType.PIXEL_ART:
                   Username: {pattern.patternData.username || 'No username'}
                 </div>
               </div>
-              
+
               <div className="pattern-actions">
                 <button
                   onClick={() => handleFillPassword(pattern)}

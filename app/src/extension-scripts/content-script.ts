@@ -562,7 +562,7 @@ class PasswordFieldDetector {
   }
   private addExtensionIcons(): number {
     this.removeExtensionIcons();
-
+    console.log('in here nika');
     let iconCount = 0;
     this.passwordFields.forEach((field, index) => {
       if (this.addIconToPasswordField(field, index)) {
@@ -574,6 +574,7 @@ class PasswordFieldDetector {
   }
 
   private addIconToPasswordField(field: HTMLInputElement, index: number): boolean {
+    console.log('in add icon to password field', field);
     try {
       field.setAttribute('data-intuipass-enhanced', 'true');
       field.setAttribute('data-field-index', index.toString());
