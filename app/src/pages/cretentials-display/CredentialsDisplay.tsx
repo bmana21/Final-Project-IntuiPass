@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import './CredentialsDisplay.css';
+import {useNavigation} from "../../components/AppRouter.tsx";
 
 interface CredentialsDisplayProps {
     username: string;
@@ -14,6 +15,7 @@ export const CredentialsDisplay: React.FC<CredentialsDisplayProps> = ({
     const [usernameCopied, setUsernameCopied] = useState(false);
     const [passwordCopied, setPasswordCopied] = useState(false);
     const [showWarningModal, setShowWarningModal] = useState(false);
+    const {navigateTo} = useNavigation();
 
     const copyToClipboard = async (text: string, field: 'username' | 'password') => {
         try {
@@ -59,7 +61,7 @@ export const CredentialsDisplay: React.FC<CredentialsDisplayProps> = ({
 
     const handleWarningOk = () => {
         setShowWarningModal(false);
-        // TODO: Implement QR code generation here
+        navigateTo('qr-code');
     };
 
     return (
