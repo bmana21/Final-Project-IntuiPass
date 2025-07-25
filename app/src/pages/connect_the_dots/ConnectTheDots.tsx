@@ -5,6 +5,7 @@ import { PasswordIntegrationService } from "../../services/password-integration-
 import { PatternType } from "../../models/pattern-type.ts";
 import UsernameInput from '../../components/UsernameInput/UsernameInput';
 import { CredentialsDisplay } from '../cretentials-display/CredentialsDisplay.tsx';
+import PasswordDifficulty, { DifficultyLevel, PasswordDifficultyRef } from '../../components/PasswordDifficulty/PasswordDifficulty';
 
 interface Point {
   x: number;
@@ -19,6 +20,7 @@ interface Connection {
 
 const ConnectTheDots: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const difficultyRef = useRef<PasswordDifficultyRef>(null);
   const { goBack, getRouteParams } = useNavigation();
 
   const [points, setPoints] = useState<Point[]>([]);
@@ -37,6 +39,150 @@ const ConnectTheDots: React.FC = () => {
   const isCreatingPassword = routeParams?.isCreatingPassword ?? true;
   const isViewingPassword = routeParams?.isViewingPassword ?? false;
   const usernameFromPattern = routeParams?.username;
+
+  const assessPasswordDifficulty = (connections: Connection[], pattern: string): DifficultyLevel => {
+    if (connections.length === 0) return 'Easy';
+
+    const pathArray = pattern.split('-').map(Number);
+    const length = pathArray.length;
+
+    const hasSimpleLines = checkForSimpleLines(pathArray);
+    const hasCrossings = checkForCrossings(connections);
+    const hasCornerUsage = checkForCornerUsage(pathArray);
+    const directionChanges = countDirectionChanges(pathArray);
+
+    let score = 0;
+
+    if (length >= 7) score += 5;
+    else if (length >= 5) score += 3;
+    else if (length >= 3) score += 1;
+
+    if (!hasSimpleLines) score += 2;
+    if (hasCrossings) score += 4;
+    if (hasCornerUsage) score += 1;
+
+    if (directionChanges >= 3) score += 2;
+    else if (directionChanges >= 2) score += 1;
+
+    if (score >= 12) return 'Hard';
+    else if (score >= 8) return 'Normal';
+    else return 'Easy';
+  };
+
+  const checkForSimpleLines = (path: number[]): boolean => {
+    if (path.length < 3) return false;
+    
+    const straightLines = [
+      [1, 2, 3], [4, 5, 6], [7, 8, 9],
+      [1, 4, 7], [2, 5, 8], [3, 6, 9],
+      [1, 5, 9], [3, 5, 7]
+    ];
+    
+    for (let i = 0; i <= path.length - 3; i++) {
+      const segment = path.slice(i, i + 3);
+      for (const line of straightLines) {
+        if (JSON.stringify(segment) === JSON.stringify(line) || 
+            JSON.stringify(segment) === JSON.stringify(line.reverse())) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  };
+
+  const checkForCrossings = (connections: Connection[]): boolean => {
+    const getPointPosition = (id: number) => {
+      const row = Math.floor((id - 1) / 3);
+      const col = (id - 1) % 3;
+      return { row, col };
+    };
+
+    const linesIntersect = (line1: Connection, line2: Connection): boolean => {
+      const p1 = getPointPosition(line1.from);
+      const q1 = getPointPosition(line1.to);
+      const p2 = getPointPosition(line2.from);
+      const q2 = getPointPosition(line2.to);
+
+      if (line1.from === line2.from || line1.from === line2.to || 
+          line1.to === line2.from || line1.to === line2.to) {
+        return false;
+      }
+
+      const orientation = (p: any, q: any, r: any) => {
+        const val = (q.col - p.col) * (r.row - q.row) - (q.row - p.row) * (r.col - q.col);
+        if (val === 0) return 0;
+        return val > 0 ? 1 : 2;
+      };
+
+      const o1 = orientation(p1, q1, p2);
+      const o2 = orientation(p1, q1, q2);
+      const o3 = orientation(p2, q2, p1);
+      const o4 = orientation(p2, q2, q1);
+
+      return (o1 !== o2 && o3 !== o4);
+    };
+
+    for (let i = 0; i < connections.length; i++) {
+      for (let j = i + 1; j < connections.length; j++) {
+        if (linesIntersect(connections[i], connections[j])) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
+  const checkForCornerUsage = (path: number[]): boolean => {
+    const corners = [1, 3, 7, 9];
+    return path.some(dot => corners.includes(dot));
+  };
+
+
+  const countDirectionChanges = (path: number[]): number => {
+    if (path.length < 3) return 0;
+
+    const getDirection = (from: number, to: number) => {
+      const fromRow = Math.floor((from - 1) / 3);
+      const fromCol = (from - 1) % 3;
+      const toRow = Math.floor((to - 1) / 3);
+      const toCol = (to - 1) % 3;
+
+      const deltaRow = toRow - fromRow;
+      const deltaCol = toCol - fromCol;
+
+      if (deltaRow === 0 && deltaCol > 0) return 'right';
+      if (deltaRow === 0 && deltaCol < 0) return 'left';
+      if (deltaRow > 0 && deltaCol === 0) return 'down';
+      if (deltaRow < 0 && deltaCol === 0) return 'up';
+      if (deltaRow > 0 && deltaCol > 0) return 'down-right';
+      if (deltaRow > 0 && deltaCol < 0) return 'down-left';
+      if (deltaRow < 0 && deltaCol > 0) return 'up-right';
+      if (deltaRow < 0 && deltaCol < 0) return 'up-left';
+      return 'same';
+    };
+
+    let changes = 0;
+    let lastDirection = getDirection(path[0], path[1]);
+
+    for (let i = 1; i < path.length - 1; i++) {
+      const currentDirection = getDirection(path[i], path[i + 1]);
+      if (currentDirection !== lastDirection) {
+        changes++;
+      }
+      lastDirection = currentDirection;
+    }
+
+    return changes;
+  };
+
+  useEffect(() => {
+    if (isCreatingPassword && difficultyRef.current) {
+      const difficulty = assessPasswordDifficulty(connections, passwordPattern);
+      difficultyRef.current.setDifficulty(difficulty);
+    }
+  }, [connections, passwordPattern, isCreatingPassword]);
 
   useEffect(() => {
     console.log("creating password is: ", isCreatingPassword);
@@ -231,13 +377,17 @@ const ConnectTheDots: React.FC = () => {
     setCurrentMousePos(null);
     setShowCredentials(false);
     setRetrievedPassword('');
+
+    if (isCreatingPassword && difficultyRef.current) {
+      difficultyRef.current.setDifficulty('Easy');
+    }
   };
 
   const canProceed = () => {
     const hasPattern = connections.length > 0 && passwordPattern.length > 0;
 
     if (isCreatingPassword) {
-      return isUsernameValid && hasPattern;
+      return isUsernameValid && hasPattern && difficultyRef.current?.getDifficulty() == 'Easy';
     } else {
       return hasPattern;
     }
@@ -321,68 +471,73 @@ const ConnectTheDots: React.FC = () => {
         </div>
       </div>
 
-        {isCreatingPassword && (
-          <UsernameInput
-            value={username}
-            onChange={setUsername}
-            onValidation={setIsUsernameValid}
-          />
-        )}
+      {isCreatingPassword && (
+        <UsernameInput
+          value={username}
+          onChange={setUsername}
+          onValidation={setIsUsernameValid}
+        />
+      )}
 
-        <div className={styles.instructions}>
-          <p>
-            {isCreatingPassword
-              ? "Press and drag from one dot to another to create your pattern. Lift the mouse to finish."
-              : "Recreate your password pattern by dragging through the dots."
-            }
-          </p>
-          {isDrawing && (
-            <p className={styles.drawingInfo}>
-              Drawing pattern... Current path: {selectedPath.join(' → ')}
-            </p>)}
-        </div>
+      {isCreatingPassword && (
+        <PasswordDifficulty ref={difficultyRef} />
+      )}
 
-        <div className={styles.canvasContainer}>
-          <canvas
-            ref={canvasRef}
-            width={400}
-            height={350}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseLeave}
-            className={styles.dotsCanvas}
-          />
-        </div>
-
-        <div className={styles.controls}>
-          <button onClick={clearConnections} className={styles.clearButton}>
-            Clear All
-          </button>
-
-          <button
-            onClick={savePassword}
-            className={`${styles.saveButton} ${!canProceed() ? 'disabled' : ''}`}
-            disabled={!canProceed()}
-          >
-            {isCreatingPassword ? "Save Pattern" : (isViewingPassword ? "View Password" : "Fill Password")}
-          </button>
-        </div>
-
-        {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
-          <CredentialsDisplay
-            username={usernameFromPattern}
-            password={retrievedPassword}
-          />
-        )}
-
-        {passwordPattern && (
-          <div className={styles.patternDisplay}>
-            <p><strong>Pattern:</strong> {passwordPattern}</p>
-            <p><small>Each sequence represents a drawn path</small></p>
-          </div>
-        )}
+      <div className={styles.instructions}>
+        <p>
+          {isCreatingPassword
+            ? "Press and drag from one dot to another to create your pattern. Lift the mouse to finish."
+            : "Recreate your password pattern by dragging through the dots."
+          }
+        </p>
+        {isDrawing && (
+          <p className={styles.drawingInfo}>
+            Drawing pattern... Current path: {selectedPath.join(' → ')}
+          </p>)}
       </div>
+
+      <div className={styles.canvasContainer}>
+        <canvas
+          ref={canvasRef}
+          width={400}
+          height={350}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
+          className={styles.dotsCanvas}
+        />
+      </div>
+
+      <div className={styles.controls}>
+        <button onClick={clearConnections} className={styles.clearButton}>
+          Clear All
+        </button>
+
+        <button
+          onClick={savePassword}
+          className={`${styles.saveButton} ${!canProceed() ? 'disabled' : ''}`}
+          disabled={!canProceed()}
+        >
+          {isCreatingPassword ? "Save Pattern" : (isViewingPassword ? "View Password" : "Fill Password")}
+        </button>
+      </div>
+
+      {showCredentials && isViewingPassword && usernameFromPattern && retrievedPassword && (
+        <CredentialsDisplay
+          username={usernameFromPattern}
+          password={retrievedPassword}
+        />
+      )}
+
+      {passwordPattern && (
+        <div className={styles.patternDisplay}>
+          <p><strong>Pattern:</strong> {passwordPattern}</p>
+          <p><small>Each sequence represents a drawn path</small></p>
+        </div>
+      )}
+    </div>
   );
 };
+
 export default ConnectTheDots;
