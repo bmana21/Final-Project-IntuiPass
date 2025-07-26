@@ -240,19 +240,11 @@ const PasswordManager: React.FC = () => {
                                     : 'Start by creating your first password'
                                 }
                             </p>
-                            {searchQuery ? (
-                                <button
-                                    className="refresh-button"
-                                    onClick={clearSearch}
-                                    style={{marginTop: '20px'}}
-                                >
-                                    Clear Search
-                                </button>
-                            ) : (
+                            {!searchQuery && (
                                 <button
                                     className="refresh-button"
                                     onClick={handleRefresh}
-                                    style={{marginTop: '20px'}}
+                                    style={{ marginTop: '20px' }}
                                 >
                                     Refresh
                                 </button>
