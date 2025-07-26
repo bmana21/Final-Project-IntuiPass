@@ -17,6 +17,23 @@ export class PasswordIntegrationService {
         this.domManager = new DomManager();
     }
 
+    private async waitForAuth(retryCount = 0): Promise<string | null> {
+        const currentUser = firebaseApp.auth().currentUser;
+        if (currentUser) {
+            return currentUser.uid;
+        }
+        if (retryCount < 3) {
+            return new Promise((resolve) => {
+                setTimeout(async () => {
+                    const result = await this.waitForAuth(retryCount + 1);
+                    resolve(result);
+                }, 200);
+            });
+        }
+        console.log("User not authenticated after retries");
+        return null;
+    }
+
     public async getPasswordByKey(key: string, patternType: PatternType, username: string): Promise<string> {
         const user_uuid: string | undefined = firebaseApp.auth().currentUser?.uid;
         if (!user_uuid) {
@@ -50,7 +67,8 @@ export class PasswordIntegrationService {
             return false;
         }
         try {
-            const user_uuid: string | undefined = firebaseApp.auth().currentUser?.uid;
+            const user_uuid = await this.waitForAuth();
+
             if (!user_uuid) {
                 console.log("User not authenticated");
                 return false;
