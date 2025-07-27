@@ -52,7 +52,6 @@ const PasswordModeSelection: React.FC = () => {
             <p>View and organize all your saved passwords</p>
           </button>
         </div>
-        
       </div>
       <div className="footer">
         <button className="signOutButton" onClick={handleSignOut}>
