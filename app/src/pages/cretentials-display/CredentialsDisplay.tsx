@@ -130,7 +130,7 @@ export const CredentialsDisplay: React.FC<CredentialsDisplayProps> = ({
 
             {showWarningModal && (
                 <div className={styles.modalOverlay}>
-                    <div className={styles.warninModal}>
+                    <div className={styles.warningModal}>
                         <div className={styles.warningHeader}>
                             <span className={styles.warningIcon}>⚠️</span>
                             <h3 className={styles.warningTitle}>Security Warning</h3>
