@@ -47,6 +47,7 @@ export class UserPatternData {
       data.password_encrypted
     );
     result.uuid = data.uuid;
+    result.createdAt = data.createdAt;
     return result;
   }
 }
