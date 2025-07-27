@@ -49,7 +49,7 @@ const Popup: React.FC = () => {
   return (
     <div className={styles.popupContainer}>
       <div className={styles.header}>
-        <button className="backButton" onClick={goBack}>
+        <button className={styles.backButton} onClick={goBack}>
           ← Back
         </button>
         <div className={styles.headerContent}>
@@ -66,6 +66,7 @@ const Popup: React.FC = () => {
           <p className={styles.userEmail}>{user.email || ""}</p>
         </div>
       </div>
+      
       {!isCreatingPassword && (
         <SavedPatterns />
       )}

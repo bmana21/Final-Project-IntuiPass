@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import './CredentialsDisplay.css';
+import styles from './CredentialsDisplay.module.css';
 import {useNavigation} from "../../components/AppRouter.tsx";
 
 interface CredentialsDisplayProps {
@@ -68,59 +68,59 @@ export const CredentialsDisplay: React.FC<CredentialsDisplayProps> = ({
 
     return (
         <>
-            <div className="credentials-container">
-                <div className="credential-field">
+            <div className={styles.credentialsContainer}>
+                <div className={styles.credentialField}>
                     <label>Username</label>
-                    <div className="input-group">
+                    <div className={styles.inputGroup}>
                         <input
                             type="text"
                             value={username}
                             readOnly
-                            className="credential-input"
+                            className={styles.credentialInput}
                         />
                         <button
-                            className={`copy-button ${usernameCopied ? 'copied' : ''}`}
+                            className={`${styles.copyButton} ${usernameCopied ? styles.copied : ''}`}
                             onClick={() => copyToClipboard(username, 'username')}
                         >
-                            <span className="copy-text">
+                            <span className={styles.copyText}>
                                 {usernameCopied ? 'Copied!' : 'Copy'}
                             </span>
                         </button>
                     </div>
                 </div>
 
-                <div className="credential-field">
+                <div className={styles.credentialField}>
                     <label>Password</label>
-                    <div className="input-group">
+                    <div className={styles.inputGroup}>
                         <input
                             type={isPasswordVisible ? 'text' : 'password'}
                             value={password}
                             readOnly
-                            className="credential-input password-field"
+                            className={`${styles.credentialInput} ${styles.passwordField}`}
                         />
                         <button
-                            className="view-button"
+                            className={styles.viewButton}
                             onClick={togglePasswordVisibility}
                         >
-                            <span className="view-text">
+                            <span className={styles.viewText}>
                                 {isPasswordVisible ? '🔒' : '👁️'}
                             </span>
                         </button>
                         <button
-                            className={`copy-button ${passwordCopied ? 'copied' : ''}`}
+                            className={`${styles.copyButton} ${passwordCopied ? styles.copied : ''}`}
                             onClick={() => copyToClipboard(password, 'password')}
                         >
-                            <span className="copy-text">
+                            <span className={styles.copyText}>
                                 {passwordCopied ? 'Copied!' : 'Copy'}
                             </span>
                         </button>
                     </div>
                 </div>
 
-                <div className="qr-share-section">
-                    <span className="qr-share-label">Share with mobile device</span>
+                <div className={styles.qrShareSection}>
+                    <span className={styles.qrShareLabel}>Share with mobile device</span>
                     <button
-                        className="qr-share-button"
+                        className={styles.qrShareButton}
                         onClick={handleQRShareClick}
                     >
                         Share with QR Code
@@ -129,13 +129,13 @@ export const CredentialsDisplay: React.FC<CredentialsDisplayProps> = ({
             </div>
 
             {showWarningModal && (
-                <div className="modal-overlay">
-                    <div className="warning-modal">
-                        <div className="warning-header">
-                            <span className="warning-icon">⚠️</span>
-                            <h3 className="warning-title">Security Warning</h3>
+                <div className={styles.modalOverlay}>
+                    <div className={styles.warningModal}>
+                        <div className={styles.warningHeader}>
+                            <span className={styles.warningIcon}>⚠️</span>
+                            <h3 className={styles.warningTitle}>Security Warning</h3>
                         </div>
-                        <p className="warning-message">
+                        <p className={styles.warningMessage}>
                             The QR code will contain your generated password in plain text.
                             Only display it if you are in a private, secure environment.
 
@@ -143,15 +143,15 @@ export const CredentialsDisplay: React.FC<CredentialsDisplayProps> = ({
 
                             Do you want to continue?
                         </p>
-                        <div className="warning-buttons">
+                        <div className={styles.warningButtons}>
                             <button
-                                className="warning-button cancel"
+                                className={`${styles.warningButton} ${styles.cancel}`}
                                 onClick={handleWarningCancel}
                             >
                                 Cancel
                             </button>
                             <button
-                                className="warning-button ok"
+                                className={`${styles.warningButton} ${styles.ok}`}
                                 onClick={handleWarningOk}
                             >
                                 I Understand, Show QR Code

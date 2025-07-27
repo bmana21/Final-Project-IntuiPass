@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./QrCodeDisplay.css";
+import styles from "./QrCodeDisplay.module.css";
 import { useNavigation } from "../../components/AppRouter.tsx";
 
 const QrCodeDisplay: React.FC = () => {
@@ -65,57 +65,57 @@ const QrCodeDisplay: React.FC = () => {
     };
 
     return (
-        <div className="qr-display-container">
-            <div className="qr-header">
-                <h2 className="qr-title">Scan with Your Mobile Device</h2>
-                <div className="timer-display">
-                    Auto-close in: <span className="timer-countdown">{formatTime(timeLeft)}</span>
+        <div className={styles.qrDisplayContainer}>
+            <div className={styles.qrHeader}>
+                <h2 className={styles.qrTitle}>Scan with Your Mobile Device</h2>
+                <div className={styles.timerDisplay}>
+                    Auto-close in: <span className={styles.timerCountdown}>{formatTime(timeLeft)}</span>
                 </div>
             </div>
 
-            <div className="qr-content">
-                <div className="qr-code-wrapper">
+            <div className={styles.qrContent}>
+                <div className={styles.qrCodeWrapper}>
                     {qrCodeDataURL ? (
                         <img
                             src={qrCodeDataURL}
                             alt="QR Code for password"
-                            className="qr-code-image"
+                            className={styles.qrCodeImage}
                         />
                     ) : (
-                        <div className="qr-loading">
-                            <div className="loading-spinner"></div>
+                        <div className={styles.qrLoading}>
+                            <div className={styles.loadingSpinner}></div>
                             <p>Generating QR Code...</p>
                         </div>
                     )}
                 </div>
 
-                <div className="qr-instructions">
-                    <p className="instruction-text">
+                <div className={styles.qrInstructions}>
+                    <p className={styles.instructionText}>
                         Open your phone's camera app and point it at the QR code above
                     </p>
-                    <p className="instruction-subtitle">
+                    <p className={styles.instructionSubtitle}>
                         Your password will appear on your phone's screen
                     </p>
                 </div>
 
-                <div className="security-notice">
-                    <div className="notice-icon">🔒</div>
-                    <div className="notice-text">
+                <div className={styles.securityNotice}>
+                    <div className={styles.noticeIcon}>🔒</div>
+                    <div className={styles.noticeText}>
                         <strong>Security Notice:</strong> This QR code contains your password.
                         Make sure no one else can see your screen.
                     </div>
                 </div>
             </div>
 
-            <div className="qr-actions">
+            <div className={styles.qrActions}>
                 <button
-                    className="action-button secondary"
+                    className={`${styles.actionButton} ${styles.secondary}`}
                     onClick={handleGoBack}
                 >
                     ← Go Back
                 </button>
                 <button
-                    className="action-button primary"
+                    className={`${styles.actionButton} ${styles.primary}`}
                     onClick={handleClose}
                 >
                     Close Extension
