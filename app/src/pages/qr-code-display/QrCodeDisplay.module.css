@@ -1,4 +1,4 @@
-.qr-display-container {
+.qrDisplayContainer {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
@@ -14,32 +14,32 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.qr-header {
+.qrHeader {
     text-align: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     padding-bottom: 12px;
 }
 
-.qr-title {
+.qrTitle {
     font-size: 18px;
     font-weight: 600;
     color: #fff;
     margin: 0 0 6px 0;
 }
 
-.timer-display {
+.timerDisplay {
     font-size: 14px;
     color: rgba(255, 255, 255, 0.8);
     font-weight: 500;
 }
 
-.timer-countdown {
+.timerCountdown {
     color: #FF5722;
     font-weight: 600;
     font-family: 'Courier New', monospace;
 }
 
-.qr-content {
+.qrContent {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -48,7 +48,7 @@
     justify-content: center;
 }
 
-.qr-code-wrapper {
+.qrCodeWrapper {
     background: white;
     padding: 12px;
     border-radius: 10px;
@@ -56,14 +56,14 @@
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.qr-code-image {
+.qrCodeImage {
     display: block;
     width: 200px;
     height: 200px;
     border-radius: 8px;
 }
 
-.qr-loading {
+.qrLoading {
     width: 200px;
     height: 200px;
     display: flex;
@@ -74,7 +74,7 @@
     color: #666;
 }
 
-.loading-spinner {
+.loadingSpinner {
     width: 40px;
     height: 40px;
     border: 3px solid rgba(0, 0, 0, 0.1);
@@ -88,25 +88,25 @@
     100% { transform: rotate(360deg); }
 }
 
-.qr-instructions {
+.qrInstructions {
     text-align: center;
     max-width: 300px;
 }
 
-.instruction-text {
+.instructionText {
     font-size: 16px;
     color: #fff;
     margin: 0 0 4px 0;
     font-weight: 500;
 }
 
-.instruction-subtitle {
+.instructionSubtitle {
     font-size: 14px;
     color: rgba(255, 255, 255, 0.7);
     margin: 0;
 }
 
-.security-notice {
+.securityNotice {
     display: flex;
     align-items: flex-start;
     gap: 8px;
@@ -118,22 +118,22 @@
     box-sizing: border-box;
 }
 
-.notice-icon {
+.noticeIcon {
     font-size: 18px;
     flex-shrink: 0;
 }
 
-.notice-text {
+.noticeText {
     font-size: 13px;
     color: #fff;
     line-height: 1.4;
 }
 
-.notice-text strong {
+.noticeText strong {
     color: #FFC107;
 }
 
-.qr-actions {
+.qrActions {
     display: flex;
     gap: 12px;
     justify-content: space-between;
@@ -141,7 +141,7 @@
     border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.action-button {
+.actionButton {
     flex: 1;
     padding: 10px 16px;
     border: none;
@@ -156,89 +156,89 @@
     gap: 6px;
 }
 
-.action-button.secondary {
+.actionButton.secondary {
     background: rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.action-button.secondary:hover {
+.actionButton.secondary:hover {
     background: rgba(255, 255, 255, 0.2);
     color: #fff;
     transform: translateY(-1px);
 }
 
-.action-button.primary {
+.actionButton.primary {
     background: #9C27B0;
     color: white;
 }
 
-.action-button.primary:hover {
+.actionButton.primary:hover {
     background: #7B1FA2;
     transform: translateY(-1px);
 }
 
 @media (max-width: 400px) {
-    .qr-display-container {
+    .qrDisplayContainer {
         padding: 16px;
         gap: 16px;
         min-height: auto;
     }
 
-    .qr-header {
+    .qrHeader {
         padding-bottom: 12px;
     }
 
-    .qr-title {
+    .qrTitle {
         font-size: 16px;
         margin: 0 0 6px 0;
     }
 
-    .timer-display {
+    .timerDisplay {
         font-size: 13px;
     }
 
-    .qr-content {
+    .qrContent {
         gap: 14px;
     }
 
-    .qr-code-wrapper {
+    .qrCodeWrapper {
         padding: 12px;
     }
 
-    .qr-code-image,
-    .qr-loading {
+    .qrCodeImage,
+    .qrLoading {
         width: 160px;
         height: 160px;
     }
 
-    .instruction-text {
+    .instructionText {
         font-size: 14px;
     }
 
-    .instruction-subtitle {
+    .instructionSubtitle {
         font-size: 12px;
     }
 
-    .security-notice {
+    .securityNotice {
         padding: 10px;
         gap: 8px;
     }
 
-    .notice-icon {
+    .noticeIcon {
         font-size: 16px;
     }
 
-    .notice-text {
+    .noticeText {
         font-size: 12px;
     }
 
-    .qr-actions {
+    .qrActions {
         gap: 10px;
         padding-top: 12px;
     }
 
-    .action-button {
+    .actionButton {
         padding: 10px 12px;
         font-size: 13px;
         gap: 4px;
@@ -246,42 +246,42 @@
 }
 
 @media (max-width: 320px) {
-    .qr-display-container {
+    .qrDisplayContainer {
         padding: 12px;
         gap: 12px;
     }
 
-    .qr-title {
+    .qrTitle {
         font-size: 15px;
     }
 
-    .timer-display {
+    .timerDisplay {
         font-size: 12px;
     }
 
-    .qr-code-image,
-    .qr-loading {
+    .qrCodeImage,
+    .qrLoading {
         width: 140px;
         height: 140px;
     }
 
-    .qr-code-wrapper {
+    .qrCodeWrapper {
         padding: 10px;
     }
 
-    .instruction-text {
+    .instructionText {
         font-size: 13px;
     }
 
-    .instruction-subtitle {
+    .instructionSubtitle {
         font-size: 11px;
     }
 
-    .notice-text {
+    .noticeText {
         font-size: 11px;
     }
 
-    .action-button {
+    .actionButton {
         padding: 8px 10px;
         font-size: 12px;
     }
