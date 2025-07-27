@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Page, useNavigation} from "../../components/AppRouter";
 import {getPatternTypeDisplay} from "../../utils/PatternUtils";
 import {UserPatternData} from "../../models/user-pattern-data";
-import "./PasswordManager.css";
+import styles from "./PasswordManager.module.css";
 import {UserPatternService} from "../../services/firestore-service.ts";
 import {firebaseApp} from "../../firebase/firebase-config.ts";
 import {PatternType} from "../../models/pattern-type.ts";
@@ -141,21 +141,21 @@ const PasswordManager: React.FC = () => {
 
     if (!authChecked || isLoading) {
         return (
-            <div className="manager-container">
-                <div className="header">
-                    <button className="back-button" onClick={goBack}>
+            <div className={styles.managerContainer}>
+                <div className={styles.header}>
+                    <button className={styles.backButton} onClick={goBack}>
                         ← Back
                     </button>
-                    <h1 className="page-title">Password Manager</h1>
-                    <button className="refresh-button" onClick={handleRefresh} disabled={isLoading}>
+                    <h1 className={styles.pageTitle}>Password Manager</h1>
+                    <button className={styles.refreshButton} onClick={handleRefresh} disabled={isLoading}>
                         🔄
                     </button>
                 </div>
 
-                <div className="passwords-container">
-                    <div className="loading-screen">
-                        <div className="spinner"></div>
-                        <div className="loading-text">
+                <div className={styles.passwordsContainer}>
+                    <div className={styles.loadingScreen}>
+                        <div className={styles.spinner}></div>
+                        <div className={styles.loadingText}>
                             {!authChecked ? "Checking authentication..." : "Loading your passwords..."}
                         </div>
                     </div>
@@ -166,23 +166,23 @@ const PasswordManager: React.FC = () => {
 
     if (!firebaseApp.auth().currentUser) {
         return (
-            <div className="manager-container">
-                <div className="header">
-                    <button className="back-button" onClick={goBack}>
+            <div className={styles.managerContainer}>
+                <div className={styles.header}>
+                    <button className={styles.backButton} onClick={goBack}>
                         ← Back
                     </button>
-                    <h1 className="page-title">Password Manager</h1>
-                    <button className="refresh-button" onClick={handleRefresh}>
+                    <h1 className={styles.pageTitle}>Password Manager</h1>
+                    <button className={styles.refreshButton} onClick={handleRefresh}>
                         🔄
                     </button>
                 </div>
 
-                <div className="passwords-container">
-                    <div className="no-passwords">
-                        <div className="no-passwords-icon">🔐</div>
+                <div className={styles.passwordsContainer}>
+                    <div className={styles.noPasswords}>
+                        <div className={styles.noPassswordsIcon}>🔐</div>
                         <h3>Authentication Required</h3>
                         <p>Please log in to view your saved passwords</p>
-                        <button className="refresh-button" onClick={handleRefresh} style={{marginTop: '20px'}}>
+                        <button className={styles.refreshButton} onClick={handleRefresh} style={{marginTop: '20px'}}>
                             Try Again
                         </button>
                     </div>
@@ -193,30 +193,30 @@ const PasswordManager: React.FC = () => {
 
     return (
         <>
-            <div className="manager-container">
-                <div className="header">
-                    <button className="back-button" onClick={goBack}>
+            <div className={styles.managerContainer}>
+                <div className={styles.header}>
+                    <button className={styles.backButton} onClick={goBack}>
                         ← Back
                     </button>
-                    <h1 className="page-title">Password Manager</h1>
-                    <button className="refresh-button" onClick={handleRefresh} disabled={isLoading}>
+                    <h1 className={styles.pageTitle}>Password Manager</h1>
+                    <button className={styles.refreshButton} onClick={handleRefresh} disabled={isLoading}>
                         🔄
                     </button>
                 </div>
 
-                <div className="passwords-container">
-                    <div className="search-container">
-                        <div className="search-input-wrapper">
+                <div className={styles.passwordsContainer}>
+                    <div className={styles.searchContainer}>
+                        <div className={styles.searchInputWrapper}>
                             <input
                                 type="text"
-                                className="search-input"
+                                className={styles.searchInput}
                                 placeholder="Search by website..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                             {searchQuery && (
                                 <button
-                                    className="clear-search-button"
+                                    className={styles.clearSearchButton}
                                     onClick={clearSearch}
                                     title="Clear search"
                                 >
@@ -227,8 +227,8 @@ const PasswordManager: React.FC = () => {
                     </div>
 
                     {Object.keys(groupedPasswords).length === 0 ? (
-                        <div className="no-passwords">
-                            <div className="no-passwords-icon">
+                        <div className={styles.noPasswords}>
+                            <div className={styles.noPasswordsIcon}>
                                 {searchQuery ? '🔍' : '🔐'}
                             </div>
                             <h3>
@@ -242,7 +242,7 @@ const PasswordManager: React.FC = () => {
                             </p>
                             {!searchQuery && (
                                 <button
-                                    className="refresh-button"
+                                    className={styles.refreshButton}
                                     onClick={handleRefresh}
                                     style={{ marginTop: '20px' }}
                                 >
@@ -253,49 +253,49 @@ const PasswordManager: React.FC = () => {
                     ) : (
                         <>
                             {searchQuery && (
-                                <div className="search-results-info">
+                                <div className={styles.searchResultsInfo}>
                                     Found {filteredPasswords.length} password{filteredPasswords.length !== 1 ? 's' : ''} matching "{searchQuery}"
                                 </div>
                             )}
-                            <div className="passwords-list">
+                            <div className={styles.passwrodsList}>
                                 {Object.entries(groupedPasswords).map(([domain, passwords]) => (
-                                    <div key={domain} className="password-group">
-                                        <div className="password-header" onClick={() => toggleWebsiteExpansion(domain)}>
-                                            <div className="website-info">
-                                                <div className="website-icon">🌐</div>
-                                                <div className="website-details">
-                                                    <div className="website-name">{domain}</div>
-                                                    <div className="password-count">{passwords.length} passwords saved</div>
+                                    <div key={domain} className={styles.passwordGroup}>
+                                        <div className={styles.passwordHeader} onClick={() => toggleWebsiteExpansion(domain)}>
+                                            <div className={styles.websiteInfo}>
+                                                <div className={styles.websiteIcon}>🌐</div>
+                                                <div className={styles.websiteDetails}>
+                                                    <div className={styles.websiteName}>{domain}</div>
+                                                    <div className={styles.passwordCount}>{passwords.length} passwords saved</div>
                                                 </div>
                                             </div>
-                                            <div className="expand-icon">
+                                            <div className={styles.expandIcon}>
                                                 {expandedWebsites.has(domain) ? '▼' : '▶'}
                                             </div>
                                         </div>
 
                                         {expandedWebsites.has(domain) && (
-                                            <div className="password-details-group">
+                                            <div className={styles.passwordDetailsGroup}>
                                                 {passwords.map((password) => (
                                                     <div
                                                         key={password.uuid}
-                                                        className="password-tile"
+                                                        className={styles.passwordTile}
                                                         onClick={() => handlePasswordView(password)}
                                                     >
-                                                        <div className="pattern-type-icon">
+                                                        <div className={styles.patternTypeIcon}>
                                                             {getPatternTypeDisplay(password.pattern_type).icon}
                                                         </div>
-                                                        <div className="password-info">
-                                                            <div className="password-main-text">
+                                                        <div className={styles.passwordInfo}>
+                                                            <div className={styles.passwordMainText}>
                                                                 {getPatternTypeDisplay(password.pattern_type).name}
                                                                 <br/>
                                                                 {password.username}
                                                             </div>
-                                                            <div className="password-date-text">
+                                                            <div className={styles.passwordDateText}>
                                                                 {new Date(password.createdAt).toLocaleDateString()}
                                                             </div>
                                                         </div>
                                                         <button
-                                                            className="delete-button"
+                                                            className={styles.deleteButton}
                                                             onClick={(e) => handlePasswordDelete(e, password)}
                                                             title="Delete password"
                                                         >
@@ -314,33 +314,33 @@ const PasswordManager: React.FC = () => {
             </div>
 
             {showDeleteModal && passwordToDelete && (
-                <div className="modal-overlay">
-                    <div className="delete-confirmation-modal">
-                        <div className="modal-header">
-                            <div className="modal-icon">⚠️</div>
-                            <h3 className="modal-title">Delete Password</h3>
+                <div className={styles.modalOverlay}>
+                    <div className={styles.deleteConfirmationModal}>
+                        <div className={styles.modalHeader}>
+                            <div className={styles.modalIcon}>⚠️</div>
+                            <h3 className={styles.modalTitle}>Delete Password</h3>
                         </div>
 
-                        <div className="modal-content">
-                            <p className="modal-message">
+                        <div className={styles.modalContent}>
+                            <p className={styles.modalMessage}>
                                 Are you sure you want to delete the password for{' '}
                                 <strong>{passwordToDelete.username}</strong> on{' '}
                                 <strong>{passwordToDelete.website_url}</strong>?
                             </p>
-                            <p className="modal-warning">
+                            <p className={styles.modalWarning}>
                                 This action cannot be undone.
                             </p>
                         </div>
 
-                        <div className="modal-actions">
+                        <div className={styles.modalActions}>
                             <button
-                                className="modal-button secondary"
+                                className={`${styles.modalButton} ${styles.secondary}`}
                                 onClick={cancelDelete}
                             >
                                 Cancel
                             </button>
                             <button
-                                className="modal-button danger"
+                                className={`${styles.modalButton} ${styles.danger}`}
                                 onClick={confirmDelete}
                             >
                                 Delete

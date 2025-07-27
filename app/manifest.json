@@ -56,7 +56,7 @@
     "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://*.firebaseapp.com https://*.firebase.googleapis.com https://www.googleapis.com https://apis.google.com https://accounts.google.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://www.gstatic.com https://firestore.googleapis.com wss://firestore.googleapis.com https://cloud.myscript.com https://webdemoapi.myscript.com wss://cloud.myscript.com wss://webdemoapi.myscript.com; frame-src https://*.firebaseapp.com https://firestore.googleapis.com https://accounts.google.com"
   },
   "oauth2": {
-    "client_id": "26624816574-5s831tuu4hesfk3jfdffjksllspt38ma.apps.googleusercontent.com",
+    "client_id": "26624816574-to693njv3klcemclp52l5tcpp6n5p6nv.apps.googleusercontent.com",
     "scopes": [
       "openid",
       "email",
