@@ -48,14 +48,13 @@ const MathFormulaPassword: React.FC = () => {
         const operatorScore = calculateOperatorScore(formula);
         const symbolScore = calculateSymbolScore(formula);
         const symbolCountScore = calculateSymbolCountScore(formula);
-        const structuralScore = calculateStructuralScore(formula);
         const functionScore = calculateFunctionScore(formula);
         const nestingScore = calculateNestingScore(formula);
         const complexityPenalty = calculateComplexityPenalty(formula);
 
-        score = lengthScore + operatorScore + symbolScore + symbolCountScore + structuralScore + functionScore + nestingScore - complexityPenalty;
+        score = lengthScore + operatorScore + symbolScore + symbolCountScore + functionScore + nestingScore - complexityPenalty;
 
-        if (score >= 24) return 'Hard';
+        if (score >= 20) return 'Hard';
         else if (score >= 12) return 'Normal';
         else return 'Easy';
     };
@@ -157,23 +156,6 @@ const MathFormulaPassword: React.FC = () => {
         const uniqueCount = uniqueSymbols.size;
         
         return uniqueCount;
-    };
-
-    const calculateStructuralScore = (formula: string): number => {
-        let score = 0;
-        
-        const superscripts = (formula.match(/\^/g) || []).length;
-        const subscripts = (formula.match(/_/g) || []).length;
-        const fractions = (formula.match(/\\frac/g) || []).length;
-        
-        score += Math.min(superscripts, 3);
-        score += Math.min(subscripts, 3);
-        score += fractions * 2;
-        
-        if (formula.includes('\\begin{')) score += 3;
-        if (formula.includes('\\matrix') || formula.includes('\\pmatrix')) score += 2;
-        
-        return Math.min(score, 8);
     };
 
     const calculateFunctionScore = (formula: string): number => {
